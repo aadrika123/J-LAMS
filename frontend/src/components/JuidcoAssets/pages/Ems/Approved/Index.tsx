@@ -201,7 +201,6 @@ const Approved = () => {
             data.push(rowData);
         });
 
-
         autoTable(doc, {
             head: [columns.map(column => column.header)],
             body: data,
