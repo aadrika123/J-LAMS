@@ -1,0 +1,38 @@
+//!-----------------------------------------------------------------//
+// !Author: Jaideep
+// !status: Open
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model assets_list {
+  id Int @id @default(autoincrement())
+
+  type_of_assets          String?
+  asset_sub_category_name String?
+  assets_category_type    String?
+  khata_no                String?
+  plot_no                 String?
+  ward_no                 String?
+  address                 String?
+  depreciation_method     String?
+  apreciation_method      String?
+  blue_print              String?
+  ownership_doc           String?
+  type_of_land            String?
+  area                    String?
+  order_no                String?
+  order_date              String?
+  acquisition             String?
+  from_whom_acquired      String?
+  mode_of_acquisition     String?
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
