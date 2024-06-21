@@ -167,7 +167,7 @@ const View = ({ id }: { id: number }) => {
         plot_no: data?.data?.plot_no,
         blue_print: data?.data?.blue_print,
         ownership_doc: data?.data?.ownership_doc,
-        ward_no: data?.ward_no,
+        ward_no: data?.data?.ward_no,
         address: data?.data?.address,
         depreciation_method: "Straight Line Method",
         apreciation_method: "Percentage Based Approach",
@@ -287,11 +287,10 @@ const View = ({ id }: { id: number }) => {
 
                 </div>
                 {isOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-
-                        <div className="bg-white p-6 rounded-lg">
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto z-50 pt-10">
+                        <div className="bg-white p-16 rounded-lg h-auto bg-opacity-100 relative z-50">
                             <button
-                                className="mt-4 px-4 py-2 flex mb-5 bg-red-500 text-white rounded-md ml-auto"
+                                className="mt-12 px-4 py-2 flex mb-5 bg-red-500 text-white rounded-md ml-auto"
                                 onClick={togglePopup}
                             >
                                 Close
@@ -489,7 +488,19 @@ const View = ({ id }: { id: number }) => {
                                                 value={values.order_date}
                                                 label="Order Date"
                                                 name="order_date"
-                                                type="text"
+                                                type="date"
+                                                onKeyPress={(e: any) => {
+                                                    if (
+                                                        (
+                                                            (e.key >= "a" || e.key >= "z") ||
+                                                            (e.key <= "A" || e.key <= "Z") ||
+                                                            (e.key <= "0" || e.key <= "9") ||
+                                                            e.key === " "
+                                                        )
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
 
                                             <div>
@@ -501,11 +512,14 @@ const View = ({ id }: { id: number }) => {
                                                     onChange={handleFile2Change}
 
                                                 />
-                                                <img src={data?.data?.blue_print} alt="img" width="20" height="20" />
+                                                {data?.data?.blue_print === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
+                                    : <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                                }
+                                                {/* <img src={data?.data?.blue_print} alt="img" width="20" height="20" /> */}
                                             </div>
 
                                             <div>
-                                                <label>Blue Print</label>
+                                                <label>OwnerShip Doc</label>
                                                 <input
                                                     type='file'
                                                     name='ownership_doc'
@@ -513,7 +527,11 @@ const View = ({ id }: { id: number }) => {
                                                     onChange={handleFile1Change}
 
                                                 />
-                                                <img src={data?.data?.ownership_doc} alt="img" width="20" height="20" />
+                                                
+                                                    {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
+                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                }
+                                                {/* <img src={data?.data?.ownership_doc} alt="img" width="20" height="20" /> */}
                                             </div>
 
                                             <InputBox
@@ -524,7 +542,7 @@ const View = ({ id }: { id: number }) => {
                                                 placeholder={"Enter Your Address"}
                                                 name="address"
                                                 type="text"
-                                                maxLength={30}
+                                                maxLength={100}
                                                 onKeyPress={(e: any) => {
                                                     if (
                                                         !(
@@ -600,17 +618,17 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Ward No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>no data found </> : <>{data?.data?.ward_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Type</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>no data found</> : <>{data?.data?.type_of_assets}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>No data found</> : <>{data?.data?.type_of_assets}</>}</p>
                 </div>
 
                 <div className=''>
                     <InnerHeading>Address</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.address === null ? <>no data found </> : <>{data?.data?.address}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.address === null ? <>No data found </> : <>{data?.data?.address}</>}</p>
                 </div>
             </div>
 
@@ -625,12 +643,12 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Order Number</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_no === null ? <>no data found </> : <>{data?.data?.order_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_no === null ? <>No data found </> : <>{data?.data?.order_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Order Date</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_date === null ? <>no data found </> : <>{data?.data?.order_date}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_date === null ? <>No data found </> : <>{data?.data?.order_date}</>}</p>
                 </div>
 
             </div>
@@ -646,47 +664,47 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Asset Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>no data found </> : <>{data?.data?.type_of_assets}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>No data found </> : <>{data?.data?.type_of_assets}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Sub-Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.asset_sub_category_name === null ? <>no data found </> : <>{data?.data?.asset_sub_category_name}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.asset_sub_category_name === null ? <>No data found </> : <>{data?.data?.asset_sub_category_name}</>}</p>
                 </div>
 
                 <div>
-                    <InnerHeading>Asset Category Tyoe</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.assets_category_type === null ? <>no data found </> : <>{data?.data?.assets_category_type}</>}</p>
+                    <InnerHeading>Asset Category Type</InnerHeading>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.assets_category_type === null ? <>No data found </> : <>{data?.data?.assets_category_type}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Area</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.area === null ? <>no data found </> : <>{data?.data?.area}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.area === null ? <>No data found </> : <>{data?.data?.area}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Khata No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.khata_no === null ? <>no data found </> : <>{data?.data?.khata_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.khata_no === null ? <>No data found </> : <>{data?.data?.khata_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Plot No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.plot_no === null ? <>no data found </> : <>{data?.data?.plot_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.plot_no === null ? <>No data found </> : <>{data?.data?.plot_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Ward No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>no data found </> : <>{data?.data?.ward_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Type of Land</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_land === null ? <>no data found </> : <>{data?.data?.type_of_land}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_land === null ? <>No data found </> : <>{data?.data?.type_of_land}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Method of Depreciation</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.depreciation_method === null ? <>no data found </> : <>{data?.data?.depreciation_method}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.depreciation_method === null ? <>No data found </> : <>{data?.data?.depreciation_method}</>}</p>
                 </div>
 
                 <div></div>
@@ -695,18 +713,35 @@ const View = ({ id }: { id: number }) => {
                     <InnerHeading>OwnerShip Document</InnerHeading>
                     <div className='flex'>
                         {data?.data?.ownership_doc?.endsWith('.pdf') ? (
-                            <iframe src={data?.data?.ownership_doc}></iframe>
+                            <>
+                                {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                    <iframe src={data?.data?.ownership_doc}></iframe>
+                                }
+                            </>
                         ) : (
-                            <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                            <>
+                                {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
+                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                }
+                            </>
                         )}
                     </div>
                 </div>
                 <div>
                     <InnerHeading>BluePrint</InnerHeading>
                     {data?.data?.blue_print?.endsWith('.pdf') ? (
-                        <iframe src={data?.data?.blue_print}></iframe>
+                        <>
+                            {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                <iframe src={data?.data?.blue_print}></iframe>
+                            }
+
+                        </>
                     ) : (
-                        <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                        <>
+                            {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                            }
+                        </>
                     )}
                 </div>
             </div>

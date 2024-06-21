@@ -1,8 +1,11 @@
 "use client";
-import goBack from "@/utils/helper";
+// import goBack from "@/utils/helper";
 import React from "react";
 
 export const NotFound = () => {
+  const handleClick = () => {
+    window.location.replace("/lams/apply/approve-application")
+  }
   return (
     <>
       <section className="bg-white dark:bg-gray-900 min-h-screen flex items-center justify-center">
@@ -17,7 +20,7 @@ export const NotFound = () => {
             <p className="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">
               Sorry, we cannot find that page. Kindly contact admin for more details.
             </p>
-            <p onClick={goBack} className="text-[#4338CA] cursor-pointer">
+            <p onClick={handleClick} className="text-[#4338CA] cursor-pointer">
               Go Back
             </p>
           </div>

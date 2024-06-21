@@ -38,7 +38,8 @@ class AssetManagementController {
 
         } catch (error) {
               return res.json({
-                "status": false,
+                  "status": false,
+                  "type":"DUPLICATE",
                 "message": "Error occured while saving Assets",
                 "meta-data": {
                     apiId,

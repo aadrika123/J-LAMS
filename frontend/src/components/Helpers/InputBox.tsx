@@ -53,6 +53,7 @@ const InputBox: React.FC<InputBoxProps> = (props) => {
           onKeyPress={(e) => props.onKeyPress && props.onKeyPress(e)}
           // onKeyDown={(e) => props.onKeyDown && props.onKeyDown(e)}
           disabled={props.disabled}
+          
         />
 
         {props.touched && props.error && (

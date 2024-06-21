@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Customer from "@/assets/icons/cv 1.png";
 import PrimaryButton from '@/components/Helpers/Button';
-import goBack from '@/utils/helper';
+// import goBack from '@/utils/helper';
 import InputBox from '@/components/Helpers/InputBox';
 import toast, { Toaster } from 'react-hot-toast';
 import { Formik, FormikHelpers } from 'formik';
@@ -89,7 +89,10 @@ export const DashboardMain = () => {
         toast.success("Assets successfully added");
         resetForm();
         window.location.replace("/lams/apply/approve-application");
-      } else {
+      } else if (res?.data?.type === "DUPLICATE") {
+        toast.error("Duplicate asset data found. Please check and try again.");
+        }
+      else {
         toast.error("Failed to add assets");
       }
     } catch (error) {
@@ -97,6 +100,7 @@ export const DashboardMain = () => {
       console.error('Error submitting data:', error);
     }
   };
+
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -252,7 +256,11 @@ export const DashboardMain = () => {
         return false;
     }
     return true;
-};
+ };
+  
+  const handleBack = () => {
+   window.location.replace("/lams/apply/approve-application");
+  }
 
 
   return (
@@ -262,7 +270,7 @@ export const DashboardMain = () => {
           <PrimaryButton
             buttonType="button"
             variant={"cancel"}
-            onClick={goBack}
+            onClick={handleBack}
             className="border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center"
           >
             <i>
@@ -606,6 +614,18 @@ export const DashboardMain = () => {
                   type="date"
                   placeholder={"Enter order date"}
                   required={true}
+                  onKeyPress={(e: any) => {
+                    if (
+                      (
+                        (e.key >= "a" || e.key >= "z") ||
+                        (e.key <= "A" || e.key <= "Z") ||
+                        (e.key <= "0" || e.key <= "9") ||
+                        e.key === " "
+                      )
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
 
                 <InputBox
@@ -616,7 +636,7 @@ export const DashboardMain = () => {
                   placeholder={"Enter Your Address"}
                   name="address"
                   type="text"
-                  maxLength={50}
+                  maxLength={100}
                   onKeyPress={(e: any) => {
                     if (
                       !(
@@ -639,6 +659,18 @@ export const DashboardMain = () => {
                   placeholder={"Enter Your Acquisition"}
                   name="acquisition"
                   type="date"
+                   onKeyPress={(e: any) => {
+                    if (
+                      (
+                        (e.key >= "a" || e.key >= "z") ||
+                        (e.key <= "A" || e.key <= "Z") ||
+                        (e.key <= "0" || e.key <= "9") ||
+                        e.key === " "
+                      )
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
 
                   <SelectForNoApi

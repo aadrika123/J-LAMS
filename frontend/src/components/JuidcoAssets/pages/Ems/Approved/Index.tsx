@@ -16,11 +16,11 @@ import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Jhar from "@/assets/icons/jhar.png"
-import PrimaryButton from '@/components/Helpers/Button';
+// import PrimaryButton from '@/components/Helpers/Button';
 import docs from '@/assets/icons/doc.svg'
 import pdf from '@/assets/icons/pdf.svg'
 import notfound from '@/assets/icons/not-found.png'
-import goBack from '@/utils/helper';
+// import goBack from '@/utils/helper';
 import autoTable from 'jspdf-autotable'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast';
@@ -58,22 +58,26 @@ const Approved = () => {
                 url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}`,
                 method: "GET",
             });
+  
+
             return res?.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
             return [];
         }
     };
-
+    
     const fetchDataforDelete = async (id: number) => {
         try {
             const res = await axios({
                 url: `${ASSETS.LIST.delete}?id=${id}`,
                 method: "POST",
             });
+              
             if (res?.data?.status === true) {
                 toast.success("Assets succesfully deleted");
                 window.location.reload()
+                
                 return res?.data?.data;
             } else {
                 toast.error("Failed to delete");
@@ -83,6 +87,8 @@ const Approved = () => {
             return [];
         }
     };
+
+
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets', currentPage, debouncedSearch, filter],
@@ -221,14 +227,12 @@ const Approved = () => {
     };
 
 
-
-
     return (
         <div>
             <Toaster />
             <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
                 <div className="flex items-center">
-                    <PrimaryButton
+                    {/* <PrimaryButton
                         buttonType="button"
                         variant={"cancel"}
                         onClick={goBack}
@@ -261,7 +265,7 @@ const Approved = () => {
                             </svg>
                         </i>
                         Back
-                    </PrimaryButton>
+                    </PrimaryButton> */}
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
@@ -282,7 +286,7 @@ const Approved = () => {
 
                         <select onChange={handleFilterChange}
                             value={filter} className="block p-2.5 mt-3 rounded-md w-[13rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 rounded-e-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500">
-                            <option value=""> by Asset Type</option>
+                            <option disabled> by Asset Type</option>
                             <option value="">All</option>
                             <option value="Immovable">Immovable</option>
                             <option value="Land">Land</option>
@@ -339,9 +343,9 @@ const Approved = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data?.data?.map((item: any) => (
+                            {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <td className="px-6 py-4">{item?.id}</td>
+                                    <td className="px-6 py-4">{index + 1}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type}</td>
                                     <td className="px-6 py-4">{item?.type_of_land}</td>
@@ -419,23 +423,27 @@ const Approved = () => {
                                                 </svg>
                                             </Link>
 
-                                            <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                    <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
-                                                    <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
-                                                </svg>
-                                            </button>
+                                            {role == 'Field Officer' ? null : (
+                                                <>
+                                                    <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                            <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
+                                                            <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
+                                                        </svg>
+                                                    </button>
 
-                                            {showModal && (
-                                                <div className="fixed inset-0 flex items-center justify-center">
-                                                    <div className="bg-white p-6 rounded shadow-md">
-                                                        <p>Are you sure you want to delete this asset?</p>
-                                                        <div className="mt-4">
-                                                            <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded mr-2">Yes</button>
-                                                            <button onClick={cancelDelete} className="px-4 py-2 bg-gray-300 rounded">No</button>
+                                                    {showModal && (
+                                                        <div className="fixed inset-0 flex items-center justify-center">
+                                                            <div className="bg-white p-6 rounded shadow-md">
+                                                                <p>Are you sure you want to delete this asset?</p>
+                                                                <div className="mt-4">
+                                                                    <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded mr-2">Yes</button>
+                                                                    <button onClick={cancelDelete} className="px-4 py-2 bg-gray-300 rounded">No</button>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
+                                                    )}
+                                                </>
                                             )}
 
                                             {/* <button onClick={() => handleDelete(item?.id)} className="text-sm  p-2 text-blue-600 dark:text-blue-500 hover:underline">
