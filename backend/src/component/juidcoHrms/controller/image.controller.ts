@@ -15,11 +15,23 @@ import { Request, Response } from "express";
 //   "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";
 
 
-const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";
+// const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload"
 
-const DMS_GET = "https://jharkhandegovernance.com/dms/backend/document/view-by-reference"
+// const DMS_GET = "https://jharkhandegovernance.com/dms/backend/document/view-by-reference"
+
+
+// const dmsUrl = "http://172.18.1.55:888/backend/document/upload";
+
+// const DMS_GET = "http://172.18.1.55:888/backend/document/view-by-reference"
+
 
 class DMSFileHandlerController {
+  private dmsUrl: string;
+  private DMS_GET:string;
+  constructor() {
+     this.dmsUrl = process.env.DMS_UPLOAD as string
+     this.DMS_GET = process.env.DMS_GET as string
+  }
   upload = async (
     req: Request,
     res: Response,
@@ -43,7 +55,7 @@ class DMSFileHandlerController {
         ...formData.getHeaders(),
       };
 
-      const response = await axios.post(dmsUrl, formData, { headers });
+      const response = await axios.post(this.dmsUrl, formData, { headers });
 
       return res.status(200).json({
         status: true,
@@ -78,7 +90,7 @@ class DMSFileHandlerController {
         token: "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
       };
       const response = await axios.post(
-        DMS_GET,
+        this.DMS_GET,
         { referenceNo: req.params.referenceNo },
         { headers }
       );
@@ -129,10 +141,10 @@ class DMSFileHandlerController {
         ...formData.getHeaders(),
       };
 
-      const response = await axios.post(dmsUrl, formData, { headers });
+      const response = await axios.post(this.dmsUrl, formData, { headers });
       const refNo = response.data.data.ReferenceNo;
       const resData: any = await axios.post(
-        DMS_GET,
+        this.DMS_GET,
         { referenceNo: refNo },
         { headers: { token: headers.token } }
       );

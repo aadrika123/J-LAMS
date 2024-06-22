@@ -79,7 +79,7 @@ const View = ({ id }: { id: number }) => {
             if (res?.data?.status === 201) {
                 toast.success("Assets successfully updated");
                 setIsOpen(false);
-                window.location.reload()
+                // window.location.reload()
                 return res.data?.data;
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE"){
                 toast.error("Duplicate asset data found. Please check and try again.");
