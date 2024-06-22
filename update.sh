@@ -23,8 +23,8 @@ migrate() {
     cd backend
     echo "creating/updating the env file ..."
     echo "PORT=$SERVER_PORT\nDATABASE_URL=\"postgresql://postgres:$DB_PASSWORD@localhost:5432/lams?schema=public\"" > .env
-    echo "DMS_UPLOAD = "https://jharkhandegovernance.com/dms/backend/document/upload"" >> .env
-    echo "DMS_UPLOAD = "https://jharkhandegovernance.com/dms/backend/document/view-by-reference"" >> .env
+    echo "DMS_UPLOAD = "https://aadrikainfomedia.com/dms/backend/document/upload"" >> .env
+    echo "DMS_UPLOAD = "https://aadrikainfomedia.com/dms/backend/document/view-by-reference"" >> .env
 
     npx prisma migrate deploy
     cd ..
