@@ -178,6 +178,7 @@ class AssetManagementController {
                 "message": "Error occured while Updating Assets",
                 "meta-data": {
                     apiId,
+                    "type":"DUPLICATE",
                     action: "POST",
                     version: "1.0",
                 },

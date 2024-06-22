@@ -58,7 +58,6 @@ const Approved = () => {
                 url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}`,
                 method: "GET",
             });
-  
 
             return res?.data?.data;
         } catch (error) {
@@ -87,8 +86,6 @@ const Approved = () => {
             return [];
         }
     };
-
-
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets', currentPage, debouncedSearch, filter],
@@ -286,7 +283,7 @@ const Approved = () => {
 
                         <select onChange={handleFilterChange}
                             value={filter} className="block p-2.5 mt-3 rounded-md w-[13rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 rounded-e-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500">
-                            <option disabled> by Asset Type</option>
+                            <option disabled selected> by Asset Type</option>
                             <option value="">All</option>
                             <option value="Immovable">Immovable</option>
                             <option value="Land">Land</option>

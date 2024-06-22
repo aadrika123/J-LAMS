@@ -81,6 +81,8 @@ const View = ({ id }: { id: number }) => {
                 setIsOpen(false);
                 window.location.reload()
                 return res.data?.data;
+            } else if (res?.data?.['meta-data']?.type === "DUPLICATE"){
+                toast.error("Duplicate asset data found. Please check and try again.");
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -88,6 +90,7 @@ const View = ({ id }: { id: number }) => {
         }
     };
 
+    
 
 
     useEffect(() => {
@@ -287,6 +290,7 @@ const View = ({ id }: { id: number }) => {
 
                 </div>
                 {isOpen && (
+                    
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto z-50 pt-10">
                         <div className="bg-white p-16 rounded-lg h-auto bg-opacity-100 relative z-50">
                             <button
@@ -513,8 +517,8 @@ const View = ({ id }: { id: number }) => {
 
                                                 />
                                                 {data?.data?.blue_print === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
-                                    : <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
-                                }
+                                                    : <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                                                }
                                                 {/* <img src={data?.data?.blue_print} alt="img" width="20" height="20" /> */}
                                             </div>
 
@@ -527,10 +531,10 @@ const View = ({ id }: { id: number }) => {
                                                     onChange={handleFile1Change}
 
                                                 />
-                                                
-                                                    {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
-                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
-                                }
+
+                                                {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
+                                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                                }
                                                 {/* <img src={data?.data?.ownership_doc} alt="img" width="20" height="20" /> */}
                                             </div>
 
