@@ -348,7 +348,7 @@ const Approved = () => {
                                     <td className="px-6 py-4">{item?.type_of_land}</td>
                                     <td className="px-6 py-4">{item?.khata_no}</td>
                                     <td className="px-6 py-4">{item?.area}</td>
-                                    <td className="px-6 py-4">{item?.blue_print?.length ? <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> : <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}</td>
+                                    <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ? <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> : <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}</td>
 
                                     <td className="px-6 py-4">
                                         <div className='flex'>

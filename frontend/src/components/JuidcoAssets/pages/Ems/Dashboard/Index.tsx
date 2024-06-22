@@ -67,6 +67,56 @@ export const DashboardMain = () => {
     order_date: Yup.string().required("Enter order date"),
   });
 
+   const handleUpload = async () => {
+    if (file1) {
+      const data = new FormData();
+      data.append('file', file1);
+      try {
+        const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+        console.log("Response:", response);
+
+        if (response.status === 200) {
+          return {
+            blue_print: response?.data?.data,
+          };
+        } else {
+          toast.error("Failed to upload files");
+        }
+      } catch (error) {
+        console.error("Error uploading files:", error);
+        toast.error("Error uploading files");
+      }
+    } else {
+      console.log("not uploaded")
+    }
+  };
+
+
+  const handleUpload2 = async () => {
+    if (file2) {
+      const data = new FormData();
+      data.append('file', file2);
+      try {
+        const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+        console.log("Response:", response);
+
+        if (response.status === 200) {
+          return {
+            ownership_doc: response?.data?.data
+          };
+        } else {
+          toast.error("Failed to upload files");
+        }
+      } catch (error) {
+        console.error("Error uploading files:", error);
+        toast.error("Error uploading files");
+      }
+    } else {
+       console.log("not uploaded")
+    }
+  };
+
+
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
     console.log("values", values)
     try {
@@ -191,55 +241,7 @@ export const DashboardMain = () => {
 };
 
 
-  const handleUpload = async () => {
-    if (file1) {
-      const data = new FormData();
-      data.append('file', file1);
-      try {
-        const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-        console.log("Response:", response);
-
-        if (response.status === 200) {
-          return {
-            blue_print: response?.data?.data,
-          };
-        } else {
-          toast.error("Failed to upload files");
-        }
-      } catch (error) {
-        console.error("Error uploading files:", error);
-        toast.error("Error uploading files");
-      }
-    } else {
-      console.log("not uploaded")
-    }
-  };
-
-
-  const handleUpload2 = async () => {
-    if (file2) {
-      const data = new FormData();
-      data.append('file', file2);
-      try {
-        const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-        console.log("Response:", response);
-
-        if (response.status === 200) {
-          return {
-            ownership_doc: response?.data?.data
-          };
-        } else {
-          toast.error("Failed to upload files");
-        }
-      } catch (error) {
-        console.error("Error uploading files:", error);
-        toast.error("Error uploading files");
-      }
-    } else {
-       console.log("not uploaded")
-    }
-  };
-
+ 
  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = new Date(e.target.value);
     const currentDate = new Date();

@@ -56,17 +56,58 @@ const View = ({ id }: { id: number }) => {
         }
     };
 
+    const handleUploadOwnershipDoc = async () => {
+        if (file1) {
+            const data = new FormData();
+            data.append('file', file1);
+            try {
+                const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+                if (response.status === 200) {
+                    return {
+                        ownership_doc: response?.data?.data
+                    };
+                } else {
+                    toast.error("Failed to upload files");
+                }
+            } catch (error) {
+                console.error("Error uploading files:", error);
+                toast.error("Error uploading files");
+            }
+        }
+    };
+
+    const handleUploadBlueprint = async () => {
+        if (file2) {
+            const data = new FormData();
+            data.append('file', file2);
+            try {
+                const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+                if (response.status === 200) {
+                    return {
+                        blue_print: response?.data?.data
+                    };
+                } else {
+                    toast.error("Failed to upload files");
+                }
+            } catch (error) {
+                console.error("Error uploading files:", error);
+                toast.error("Error uploading files");
+            }
+        }
+    };
+
     const dataUpdate = async (values: any) => {
         try {
-            const fileUploadData = await handleUpload();
+            const fileUploadData = await handleUploadOwnershipDoc();
             if (fileUploadData) {
-                values.blue_print = fileUploadData.blue_print;
+                values.ownership_doc = fileUploadData.ownership_doc;
             }
 
-            const fileUploadData2 = await handleUpload2();
+            const fileUploadData2 = await handleUploadBlueprint();
             if (fileUploadData2) {
-                values.ownership_doc = fileUploadData2.ownership_doc;
+                values.blue_print = fileUploadData2.blue_print;
             }
+
             const res = await axios({
                 url: `${ASSETS.LIST.update}?id=${id}`,
                 method: "POST",
@@ -81,17 +122,49 @@ const View = ({ id }: { id: number }) => {
                 setIsOpen(false);
                 window.location.reload()
                 return res.data?.data;
-            } else if (res?.data?.['meta-data']?.type === "DUPLICATE"){
+            } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
                 toast.error("Duplicate asset data found. Please check and try again.");
             }
         } catch (error) {
-            console.error("Error fetching data:", error);
+            console.error("Error updating data:", error);
             return [];
         }
     };
 
-    
 
+    // const dataUpdate = async (values: any) => {
+    //     try {
+    //         const fileUploadData = await handleUpload();
+    //         if (fileUploadData) {
+    //             values.blue_print = fileUploadData.blue_print;
+    //         }
+
+    //         const fileUploadData2 = await handleUpload2();
+    //         if (fileUploadData2) {
+    //             values.ownership_doc = fileUploadData2.ownership_doc;
+    //         }
+    //         const res = await axios({
+    //             url: `${ASSETS.LIST.update}?id=${id}`,
+    //             method: "POST",
+    //             data: {
+    //                 id,
+    //                 ...values
+    //             }
+    //         });
+
+    //         if (res?.data?.status === 201) {
+    //             toast.success("Assets successfully updated");
+    //             setIsOpen(false);
+    //             // window.location.reload()
+    //             return res.data?.data;
+    //         } else if (res?.data?.['meta-data']?.type === "DUPLICATE"){
+    //             toast.error("Duplicate asset data found. Please check and try again.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching data:", error);
+    //         return [];
+    //     }
+    // };
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -181,61 +254,128 @@ const View = ({ id }: { id: number }) => {
     }
 
     const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFile1(e.target.files?.[0] ?? null);
+        const fileInput = e.target;
+        const file = fileInput.files?.[0] ?? null;
+
+        if (!file) {
+            setFile1(null);
+            return;
+        }
+
+        const fileType = file.type;
+        const fileSize = file.size;
+
+        const acceptedFileTypes = ["image/png", "image/jpeg", "application/pdf"];
+
+        if (!acceptedFileTypes.includes(fileType)) {
+            alert("Please upload a PNG, JPEG, or PDF file.");
+            setFile1(null);
+            fileInput.value = "";
+            return;
+        }
+
+        if (fileSize / 1024 >= 2048) {
+            alert("Cannot upload more than 2MB data!");
+            setFile1(null);
+            fileInput.value = "";
+            return;
+        }
+
+        setFile1(file);
     };
+
+
+    // const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   setFile2(e.target.files?.[0] ?? null);
+    // };
 
     const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFile2(e.target.files?.[0] ?? null);
-    };
+        const fileInput = e.target;
+        const file = fileInput.files?.[0] ?? null;
 
-    const handleUpload = async () => {
-        if (file1) {
-            const data = new FormData();
-            data.append('file', file1);
-            try {
-                const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-                console.log("Response:", response);
-
-                if (response.status === 200) {
-                    return {
-                        blue_print: response?.data?.data,
-                    };
-                } else {
-                    toast.error("Failed to upload files");
-                }
-            } catch (error) {
-                console.error("Error uploading files:", error);
-                toast.error("Error uploading files");
-            }
-        } else {
-            console.log("not uploaded")
+        if (!file) {
+            setFile2(null);
+            return;
         }
-    };
 
+        const fileType = file.type;
+        const fileSize = file.size;
 
-    const handleUpload2 = async () => {
-        if (file2) {
-            const data = new FormData();
-            data.append('file', file2);
-            try {
-                const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-                console.log("Response:", response);
+        const acceptedFileTypes = ["image/png", "image/jpeg", "application/pdf"];
 
-                if (response.status === 200) {
-                    return {
-                        ownership_doc: response?.data?.data
-                    };
-                } else {
-                    toast.error("Failed to upload files");
-                }
-            } catch (error) {
-                console.error("Error uploading files:", error);
-                toast.error("Error uploading files");
-            }
-        } else {
-            console.log("not uploaded")
+        if (!acceptedFileTypes.includes(fileType)) {
+            alert("Please upload a PNG, JPEG, or PDF file.");
+            setFile2(null);
+            fileInput.value = "";
+            return;
         }
+
+        if (fileSize / 1024 >= 2048) {
+            alert("Cannot upload more than 2MB data!");
+            setFile2(null);
+            fileInput.value = "";
+            return;
+        }
+
+        setFile2(file);
     };
+
+    // const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setFile1(e.target.files?.[0] ?? null);
+    // };
+
+    // const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setFile2(e.target.files?.[0] ?? null);
+    // };
+
+    // const handleUpload = async () => {
+    //     if (file1) {
+    //         const data = new FormData();
+    //         data.append('file', file1);
+    //         try {
+    //             const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+    //             console.log("Response:", response);
+
+    //             if (response.status === 200) {
+    //                 return {
+    //                     blue_print: response?.data?.data,
+    //                 };
+    //             } else {
+    //                 toast.error("Failed to upload files");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error uploading files:", error);
+    //             toast.error("Error uploading files");
+    //         }
+    //     } else {
+    //         console.log("not uploaded")
+    //     }
+    // };
+
+
+    // const handleUpload2 = async () => {
+    //     if (file2) {
+    //         const data = new FormData();
+    //         data.append('file', file2);
+    //         try {
+    //             const response = await axios.post(`${ASSETS.LIST.validate}`, data);
+    //             console.log("Response:", response);
+
+    //             if (response.status === 200) {
+    //                 return {
+    //                     ownership_doc: response?.data?.data
+    //                 };
+    //             } else {
+    //                 toast.error("Failed to upload files");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error uploading files:", error);
+    //             toast.error("Error uploading files");
+    //         }
+    //     } else {
+    //         console.log("not uploaded")
+    //     }
+    // };
 
     return (
         <div>
@@ -290,7 +430,7 @@ const View = ({ id }: { id: number }) => {
 
                 </div>
                 {isOpen && (
-                    
+
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto z-50 pt-10">
                         <div className="bg-white p-16 rounded-lg h-auto bg-opacity-100 relative z-50">
                             <button
@@ -507,20 +647,7 @@ const View = ({ id }: { id: number }) => {
                                                 }}
                                             />
 
-                                            <div>
-                                                <label>Blue Print</label>
-                                                <input
-                                                    type='file'
-                                                    name='blue_print'
-                                                    className="mb-4 p-1 border border-slate-400 w-full rounded"
-                                                    onChange={handleFile2Change}
 
-                                                />
-                                                {data?.data?.blue_print === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
-                                                    : <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
-                                                }
-                                                {/* <img src={data?.data?.blue_print} alt="img" width="20" height="20" /> */}
-                                            </div>
 
                                             <div>
                                                 <label>OwnerShip Doc</label>
@@ -531,11 +658,45 @@ const View = ({ id }: { id: number }) => {
                                                     onChange={handleFile1Change}
 
                                                 />
-
-                                                {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] font-bold'> No image found</p>
-                                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
-                                                }
+                                                {data?.data?.ownership_doc?.endsWith('.pdf') ? (
+                                                    <>
+                                                        {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                                            <iframe src={data?.data?.ownership_doc}></iframe>
+                                                        }
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                                            <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                                        }
+                                                    </>
+                                                )}
                                                 {/* <img src={data?.data?.ownership_doc} alt="img" width="20" height="20" /> */}
+                                            </div>
+
+                                            <div>
+                                                <label>Blue Print</label>
+                                                <input
+                                                    type='file'
+                                                    name='blue_print'
+                                                    className="mb-4 p-1 border border-slate-400 w-full rounded"
+                                                    onChange={handleFile2Change}
+
+                                                />
+                                                {data?.data?.blue_print?.endsWith('.pdf') ? (
+                                                    <>
+                                                        {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                                            <iframe src={data?.data?.blue_print}></iframe>
+                                                        }
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                                            <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                                                        }
+                                                    </>
+                                                )}
+                                                {/* <img src={data?.data?.blue_print} alt="img" width="20" height="20" /> */}
                                             </div>
 
                                             <InputBox
@@ -719,13 +880,13 @@ const View = ({ id }: { id: number }) => {
                         {data?.data?.ownership_doc?.endsWith('.pdf') ? (
                             <>
                                 {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
-                                    <iframe src={data?.data?.ownership_doc}></iframe>
+                                    <iframe className='w-50 h-40 mt-4 overflow-x-hidden' src={data?.data?.ownership_doc}></iframe>
                                 }
                             </>
                         ) : (
                             <>
                                 {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
-                                    : <img src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                    : <img  className='w-40 h-20 mt-4' src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
                                 }
                             </>
                         )}
@@ -736,14 +897,13 @@ const View = ({ id }: { id: number }) => {
                     {data?.data?.blue_print?.endsWith('.pdf') ? (
                         <>
                             {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
-                                <iframe src={data?.data?.blue_print}></iframe>
+                                <iframe className='w-50 h-40 mt-4 overflow-hidden' src={data?.data?.blue_print}></iframe>
                             }
-
                         </>
                     ) : (
                         <>
                             {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
-                                <img src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                                <img className='w-40 h-20 mt-4' src={data?.data?.blue_print} alt="img" width="100" height="30" />
                             }
                         </>
                     )}
