@@ -105,6 +105,7 @@ class DMSFileHandlerController {
       });
     }
   };
+  
 
   uploadAndGetUrl = async (
     req: Request,
@@ -113,6 +114,7 @@ class DMSFileHandlerController {
   ): Promise<Response> => {
     try {
       const file: any = req.file;
+      console.log("file", file)
       const hashed = crypto
         .createHash("SHA256")
         .update(file?.buffer)
@@ -122,6 +124,7 @@ class DMSFileHandlerController {
       formData.append("file", file?.buffer, file?.mimetype);
       formData.append("tags", file?.originalname.substring(0, 7));
 
+      console.log("formData", formData)
       const headers = {
         "x-digest": hashed,
         token: "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
@@ -130,6 +133,8 @@ class DMSFileHandlerController {
       };
 
       const response = await axios.post(dmsUrl, formData, { headers });
+            console.log("response", response)
+
       const refNo = response.data.data.ReferenceNo;
       const resData: any = await axios.post(
         DMS_GET,
@@ -145,7 +150,9 @@ class DMSFileHandlerController {
           action: "POST",
           version: "1.0",
         },
+
         data: resData.data.data.fullPath,
+        
       });
     } catch (error) {
       return res.status(500).json({

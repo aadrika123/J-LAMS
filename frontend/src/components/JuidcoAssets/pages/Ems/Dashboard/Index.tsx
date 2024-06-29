@@ -63,7 +63,7 @@ export const DashboardMain = () => {
     assets_category_type: Yup.mixed().required("Choose Asset Category Type"),
     area: Yup.string().required("Area. is Required"),
     type_of_land: Yup.string().required("Type of Land"),
-    order_no: Yup.string().required("Enter order number"),
+    // order_no: Yup.string().required("Enter order number"),
     order_date: Yup.string().required("Enter order date"),
   });
 
@@ -581,14 +581,14 @@ export const DashboardMain = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.order_no}
-                  error={errors.order_no}
-                  touched={touched.order_no}
+                  // error={errors.order_no}
+                  // touched={touched.order_no}
                   label="Order No."
                   name="order_no"
                   type="text"
                   placeholder={"Enter order no."}
-                  required={true}
-                   maxLength={10}
+                  // required={true}
+                  maxLength={10}
                   onKeyPress={(e: any) => {
                     if (
                       !(

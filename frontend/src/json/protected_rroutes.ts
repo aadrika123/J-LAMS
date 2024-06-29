@@ -12,7 +12,8 @@ const data = [
     user_type: "Field Officer",
     paths: [
      "/lams/apply/approve-application",
-    "/lams/apply/view",
+      "/lams/apply/view",
+    "lams/apply/request-update"
     ],
   },
 ];

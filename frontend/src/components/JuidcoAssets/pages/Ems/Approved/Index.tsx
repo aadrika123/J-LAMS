@@ -24,6 +24,8 @@ import notfound from '@/assets/icons/not-found.png'
 import autoTable from 'jspdf-autotable'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast';
+import Papa from 'papaparse';
+
 
 import { jsPDF } from "jspdf";
 
@@ -38,6 +40,7 @@ const Approved = () => {
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [count, setCount] = useState<any>(0)
 
     const queryClient = useQueryClient();
 
@@ -47,7 +50,7 @@ const Approved = () => {
         { name: "ASSET TYPE" },
         { name: "LAND TYPE" },
         { name: "KHATA NO." },
-        { name: "AREA" },
+        { name: "AREA (sqFt.)" },
         { name: "DOCUMENTS" },
         { name: "ACTIONS" },
     ]
@@ -65,18 +68,32 @@ const Approved = () => {
             return [];
         }
     };
-    
+
+    const fetchDataCount = async () => {
+        try {
+            const res = await axios({
+                url: `${ASSETS.LIST.count}`,
+                method: "GET",
+            });
+            setCount(res?.data?.data)
+            return res?.data?.data;
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            return [];
+        }
+    };
+
     const fetchDataforDelete = async (id: number) => {
         try {
             const res = await axios({
                 url: `${ASSETS.LIST.delete}?id=${id}`,
                 method: "POST",
             });
-              
+
             if (res?.data?.status === true) {
                 toast.success("Assets succesfully deleted");
                 window.location.reload()
-                
+
                 return res?.data?.data;
             } else {
                 toast.error("Failed to delete");
@@ -112,6 +129,10 @@ const Approved = () => {
             setRole(user_details?.user_type)
         }
     }, []);
+
+    useEffect(() => {
+        fetchDataCount()
+    }, [])
 
     if (isLoading) {
         return (
@@ -185,11 +206,11 @@ const Approved = () => {
 
         const columns = [
             { header: "#" },
-            { header: "ASSET header" },
+            { header: "ASSET NAME" },
             { header: "ASSET TYPE" },
             { header: "LAND TYPE" },
             { header: "KHATA NO." },
-            { header: "AREA" },
+            { header: "AREA (sqFt.)" },
         ]
 
         const data: any = [];
@@ -223,6 +244,31 @@ const Approved = () => {
         setFilter(e.target.value);
     };
 
+
+
+    const handleExportCSV = () => {
+        const csvData = data?.data?.map((row: any) => [row.id, row.type_of_assets, row.assets_category_type, row.type_of_land, row.khata_no, row.area]);
+
+        csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'assets_data.csv');
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+    // console.log("count", count)
+    const total = count?.data?.length
+    const status1Items = count?.data?.filter((item: any) => item.status === 1).length;
+    const statusMinus1Items = count?.data?.filter((item: any) => item.status === -1).length;
 
     return (
         <div>
@@ -272,8 +318,7 @@ const Approved = () => {
             </div>
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-5">
-                <div className="flex gap-5 overflow-x-auto sm:rounded-lg p-5">
-
+                <div className="flex gap-5 justify-between overflow-x-auto sm:rounded-lg p-5">
 
                     <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
@@ -290,6 +335,26 @@ const Approved = () => {
 
                         </select>
                     </div>
+
+                    {role == 'Field Officer' ?
+                        <div>
+                            <div id="toast-message-cta" className="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:bg-gray-800 dark:text-gray-400" role="alert">
+                                <div className="flex">
+                                    <div className="ms-3 text-sm font-normal">
+                                        <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Update Request</span> <br></br>
+                                        <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>{total || 0}</span></span><br></br>
+                                        <span className="mb-1 text-sm font-semibold text-[#42ca38] dark:text-white"> Approved- <span className='text-slate-700'>{status1Items || 0} ,</span></span>
+                                        <span className="mb-1 text-sm font-semibold text-[#ca3838] dark:text-white"> Rejected- <span className='text-slate-700'>{statusMinus1Items || 0} , </span></span>
+                                        <span className="mb-1 text-sm font-semibold text-[#cab938] dark:text-white"> Pending- <span className='text-slate-700'>{total - (status1Items + statusMinus1Items) || 0}</span></span>
+                                        <div className="mb-2 text-sm font-normal mt-2">Hi Field Officer , you have recieved request for some changes in assets data. </div>
+                                        <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Requests</Link>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        : null}
+
                 </div>
 
                 <div className="flex justify-end mb-5">
@@ -318,12 +383,18 @@ const Approved = () => {
                             </button>
                         </div>
 
-                        <button onClick={handleDownload} type="submit" className="inline-flex  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
-                            Export
+                        <button onClick={handleDownload} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
+                            Export PDF
                         </button>
 
+                        <button onClick={handleExportCSV} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
+                            Export CSV
+                        </button>
+
+
+
                         {role == 'Field Officer' ? null : (
-                            <button onClick={handleClick} type="submit" className="inline-flex w-[15rem]  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
+                            <button onClick={handleClick} type="submit" className="inline-flex w-[16rem]  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
                                 + Add New Asset
                             </button>
                         )}

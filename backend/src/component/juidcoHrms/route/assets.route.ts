@@ -60,6 +60,13 @@ class AssetManagementRoute {
         (req: Request, res: Response, next: NextFunction) =>
           this.ulbmasterController.get(req, res, next, "0107"),
     ); //0107
+
+    app
+      .route(`${baseUrl}/assets/update-list`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getAllUpdated(req, res, next, "0108"),
+    ); //0108
   }
 
   

@@ -20,6 +20,7 @@ type Urls = {
     getAll?: string;
     validate?: string;
     count?: string;
+    getAllData?: string;
   };
 };
 
@@ -31,7 +32,7 @@ export const ASSETS: Urls = {
     delete: "/asset/delete-single",
     update: "/asset/update-single",
     getAll: "/assets/ulb-get",
-    validate: "dms/upload-gets"
-    // /assets/ulb-get?
+    validate: "dms/upload-gets",
+    count:"/assets/update-list?limit=7",
   },
 };

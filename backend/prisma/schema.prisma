@@ -12,12 +12,11 @@ datasource db {
 }
 
 model assets_list {
-  id Int @id @default(autoincrement())
-
+  id                      Int @id @default(autoincrement())
   type_of_assets          String?
   asset_sub_category_name String?
   assets_category_type    String?
-  khata_no                String? @unique
+  khata_no                String? 
   plot_no                 String?
   ward_no                 String?
   address                 String?
@@ -32,7 +31,69 @@ model assets_list {
   acquisition             String?
   from_whom_acquired      String?
   mode_of_acquisition     String?
+  asset_list              assets_list_change_log[]
+  asset_update            asset_update_req[]
+  status                  Int?      @default(0) // 0: pending, 1: approved, -1: rejected
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model assets_list_change_log {
+  id                      Int @id @default(autoincrement())
+
+  type_of_assets          String?
+  asset_sub_category_name String?
+  assets_category_type    String?
+  khata_no                String?
+  plot_no                 String?
+  ward_no                 String?
+  address                 String?
+  depreciation_method     String?
+  apreciation_method      String?
+  blue_print              String?
+  ownership_doc           String?
+  type_of_land            String?
+  area                    String?
+  order_no                String?
+  order_date              String?
+  acquisition             String?
+  from_whom_acquired      String?
+  mode_of_acquisition     String?
+  status                  Int?     @default(0) // 0: pending, 1: approved, -1: rejected
+
+  asset                   assets_list  @relation(fields: [assetId], references: [id])
+  assetId                 Int
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+
+model asset_update_req {
+  id                    Int       @id @default(autoincrement())
+  type_of_assets        String?
+  asset_sub_category_name String?
+  assets_category_type  String?
+  khata_no              String?
+  plot_no               String?
+  ward_no               String?
+  address               String?
+  depreciation_method   String?
+  apreciation_method    String?
+  blue_print            String?
+  ownership_doc         String?
+  type_of_land          String?
+  area                  String?
+  order_no              String?
+  order_date            String?
+  acquisition           String?
+  from_whom_acquired    String?
+  mode_of_acquisition   String?
+  status                Int?     @default(0) // 0: pending, 1: approved, -1: rejected
+
+  asset                 assets_list  @relation(fields: [assetId], references: [id])
+  assetId               Int
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }

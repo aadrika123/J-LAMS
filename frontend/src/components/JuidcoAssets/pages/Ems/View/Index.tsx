@@ -30,13 +30,12 @@ const View = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
     const params = new URLSearchParams(searchParams);
     const status = params.get('status');
-
-
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
     const [ulbName, setUlbName] = useState<string>("");
     const [file1, setFile1] = useState<File | null>(null);
     const [file2, setFile2] = useState<File | null>(null);
+    const [, setRole] = useState('');
 
 
     const togglePopup = () => {
@@ -55,6 +54,16 @@ const View = ({ id }: { id: number }) => {
             return [];
         }
     };
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const data = sessionStorage.getItem("user_details");
+            const user_details = JSON.parse(data as string);
+            console.log(user_details?.user_type, "user");
+            setRole(user_details?.user_type)
+        }
+    }, []);
+
 
     const handleUploadOwnershipDoc = async () => {
         if (file1) {
@@ -107,6 +116,8 @@ const View = ({ id }: { id: number }) => {
             if (fileUploadData2) {
                 values.blue_print = fileUploadData2.blue_print;
             }
+           
+            values.status = 0
 
             const res = await axios({
                 url: `${ASSETS.LIST.update}?id=${id}`,
@@ -120,7 +131,7 @@ const View = ({ id }: { id: number }) => {
             if (res?.data?.status === 201) {
                 toast.success("Assets successfully updated");
                 setIsOpen(false);
-                window.location.reload()
+                // window.location.reload()
                 return res.data?.data;
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
                 toast.error("Duplicate asset data found. Please check and try again.");
@@ -130,41 +141,6 @@ const View = ({ id }: { id: number }) => {
             return [];
         }
     };
-
-
-    // const dataUpdate = async (values: any) => {
-    //     try {
-    //         const fileUploadData = await handleUpload();
-    //         if (fileUploadData) {
-    //             values.blue_print = fileUploadData.blue_print;
-    //         }
-
-    //         const fileUploadData2 = await handleUpload2();
-    //         if (fileUploadData2) {
-    //             values.ownership_doc = fileUploadData2.ownership_doc;
-    //         }
-    //         const res = await axios({
-    //             url: `${ASSETS.LIST.update}?id=${id}`,
-    //             method: "POST",
-    //             data: {
-    //                 id,
-    //                 ...values
-    //             }
-    //         });
-
-    //         if (res?.data?.status === 201) {
-    //             toast.success("Assets successfully updated");
-    //             setIsOpen(false);
-    //             // window.location.reload()
-    //             return res.data?.data;
-    //         } else if (res?.data?.['meta-data']?.type === "DUPLICATE"){
-    //             toast.error("Duplicate asset data found. Please check and try again.");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching data:", error);
-    //         return [];
-    //     }
-    // };
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -320,63 +296,6 @@ const View = ({ id }: { id: number }) => {
         setFile2(file);
     };
 
-    // const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setFile1(e.target.files?.[0] ?? null);
-    // };
-
-    // const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setFile2(e.target.files?.[0] ?? null);
-    // };
-
-    // const handleUpload = async () => {
-    //     if (file1) {
-    //         const data = new FormData();
-    //         data.append('file', file1);
-    //         try {
-    //             const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-    //             console.log("Response:", response);
-
-    //             if (response.status === 200) {
-    //                 return {
-    //                     blue_print: response?.data?.data,
-    //                 };
-    //             } else {
-    //                 toast.error("Failed to upload files");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error uploading files:", error);
-    //             toast.error("Error uploading files");
-    //         }
-    //     } else {
-    //         console.log("not uploaded")
-    //     }
-    // };
-
-
-    // const handleUpload2 = async () => {
-    //     if (file2) {
-    //         const data = new FormData();
-    //         data.append('file', file2);
-    //         try {
-    //             const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-    //             console.log("Response:", response);
-
-    //             if (response.status === 200) {
-    //                 return {
-    //                     ownership_doc: response?.data?.data
-    //                 };
-    //             } else {
-    //                 toast.error("Failed to upload files");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error uploading files:", error);
-    //             toast.error("Error uploading files");
-    //         }
-    //     } else {
-    //         console.log("not uploaded")
-    //     }
-    // };
-
     return (
         <div>
             <Toaster />
@@ -417,17 +336,21 @@ const View = ({ id }: { id: number }) => {
                         Back
                     </PrimaryButton>
                 </div>
-
-
             </div>
 
             <div>
+                <div className='mb-5'>
+                    {status && status == 'clicked' && (
+                        <div>
+                            Update Status - {data?.data?.status === 1 ? <div className='text-green-500'>Approved</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ?<div className='text-red-500'>Rejected</div>: null}
+                        </div>
+                    )}
+                </div>
+                
                 <div className="flex justify-end animate-pulse">
-
                     {status && status == 'clicked' && (
                         <PrimaryButton buttonType="submit" variant="primary" onClick={togglePopup}>Update</PrimaryButton>
                     )}
-
                 </div>
                 {isOpen && (
 
@@ -602,7 +525,7 @@ const View = ({ id }: { id: number }) => {
                                                     },
                                                     {
                                                         id: 2,
-                                                        name: "esidential Land",
+                                                        name: "Residential Land",
                                                     }
                                                 ]}
                                             />
@@ -778,22 +701,22 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>ULB Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{ulbName}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{ulbName}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Ward No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Type</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>No data found</> : <>{data?.data?.type_of_assets}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_assets === null ? <>No data found</> : <>{data?.data?.type_of_assets}</>}</p>
                 </div>
 
                 <div className=''>
                     <InnerHeading>Address</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.address === null ? <>No data found </> : <>{data?.data?.address}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.address === null ? <>No data found </> : <>{data?.data?.address}</>}</p>
                 </div>
             </div>
 
@@ -808,12 +731,12 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Order Number</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_no === null ? <>No data found </> : <>{data?.data?.order_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.order_no === null ? <>No data found </> : <>{data?.data?.order_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Order Date</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.order_date === null ? <>No data found </> : <>{data?.data?.order_date}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.order_date === null ? <>No data found </> : <>{data?.data?.order_date}</>}</p>
                 </div>
 
             </div>
@@ -829,47 +752,47 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Asset Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_assets === null ? <>No data found </> : <>{data?.data?.type_of_assets}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_assets === null ? <>No data found </> : <>{data?.data?.type_of_assets}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Sub-Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.asset_sub_category_name === null ? <>No data found </> : <>{data?.data?.asset_sub_category_name}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.asset_sub_category_name === null ? <>No data found </> : <>{data?.data?.asset_sub_category_name}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Category Type</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.assets_category_type === null ? <>No data found </> : <>{data?.data?.assets_category_type}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.assets_category_type === null ? <>No data found </> : <>{data?.data?.assets_category_type}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Area</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.area === null ? <>No data found </> : <>{data?.data?.area}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.area === null ? <>No data found </> : <>{data?.data?.area}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Khata No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.khata_no === null ? <>No data found </> : <>{data?.data?.khata_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.khata_no === null ? <>No data found </> : <>{data?.data?.khata_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Plot No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.plot_no === null ? <>No data found </> : <>{data?.data?.plot_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.plot_no === null ? <>No data found </> : <>{data?.data?.plot_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Ward No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Type of Land</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.type_of_land === null ? <>No data found </> : <>{data?.data?.type_of_land}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_land === null ? <>No data found </> : <>{data?.data?.type_of_land}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Method of Depreciation</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold'>{data?.data?.depreciation_method === null ? <>No data found </> : <>{data?.data?.depreciation_method}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.depreciation_method === null ? <>No data found </> : <>{data?.data?.depreciation_method}</>}</p>
                 </div>
 
                 <div></div>
@@ -886,7 +809,7 @@ const View = ({ id }: { id: number }) => {
                         ) : (
                             <>
                                 {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
-                                    : <img  className='w-40 h-20 mt-4' src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                    : <img  className='w-20 h-20 mt-4' src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
                                 }
                             </>
                         )}
@@ -903,7 +826,7 @@ const View = ({ id }: { id: number }) => {
                     ) : (
                         <>
                             {data?.data?.blue_print === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
-                                <img className='w-40 h-20 mt-4' src={data?.data?.blue_print} alt="img" width="100" height="30" />
+                                <img className='w-20 h-20 mt-4' src={data?.data?.blue_print} alt="img" width="100" height="30" />
                             }
                         </>
                     )}
@@ -916,4 +839,3 @@ const View = ({ id }: { id: number }) => {
 }
 
 export default View
-
