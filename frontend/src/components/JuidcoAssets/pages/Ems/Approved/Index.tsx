@@ -40,7 +40,7 @@ const Approved = () => {
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
-    const [count, setCount] = useState<any>(0)
+    const [count, setCount] = useState<any>([])
 
     const queryClient = useQueryClient();
 
@@ -75,7 +75,7 @@ const Approved = () => {
                 url: `${ASSETS.LIST.count}`,
                 method: "GET",
             });
-            setCount(res?.data?.data)
+            setCount(res?.data)
             return res?.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -93,8 +93,8 @@ const Approved = () => {
             if (res?.data?.status === true) {
                 toast.success("Assets succesfully deleted");
                 window.location.reload()
-
                 return res?.data?.data;
+                
             } else {
                 toast.error("Failed to delete");
             }
@@ -109,7 +109,6 @@ const Approved = () => {
         queryFn: () => fetchData(currentPage, debouncedSearch, filter),
         staleTime: 1000,
     });
-
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -265,10 +264,6 @@ const Approved = () => {
         document.body.removeChild(link);
 
     }
-    // console.log("count", count)
-    const total = count?.data?.length
-    const status1Items = count?.data?.filter((item: any) => item.status === 1).length;
-    const statusMinus1Items = count?.data?.filter((item: any) => item.status === -1).length;
 
     return (
         <div>
@@ -338,24 +333,26 @@ const Approved = () => {
 
                     {role == 'Field Officer' ?
                         <div>
+                            <span className="relative flex h-4 w-4 float-right mt-[-0.5rem]">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#67c068] opacity-75 "></span>
+                                <span className="relative inline-flex rounded-full h-4 w-4 bg-[#42ca38] "></span>
+                            </span>
                             <div id="toast-message-cta" className="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:bg-gray-800 dark:text-gray-400" role="alert">
                                 <div className="flex">
                                     <div className="ms-3 text-sm font-normal">
                                         <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Update Request</span> <br></br>
-                                        <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>{total || 0}</span></span><br></br>
-                                        <span className="mb-1 text-sm font-semibold text-[#42ca38] dark:text-white"> Approved- <span className='text-slate-700'>{status1Items || 0} ,</span></span>
-                                        <span className="mb-1 text-sm font-semibold text-[#ca3838] dark:text-white"> Rejected- <span className='text-slate-700'>{statusMinus1Items || 0} , </span></span>
-                                        <span className="mb-1 text-sm font-semibold text-[#cab938] dark:text-white"> Pending- <span className='text-slate-700'>{total - (status1Items + statusMinus1Items) || 0}</span></span>
-                                        <div className="mb-2 text-sm font-normal mt-2">Hi Field Officer , you have recieved request for some changes in assets data. </div>
+                                        <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({count?.data?.count || 0})</span></span><br></br>
+                                        <span className="mb-1 text-sm font-semibold text-[#42ca38] dark:text-white"> Approved- <span className='text-slate-700'>{count?.data?.status1Items || 0} ,</span></span>
+                                        <span className="mb-1 text-sm font-semibold text-[#ca3838] dark:text-white"> Rejected- <span className='text-slate-700'>{count?.data?.statusMinus1Items || 0} , </span></span>
+                                        <span className="mb-1 text-sm font-semibold text-[#cab938] dark:text-white"> Pending- <span className='text-slate-700'>{count?.data?.count - (count?.data?.status1Items + count?.data?.statusMinus1Items) || 0}</span></span>
+                                        <div className="mb-2 text-sm font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved request for some changes in assets data. </div>
                                         <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Requests</Link>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                         : null}
-
-                </div>
+                    </div>
 
                 <div className="flex justify-end mb-5">
                     <div className="relative">

@@ -35,7 +35,7 @@ const View = ({ id }: { id: number }) => {
     const [ulbName, setUlbName] = useState<string>("");
     const [file1, setFile1] = useState<File | null>(null);
     const [file2, setFile2] = useState<File | null>(null);
-    const [, setRole] = useState('');
+    const [role, setRole] = useState('');
 
 
     const togglePopup = () => {
@@ -116,7 +116,7 @@ const View = ({ id }: { id: number }) => {
             if (fileUploadData2) {
                 values.blue_print = fileUploadData2.blue_print;
             }
-           
+
             values.status = 0
 
             const res = await axios({
@@ -127,20 +127,22 @@ const View = ({ id }: { id: number }) => {
                     ...values
                 }
             });
-
+            
             if (res?.data?.status === 201) {
-                toast.success("Assets successfully updated");
+                toast.success("Assets successfully send for approval.");
                 setIsOpen(false);
-                // window.location.reload()
-                return res.data?.data;
+                window.location.reload()
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
                 toast.error("Duplicate asset data found. Please check and try again.");
+            } else if (res?.data?.status === 400) {
+                toast.success("There is already a pending update request for this asset");
             }
         } catch (error) {
             console.error("Error updating data:", error);
             return [];
         }
     };
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -342,11 +344,15 @@ const View = ({ id }: { id: number }) => {
                 <div className='mb-5'>
                     {status && status == 'clicked' && (
                         <div>
-                            Update Status - {data?.data?.status === 1 ? <div className='text-green-500'>Approved</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ?<div className='text-red-500'>Rejected</div>: null}
+                            {role === 'Field Officer' ? null :
+                                <>
+                                    Update Status - {data?.data?.status === 1 ? <div className='text-green-500'>Approved</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : null}
+                                </>
+                            }
                         </div>
                     )}
                 </div>
-                
+
                 <div className="flex justify-end animate-pulse">
                     {status && status == 'clicked' && (
                         <PrimaryButton buttonType="submit" variant="primary" onClick={togglePopup}>Update</PrimaryButton>
@@ -413,29 +419,53 @@ const View = ({ id }: { id: number }) => {
                                                     }
                                                 ]}
                                             />
+                                            {values?.type_of_assets === 'Drainage' && (
+                                                <>
+                                                    <SelectForNoApi
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.asset_sub_category_name}
+                                                        label="Asset Sub-Category Name"
+                                                        name="asset_sub_category_name"
+                                                        required={true}
+                                                        placeholder={"Choose Asset Sub Category Name"}
+                                                        options={[
 
-                                            <SelectForNoApi
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.asset_sub_category_name}
-                                                label="Asset Sub-Category Name"
-                                                name="asset_sub_category_name"
-                                                placeholder={"Choose Asset Sub Category Name"}
-                                                options={[
-                                                    {
-                                                        id: 1,
-                                                        name: "Hospitals",
-                                                    },
-                                                    {
-                                                        id: 2,
-                                                        name: "Library",
-                                                    },
-                                                    {
-                                                        id: 3,
-                                                        name: "Parking",
-                                                    }
-                                                ]}
-                                            />
+                                                            {
+                                                                id: 1,
+                                                                name: "Core Asset Drainage",
+                                                            },
+
+                                                        ]}
+                                                    />
+                                                </>
+                                            )}
+
+                                            {values?.type_of_assets !== 'Drainage' && (
+                                                <SelectForNoApi
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.asset_sub_category_name}
+                                                    label="Asset Sub-Category Name"
+                                                    name="asset_sub_category_name"
+                                                    required={true}
+                                                    placeholder={"Choose Asset Sub Category Name"}
+                                                    options={[
+                                                        {
+                                                            id: 1,
+                                                            name: "Hospitals",
+                                                        },
+                                                        {
+                                                            id: 2,
+                                                            name: "Library",
+                                                        },
+                                                        {
+                                                            id: 3,
+                                                            name: "Parking",
+                                                        }
+                                                    ]}
+                                                />
+                                            )}
 
                                             <SelectForNoApi
                                                 onChange={handleChange}
@@ -655,6 +685,8 @@ const View = ({ id }: { id: number }) => {
                                                         placeholder={"Enter Apreciation Method"}
                                                         name="apreciation_method"
                                                         type="text"
+                                                        isReadOnly={true}
+
                                                     /></>
                                             ) : (
                                                 <InputBox
@@ -809,7 +841,7 @@ const View = ({ id }: { id: number }) => {
                         ) : (
                             <>
                                 {data?.data?.ownership_doc === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
-                                    : <img  className='w-20 h-20 mt-4' src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
+                                    : <img className='w-20 h-20 mt-4' src={data?.data?.ownership_doc} alt="img" width="100" height="30" />
                                 }
                             </>
                         )}

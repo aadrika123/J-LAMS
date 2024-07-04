@@ -162,193 +162,411 @@ class AssetsManagementDao {
             console.log(err);
         }
     };
- 
+
     update = async (req: Request) => {
-    const {
-        type_of_assets,
-        asset_sub_category_name,
-        assets_category_type,
-        khata_no,
-        plot_no,
-        ward_no,
-        address,
-        depreciation_method,
-        apreciation_method,
-        blue_print,
-        ownership_doc,
-        type_of_land,
-        area,
-        order_no,
-        order_date,
-        acquisition,
-        from_whom_acquired,
-        mode_of_acquisition,
-        status
-    } = req.body;
+        const {
+            type_of_assets,
+            asset_sub_category_name,
+            assets_category_type,
+            khata_no,
+            plot_no,
+            ward_no,
+            address,
+            depreciation_method,
+            apreciation_method,
+            blue_print,
+            ownership_doc,
+            type_of_land,
+            area,
+            order_no,
+            order_date,
+            acquisition,
+            from_whom_acquired,
+            mode_of_acquisition,
+            status
+        } = req.body;
 
-    const id = Number(req.query.id);
+        const id = Number(req.query.id);
 
-    try {
-        const result = await prisma.$transaction(async (tx) => {
-            const existingAsset = await tx.assets_list.findUnique({
-                where: {
-                    id
-                }
-            });
-
-            if (!existingAsset) {
-                throw new Error("Asset not found");
-            }
-
-            await tx.assets_list_change_log.create({
-                data: {
-                    assetId: id,
-                    type_of_assets: existingAsset.type_of_assets,
-                    asset_sub_category_name: existingAsset.asset_sub_category_name,
-                    assets_category_type: existingAsset.assets_category_type,
-                    khata_no: existingAsset.khata_no,
-                    plot_no: existingAsset.plot_no,
-                    ward_no: existingAsset.ward_no,
-                    address: existingAsset.address,
-                    depreciation_method: existingAsset.depreciation_method,
-                    apreciation_method: existingAsset.apreciation_method,
-                    blue_print: existingAsset.blue_print,
-                    ownership_doc: existingAsset.ownership_doc,
-                    type_of_land: existingAsset.type_of_land,
-                    area: existingAsset.area,
-                    order_no: existingAsset.order_no,
-                    order_date: existingAsset.order_date,
-                    acquisition: existingAsset.acquisition,
-                    from_whom_acquired: existingAsset.from_whom_acquired,
-                    mode_of_acquisition: existingAsset.mode_of_acquisition,
-                    status: existingAsset.status
-                }
-            });
-
-            let updatedAsset = null;
-
-            if (status === 1) {
-                updatedAsset = await tx.assets_list.update({
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                const existingAsset: any = await tx.assets_list.findUnique({
                     where: {
                         id
-                    },
-                    data: {
-                        type_of_assets,
-                        asset_sub_category_name,
-                        assets_category_type,
-                        khata_no,
-                        plot_no,
-                        ward_no,
-                        address,
-                        depreciation_method,
-                        apreciation_method,
-                        ownership_doc,
-                        blue_print,
-                        type_of_land,
-                        area,
-                        order_no,
-                        order_date,
-                        acquisition,
-                        from_whom_acquired,
-                        mode_of_acquisition,
-                        status
                     }
                 });
 
-                await tx.asset_update_req.updateMany({
+                if (!existingAsset) {
+                    console.log("Asset not found");
+                }
+
+            await tx.assets_list_change_log.create({
+                    data: {
+                        assetId: id,
+                        type_of_assets: existingAsset.type_of_assets,
+                        asset_sub_category_name: existingAsset.asset_sub_category_name,
+                        assets_category_type: existingAsset.assets_category_type,
+                        khata_no: existingAsset.khata_no,
+                        plot_no: existingAsset.plot_no,
+                        ward_no: existingAsset.ward_no,
+                        address: existingAsset.address,
+                        depreciation_method: existingAsset.depreciation_method,
+                        apreciation_method: existingAsset.apreciation_method,
+                        blue_print: existingAsset.blue_print,
+                        ownership_doc: existingAsset.ownership_doc,
+                        type_of_land: existingAsset.type_of_land,
+                        area: existingAsset.area,
+                        order_no: existingAsset.order_no,
+                        order_date: existingAsset.order_date,
+                        acquisition: existingAsset.acquisition,
+                        from_whom_acquired: existingAsset.from_whom_acquired,
+                        mode_of_acquisition: existingAsset.mode_of_acquisition,
+                        status: existingAsset.status
+                    }
+                });
+
+                let updatedAsset = null;
+
+            if (status === 1) {
+                    updatedAsset = await tx.assets_list.update({
+                        where: {
+                            id
+                        },
+                        data: {
+                            type_of_assets,
+                            asset_sub_category_name,
+                            assets_category_type,
+                            khata_no,
+                            plot_no,
+                            ward_no,
+                            address,
+                            depreciation_method,
+                            apreciation_method,
+                            ownership_doc,
+                            blue_print,
+                            type_of_land,
+                            area,
+                            order_no,
+                            order_date,
+                            acquisition,
+                            from_whom_acquired,
+                            mode_of_acquisition,
+                            status
+                        }
+                    });
+
+                    await tx.asset_update_req.updateMany({
+                        where: {
+                            assetId: id,
+                            status: 0
+                        },
+                        data: {
+                            status: 1
+                        }
+                    });
+
+                } else if (status === -1) {
+                    console.error("rejected");
+                    await tx.asset_update_req.updateMany({
+                        where: {
+                            assetId: id,
+                            status: 0
+                        },
+                        data: {
+                            status: -1
+                        }
+                    });
+
+                    updatedAsset = await tx.assets_list.update({
+                        where: {
+                            id,
+                        },
+                        data: {
+                            type_of_assets,
+                            asset_sub_category_name,
+                            assets_category_type,
+                            khata_no,
+                            plot_no,
+                            ward_no,
+                            address,
+                            depreciation_method,
+                            apreciation_method,
+                            ownership_doc,
+                            blue_print,
+                            type_of_land,
+                            area,
+                            order_no,
+                            order_date,
+                            acquisition,
+                            from_whom_acquired,
+                            mode_of_acquisition,
+                            status
+                        }
+                    });
+
+                } else if (status === 0) {
+                    console.error("waiting for approval");
+
+                    const pendingRequests = await tx.asset_update_req.findMany({
                     where: {
                         assetId: id,
                         status: 0
-                    },
-                    data: {
-                        status: 1
                     }
-                });
+                    });
+                    
 
-            } else if (status === -1) {
-                console.error("rejected");
-                await tx.asset_update_req.updateMany({
-                    where: {
-                        assetId: id,
-                        status: 0
-                    },
-                    data: {
-                        status: -1
+                if (pendingRequests.length > 0) {
+                    console.log("There is already a pending update request for this asset")
+                    throw {status:400 ,error:true, message:'There is already a pending update request for this asset'}
+                }
+                    
+                else {
+                    
+                    return await tx.asset_update_req.create({
+                        data: {
+                            assetId: id,
+                            type_of_assets,
+                            asset_sub_category_name,
+                            assets_category_type,
+                            khata_no,
+                            plot_no,
+                            ward_no,
+                            address,
+                            depreciation_method,
+                            apreciation_method,
+                            blue_print,
+                            ownership_doc,
+                            type_of_land,
+                            area,
+                            order_no,
+                            order_date,
+                            acquisition,
+                            from_whom_acquired,
+                            mode_of_acquisition,
+                            status
+                        }
+                    });
                     }
-                });
+                }
+                console.error("approved/rejected");
+                return updatedAsset;
+            });
 
-                updatedAsset = await tx.assets_list.update({
-                    where: {
-                        id,
-                    },
-                    data: {
-                        type_of_assets,
-                        asset_sub_category_name,
-                        assets_category_type,
-                        khata_no,
-                        plot_no,
-                        ward_no,
-                        address,
-                        depreciation_method,
-                        apreciation_method,
-                        ownership_doc,
-                        blue_print,
-                        type_of_land,
-                        area,
-                        order_no,
-                        order_date,
-                        acquisition,
-                        from_whom_acquired,
-                        mode_of_acquisition,
-                        status
-                    }
-                });
-            } else if (status === 0) {
-                console.error("waiting for approval");
-                return await tx.asset_update_req.create({
-                    data: {
-                        assetId: id,
-                        type_of_assets,
-                        asset_sub_category_name,
-                        assets_category_type,
-                        khata_no,
-                        plot_no,
-                        ward_no,
-                        address,
-                        depreciation_method,
-                        apreciation_method,
-                        blue_print,
-                        ownership_doc,
-                        type_of_land,
-                        area,
-                        order_no,
-                        order_date,
-                        acquisition,
-                        from_whom_acquired,
-                        mode_of_acquisition,
-                        status
-                    }
-                });
-            }
-            console.error("approved/rejected");
-            return updatedAsset;
-        });
+            return generateRes(result);
+        } catch (error:any) {
+            console.error(error);
+            return error
+        }
+    };
 
-        return generateRes(result);
-    } catch (error) {
-        console.error(error);
-    }
-};
+    // update = async (req: Request) => {
+    //     const {
+    //         type_of_assets,
+    //         asset_sub_category_name,
+    //         assets_category_type,
+    //         khata_no,
+    //         plot_no,
+    //         ward_no,
+    //         address,
+    //         depreciation_method,
+    //         apreciation_method,
+    //         blue_print,
+    //         ownership_doc,
+    //         type_of_land,
+    //         area,
+    //         order_no,
+    //         order_date,
+    //         acquisition,
+    //         from_whom_acquired,
+    //         mode_of_acquisition,
+    //         status
+    //     } = req.body;
 
-     getAllUpdated = async (req: Request) => {
+    //     const id = Number(req.query.id);
+
+    //     try {
+    //         const result = await prisma.$transaction(async (tx) => {
+    //             const existingAsset = await tx.assets_list.findUnique({
+    //                 where: {
+    //                     id
+    //                 }
+    //             });
+
+    //             if (!existingAsset) {
+    //                 throw new Error("Asset not found");
+    //             }
+
+    //             const pendingRequests = await tx.asset_update_req.findMany({
+    //                 where: {
+    //                     assetId: id,
+    //                     status: 0
+    //                 }
+    //             });
+
+    //             if (pendingRequests.length > 0) {
+    //                 console.log("There is already a pending update request for this asset.")
+    //                 throw new Error("There is already a pending update request for this asset.");
+    //             }
+
+    //             await tx.assets_list_change_log.create({
+    //                 data: {
+    //                     assetId: id,
+    //                     type_of_assets: existingAsset.type_of_assets,
+    //                     asset_sub_category_name: existingAsset.asset_sub_category_name,
+    //                     assets_category_type: existingAsset.assets_category_type,
+    //                     khata_no: existingAsset.khata_no,
+    //                     plot_no: existingAsset.plot_no,
+    //                     ward_no: existingAsset.ward_no,
+    //                     address: existingAsset.address,
+    //                     depreciation_method: existingAsset.depreciation_method,
+    //                     apreciation_method: existingAsset.apreciation_method,
+    //                     blue_print: existingAsset.blue_print,
+    //                     ownership_doc: existingAsset.ownership_doc,
+    //                     type_of_land: existingAsset.type_of_land,
+    //                     area: existingAsset.area,
+    //                     order_no: existingAsset.order_no,
+    //                     order_date: existingAsset.order_date,
+    //                     acquisition: existingAsset.acquisition,
+    //                     from_whom_acquired: existingAsset.from_whom_acquired,
+    //                     mode_of_acquisition: existingAsset.mode_of_acquisition,
+    //                     status: existingAsset.status
+    //                 }
+    //             });
+
+    //             let updatedAsset = null;
+
+    //             if (status === 1) {
+    //                 updatedAsset = await tx.assets_list.update({
+    //                     where: {
+    //                         id
+    //                     },
+    //                     data: {
+    //                         type_of_assets,
+    //                         asset_sub_category_name,
+    //                         assets_category_type,
+    //                         khata_no,
+    //                         plot_no,
+    //                         ward_no,
+    //                         address,
+    //                         depreciation_method,
+    //                         apreciation_method,
+    //                         ownership_doc,
+    //                         blue_print,
+    //                         type_of_land,
+    //                         area,
+    //                         order_no,
+    //                         order_date,
+    //                         acquisition,
+    //                         from_whom_acquired,
+    //                         mode_of_acquisition,
+    //                         status
+    //                     }
+    //                 });
+
+    //                 await tx.asset_update_req.updateMany({
+    //                     where: {
+    //                         assetId: id,
+    //                         status: 0
+    //                     },
+    //                     data: {
+    //                         status: 1
+    //                     }
+    //                 });
+
+    //             } else if (status === -1) {
+    //                 console.error("rejected");
+    //                 await tx.asset_update_req.updateMany({
+    //                     where: {
+    //                         assetId: id,
+    //                         status: 0
+    //                     },
+    //                     data: {
+    //                         status: -1
+    //                     }
+    //                 });
+
+    //                 updatedAsset = await tx.assets_list.update({
+    //                     where: {
+    //                         id,
+    //                     },
+    //                     data: {
+    //                         type_of_assets,
+    //                         asset_sub_category_name,
+    //                         assets_category_type,
+    //                         khata_no,
+    //                         plot_no,
+    //                         ward_no,
+    //                         address,
+    //                         depreciation_method,
+    //                         apreciation_method,
+    //                         ownership_doc,
+    //                         blue_print,
+    //                         type_of_land,
+    //                         area,
+    //                         order_no,
+    //                         order_date,
+    //                         acquisition,
+    //                         from_whom_acquired,
+    //                         mode_of_acquisition,
+    //                         status
+    //                     }
+    //                 });
+    //             } else if (status === 0) {
+    //                 console.error("waiting for approval");
+    //                 return await tx.asset_update_req.create({
+    //                     data: {
+    //                         assetId: id,
+    //                         type_of_assets,
+    //                         asset_sub_category_name,
+    //                         assets_category_type,
+    //                         khata_no,
+    //                         plot_no,
+    //                         ward_no,
+    //                         address,
+    //                         depreciation_method,
+    //                         apreciation_method,
+    //                         blue_print,
+    //                         ownership_doc,
+    //                         type_of_land,
+    //                         area,
+    //                         order_no,
+    //                         order_date,
+    //                         acquisition,
+    //                         from_whom_acquired,
+    //                         mode_of_acquisition,
+    //                         status
+    //                     }
+    //                 });
+    //             }
+    //             console.error("approved/rejected");
+    //             return updatedAsset;
+    //         });
+
+    //         return generateRes(result);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+
+    getAllUpdated = async (req: Request) => {
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
-        const count = await prisma.assets_list.count();
+        const count = await prisma.asset_update_req.count();
         const totalPages = Math.ceil(count / limit);
         const filter = req.query.filter as string || '';
         const skip = (page - 1) * limit;
+        const status1Items = await prisma.asset_update_req.count({
+        where: {
+            status: 1,
+            },
+        });  
+        const statusMinus1Items = await prisma.asset_update_req.count({
+        where: {
+            status: -1,
+            },
+        }); 
 
         try {
             const assetGet = await prisma.asset_update_req.findMany({
@@ -405,6 +623,8 @@ class AssetsManagementDao {
                 totalPages,
                 count,
                 page,
+                status1Items,
+                statusMinus1Items,
                 data: assetGet,
             });
         } catch (err) {

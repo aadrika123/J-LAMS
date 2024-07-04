@@ -98,9 +98,7 @@ const ReqApproval = () => {
 
     const totalPages = data?.totalPages;
 
-
     /////////////////////////////// search data /////////////////////////////
-
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -117,6 +115,9 @@ const ReqApproval = () => {
         setFilter(e.target.value);
     };
 
+    /////////////////////////////// handleApprove & handleReject of request of assets /////////////////////////////
+
+
     const handleApprove = async (assetId: any) => {
         const area = data?.data[0]?.area
         const type_of_assets = data?.data[0]?.type_of_assets
@@ -125,6 +126,14 @@ const ReqApproval = () => {
         const khata_no = data?.data[0]?.khata_no
         const blue_print = data?.data[0]?.blue_print
         const ownership_doc = data?.data[0]?.ownership_doc
+        const asset_sub_category_name = data?.data[0]?.asset_sub_category_name
+        const plot_no = data?.data[0]?.plot_no
+        const ward_no = data?.data[0]?.ward_no
+        const address = data?.data[0]?.address
+        const depreciation_method = "Straight Line Method"
+        const apreciation_method = "Percentage Based Approach"
+        const order_date = data?.data[0]?.order_date
+        const order_no = data?.data[0]?.order_no
 
         const res = await axios({
             url: `${ASSETS.LIST.update}?id=${assetId}`,
@@ -137,7 +146,15 @@ const ReqApproval = () => {
                 type_of_land,
                 khata_no,
                 blue_print,
-                ownership_doc
+                ownership_doc,
+                asset_sub_category_name,
+                plot_no,
+                ward_no,
+                address,
+                depreciation_method,
+                apreciation_method,
+                order_date,
+                order_no
             }
 
         });
@@ -158,7 +175,7 @@ const ReqApproval = () => {
             }
         });
         if (res?.data?.status === 201) {
-            toast.success("Assets update Rejected");   
+            toast.success("Assets update Rejected");
             window.location.reload()
         } else {
             toast.error("Please check and try again.");
@@ -175,9 +192,13 @@ const ReqApproval = () => {
         setSelectedItem(null);
     };
 
+    /////////////////////////////// handleApprove & handleReject of request of assets /////////////////////////////
+
+
     return (
         <div>
             <Toaster />
+
             <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
                 <div className="flex items-center">
 
@@ -204,7 +225,6 @@ const ReqApproval = () => {
                             <option value="">All</option>
                             <option value="Immovable">Immovable</option>
                             <option value="Land">Land</option>
-
                         </select>
                     </div>
                 </div>
@@ -234,7 +254,6 @@ const ReqApproval = () => {
                                 <span className="sr-only">Search</span>
                             </button>
                         </div>
-
                     </div>
                 </div>
 
@@ -304,10 +323,10 @@ const ReqApproval = () => {
                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                                 <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl h-auto space-y-8 transform transition-transform duration-300 ease-out scale-95">
                                     <div className='flex justify-between'>
-                                         <h2 className="text-2xl font-extrabold text-center text-gray-800">Asset Update Details Request</h2>
-                                    <button onClick={handleClosePopup} className="bg-gradient-to-l from-red-500 to-indigo-500 text-white py-2 px-6 rounded-full hover:from-blue-600 hover:to-indigo-600 transition duration-300 ease-in-out transform hover:scale-105">Close</button>
-                                   </div>
-                                   
+                                        <h2 className="text-2xl font-extrabold text-center text-gray-800">Asset Update Details Request</h2>
+                                        <button onClick={handleClosePopup} className="bg-gradient-to-l from-red-500 to-indigo-500 text-white py-2 px-6 rounded-full hover:from-blue-600 hover:to-indigo-600 transition duration-300 ease-in-out transform hover:scale-105">Close</button>
+                                    </div>
+
                                     <div className="space-y-6">
                                         <p className="flex justify-between items-center">
                                             <strong className="text-gray-700">Type of Assets:</strong>
@@ -337,7 +356,7 @@ const ReqApproval = () => {
                                             <strong className="text-gray-700">Plot No:</strong>
                                             <span className="text-gray-600">{selectedItem?.plot_no}</span>
                                         </p>
-                                         <p className="flex justify-between items-center">
+                                        <p className="flex justify-between items-center">
                                             <strong className="text-gray-700">Ward No:</strong>
                                             <span className="text-gray-600">{selectedItem?.ward_no}</span>
                                         </p>
@@ -362,7 +381,7 @@ const ReqApproval = () => {
                                             <img src={selectedItem?.blue_print} alt="img" width="30" height="30" />
                                         </p>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         )}
@@ -373,7 +392,7 @@ const ReqApproval = () => {
 
                 {/* pagination */}
 
-               <nav className='mt-4'>
+                <nav className='mt-4'>
                     <div>Page {data?.page} of {data?.totalPages}</div>
                     <ul className="flex items-center -space-x-px h-8 text-sm justify-end">
                         <li>

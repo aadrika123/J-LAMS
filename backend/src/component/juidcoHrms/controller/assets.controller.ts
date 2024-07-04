@@ -159,10 +159,10 @@ class AssetManagementController {
 
         try {
             const data = await this.assetsManagementDao.update(req);
-            return res.json({
+            if (!data?.error) {
+                return res.json({
                 // "status": true,
-                                    status: 201,
-
+                status: 201,
                 "message": "Assets Data Updated Succesfully",
                 "meta-data": {
                     apiId,
@@ -171,9 +171,22 @@ class AssetManagementController {
                 },
                 data: data
             })
+            } else {
+                return res.json({
+                // "status": true,
+                status: 400,
+                "message": data?.error?.message,
+                "meta-data": {
+                    apiId,
+                    action: "POST",
+                    version: "1.0",
+                },
+                data: data
+            })
+            }
             
         } catch (error) {
-              return res.json({
+            return res.json({
                 "status": false,
                 "message": "Error occured while Updating Assets",
                 "meta-data": {
@@ -182,10 +195,9 @@ class AssetManagementController {
                     action: "POST",
                     version: "1.0",
                 },
-            })
+              })
         }
     };
-
 
         getAllUpdated = async (
         req: Request,
@@ -219,10 +231,6 @@ class AssetManagementController {
             })
         }
     };
-
-   
-
-
 }
 
 export default AssetManagementController;

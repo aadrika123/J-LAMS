@@ -114,7 +114,6 @@ class DMSFileHandlerController {
   ): Promise<Response> => {
     try {
       const file: any = req.file;
-      console.log("file", file)
       const hashed = crypto
         .createHash("SHA256")
         .update(file?.buffer)
@@ -124,7 +123,6 @@ class DMSFileHandlerController {
       formData.append("file", file?.buffer, file?.mimetype);
       formData.append("tags", file?.originalname.substring(0, 7));
 
-      console.log("formData", formData)
       const headers = {
         "x-digest": hashed,
         token: "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",

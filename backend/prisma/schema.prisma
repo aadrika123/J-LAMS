@@ -85,7 +85,7 @@ model asset_update_req {
   ownership_doc         String?
   type_of_land          String?
   area                  String?
-  order_no              String?
+  order_no              String? 
   order_date            String?
   acquisition           String?
   from_whom_acquired    String?

@@ -17,7 +17,7 @@ interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
 const Sidebar: React.FC<SideBarProps> = (props) => {
   // const pathName = usePathname();
   const [data, setData] = useState<string | null>();
-  const [sidebarLink, setSidebarLink] = useState<any>();
+  const [, setSidebarLink] = useState<any>();
   const [userDetails, setUserDetails] = useState<any>();
   // const [isTeamManagementOpen, setIsTeamManagementOpen] = useState<boolean>(false);
 
@@ -82,6 +82,14 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
           </div>
 
+          <Link href="/apply/approve-application" className="text-xl text-white">
+
+                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+                    <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white"/>
+                  <InnerHeading  className="text-xl text-white">Home</InnerHeading>
+                    </div>
+                    </Link>
+{/* 
           <div>
             {sidebarLink?.modules?.map(() => {
               return (
@@ -165,7 +173,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
                 // </div>
               );
             })}
-          </div>
+          </div> */}
         </section>
       </div>
     </div>
