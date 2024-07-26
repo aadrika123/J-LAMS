@@ -116,7 +116,6 @@ class AssetManagementController {
         }
     };
 
-
     deleteAllbyId = async (
         req: Request,
         res: Response,
@@ -159,7 +158,7 @@ class AssetManagementController {
 
         try {
             const data = await this.assetsManagementDao.update(req);
-            if (!data?.error) {
+            // if (!data?.error) {
                 return res.json({
                 // "status": true,
                 status: 201,
@@ -171,19 +170,19 @@ class AssetManagementController {
                 },
                 data: data
             })
-            } else {
-                return res.json({
-                // "status": true,
-                status: 400,
-                "message": data?.error?.message,
-                "meta-data": {
-                    apiId,
-                    action: "POST",
-                    version: "1.0",
-                },
-                data: data
-            })
-            }
+            // } else {
+            //     return res.json({
+            //     // "status": true,
+            //     status: 400,
+            //     "message": data?.error?.message,
+            //     "meta-data": {
+            //         apiId,
+            //         action: "POST",
+            //         version: "1.0",
+            //     },
+            //     data: data
+            // })
+            // }
             
         } catch (error) {
             return res.json({
@@ -199,7 +198,7 @@ class AssetManagementController {
         }
     };
 
-        getAllUpdated = async (
+     getAllFieldOfficer = async (
         req: Request,
         res: Response,
         next: NextFunction,
@@ -207,7 +206,7 @@ class AssetManagementController {
     ): Promise<object> => {
 
         try {
-            const data = await this.assetsManagementDao.getAllUpdated(req);
+            const data = await this.assetsManagementDao.getAllFieldOfficer(req);
             return res.json({
                 "status": true,
                 "message": "Assets fetched Succesfully",
@@ -231,6 +230,73 @@ class AssetManagementController {
             })
         }
     };
+
+    getAllCheckerData = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.getAllCheckerData(req);
+            return res.json({
+                "status": true,
+                "message": "Assets fetched Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data
+            })
+            
+        } catch (error) {
+              return res.json({
+                "status": false,
+                "message": "Error occured while fetching Assets",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            })
+        }
+    };
+
+    getAllAuditData = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.getAllAuditData(req);
+            return res.json({
+                "status": true,
+                "message": "Audit log fetched Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data
+            })
+            
+        } catch (error) {
+              return res.json({
+                "status": false,
+                "message": "Error occured while fetching Audit Log",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            })
+        }
+    };
+    
 }
 
 export default AssetManagementController;

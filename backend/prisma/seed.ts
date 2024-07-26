@@ -3,8 +3,6 @@ import foreign_wrapper from "./seeder/foreignWrapper.seed";
 
 const prisma = new PrismaClient();
 
-// const payroll = new PayrollDao();
-
 async function main() {
  
   setTimeout(async () => {

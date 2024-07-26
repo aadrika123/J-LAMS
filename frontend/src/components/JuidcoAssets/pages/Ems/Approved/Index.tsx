@@ -41,6 +41,12 @@ const Approved = () => {
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [count, setCount] = useState<any>([])
+    const [box, setBox] = useState<any>(false)
+    const [remarks, setRemarks] = useState<any>('')
+    const [currentAssetId, setCurrentAssetId] = useState(null);
+    const [actionType, setActionType] = useState<any>(null);
+    const [audit, setAudit]= useState<any>()
+
 
     const queryClient = useQueryClient();
 
@@ -53,6 +59,8 @@ const Approved = () => {
         { name: "AREA (sqFt.)" },
         { name: "DOCUMENTS" },
         { name: "ACTIONS" },
+        { name: "FIELD OFFICER STATUS" },
+        { name: "APPROVER STATUS" },
     ]
 
     const fetchData = async (page: number, searchQuery: string, filter: string) => {
@@ -61,21 +69,8 @@ const Approved = () => {
                 url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}`,
                 method: "GET",
             });
-
-            return res?.data?.data;
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            return [];
-        }
-    };
-
-    const fetchDataCount = async () => {
-        try {
-            const res = await axios({
-                url: `${ASSETS.LIST.count}`,
-                method: "GET",
-            });
             setCount(res?.data)
+
             return res?.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -94,7 +89,7 @@ const Approved = () => {
                 toast.success("Assets succesfully deleted");
                 window.location.reload()
                 return res?.data?.data;
-                
+
             } else {
                 toast.error("Failed to delete");
             }
@@ -103,6 +98,26 @@ const Approved = () => {
             return [];
         }
     };
+
+       const fetchAuditData = async () => {
+        try {
+            const res = await axios({
+                url: `${ASSETS.LIST.getAllAudit}`,
+                method: "GET",
+            });
+            setAudit(res?.data)
+
+            return res?.data?.data;
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            return [];
+        }
+    };
+
+    useEffect(() => {
+        fetchAuditData()
+    }, [])
+    
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets', currentPage, debouncedSearch, filter],
@@ -129,10 +144,6 @@ const Approved = () => {
         }
     }, []);
 
-    useEffect(() => {
-        fetchDataCount()
-    }, [])
-
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-screen  bg-opacity-50 ">
@@ -147,11 +158,6 @@ const Approved = () => {
     }
 
     /////////////////////////////// delete & update data /////////////////////////////
-
-    // const handleDelete = async (id: number) => {
-    //     const data = await fetchDataforDelete(id);
-    //     console.log('Deleted data:', data);
-    // };
 
     const handleDelete = async (id: number) => {
         setDeleteId(id);
@@ -171,15 +177,11 @@ const Approved = () => {
         setDeleteId(null);
     };
 
-
     /////////////////////////////// delete & update data /////////////////////////////
-
 
     const totalPages = data?.totalPages;
 
-
     /////////////////////////////// search data /////////////////////////////
-
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -243,8 +245,6 @@ const Approved = () => {
         setFilter(e.target.value);
     };
 
-
-
     const handleExportCSV = () => {
         const csvData = data?.data?.map((row: any) => [row.id, row.type_of_assets, row.assets_category_type, row.type_of_land, row.khata_no, row.area]);
 
@@ -262,48 +262,82 @@ const Approved = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
     }
+
+    const handleConfirm = () => {
+        if (actionType === 'approve') {
+            appApprover(currentAssetId);
+        } else if (actionType === 'reject') {
+            appReject(currentAssetId);
+        }
+        setShowModal(false);
+    };
+
+    const handleApprove = (assetId: any) => {
+        setCurrentAssetId(assetId);
+        setActionType('approve');
+        setBox(true);
+    };
+
+    const handleReject = (assetId: any) => {
+        setCurrentAssetId(assetId);
+        setActionType('reject');
+        setBox(true);
+    };
+
+    const deleteApprover = () => {
+        setBox(false);
+    };
+
+    const handleInputChange = (e: any) => {
+        setRemarks(e.target.value);
+    };
+
+    const appApprover = async (assetId: any) => {
+        const res = await axios({
+            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            method: "POST",
+            data: {
+                status: 2,
+                checker_remarks: remarks
+            }
+        });
+
+        if (res?.data?.status === 201) {
+            toast.success("Assets successfully updated");
+            window.location.reload()
+        } else {
+            toast.error("Please check and try again.");
+        }
+    }
+
+    const appReject = async (assetId: any) => {
+        console.log("remarks", remarks)
+        const res = await axios({
+            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            method: "POST",
+            data: {
+                status: -2,
+                checker_remarks: remarks
+            }
+        });
+
+        if (res?.data?.status === 201) {
+            toast.success("Assets successfully updated");
+            window.location.reload()
+        } else {
+            toast.error("Please check and try again.");
+        }
+    }
+
+    console.log("audit", audit)
 
     return (
         <div>
             <Toaster />
             <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
                 <div className="flex items-center">
-                    {/* <PrimaryButton
-                        buttonType="button"
-                        variant={"cancel"}
-                        onClick={goBack}
-                        className="border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center"
-                    >
-                        <i>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="25"
-                                height="20"
-                                viewBox="0 0 25 25"
-                                fill="none"
-                            >
-                                <g clipPath="url(#clip0_949_7008)">
-                                    <path
-                                        d="M10.6736 7.20536L4 13.9137L10.6736 20.622C10.7339 20.7012 10.8105 20.7665 10.8981 20.8134C10.9858 20.8604 11.0826 20.888 11.1819 20.8943C11.2812 20.9007 11.3806 20.8856 11.4736 20.8501C11.5666 20.8147 11.6508 20.7597 11.7206 20.6888C11.7905 20.618 11.8443 20.533 11.8784 20.4395C11.9125 20.3461 11.9262 20.2464 11.9184 20.1472C11.9107 20.048 11.8817 19.9517 11.8335 19.8646C11.7853 19.7776 11.7189 19.702 11.6389 19.6429L6.64583 14.6081H19.9306C20.1147 14.6081 20.2914 14.535 20.4216 14.4047C20.5518 14.2745 20.625 14.0979 20.625 13.9137C20.625 13.7295 20.5518 13.5529 20.4216 13.4227C20.2914 13.2924 20.1147 13.2193 19.9306 13.2193H6.64583L11.6389 8.18453C11.7687 8.05376 11.8413 7.87677 11.8407 7.69249C11.84 7.50821 11.7662 7.33174 11.6354 7.20189C11.5047 7.07205 11.3277 6.99946 11.1434 7.00012C10.9591 7.00077 10.7826 7.0746 10.6528 7.20536H10.6736Z"
-                                        fill="#665DD9"
-                                    />
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_949_7008">
-                                        <rect
-                                            width="25"
-                                            height="25"
-                                            fill="white"
-                                            transform="matrix(0 -1 1 0 0 25)"
-                                        />
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </i>
-                        Back
-                    </PrimaryButton> */}
+
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
@@ -332,27 +366,50 @@ const Approved = () => {
                     </div>
 
                     {role == 'Field Officer' ?
-                        <div>
-                            <span className="relative flex h-4 w-4 float-right mt-[-0.5rem]">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#67c068] opacity-75 "></span>
-                                <span className="relative inline-flex rounded-full h-4 w-4 bg-[#42ca38] "></span>
-                            </span>
-                            <div id="toast-message-cta" className="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:bg-gray-800 dark:text-gray-400" role="alert">
-                                <div className="flex">
-                                    <div className="ms-3 text-sm font-normal">
-                                        <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Update Request</span> <br></br>
-                                        <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({count?.data?.count || 0})</span></span><br></br>
-                                        <span className="mb-1 text-sm font-semibold text-[#42ca38] dark:text-white"> Approved- <span className='text-slate-700'>{count?.data?.status1Items || 0} ,</span></span>
-                                        <span className="mb-1 text-sm font-semibold text-[#ca3838] dark:text-white"> Rejected- <span className='text-slate-700'>{count?.data?.statusMinus1Items || 0} , </span></span>
-                                        <span className="mb-1 text-sm font-semibold text-[#cab938] dark:text-white"> Pending- <span className='text-slate-700'>{count?.data?.count - (count?.data?.status1Items + count?.data?.statusMinus1Items) || 0}</span></span>
-                                        <div className="mb-2 text-sm font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved request for some changes in assets data. </div>
-                                        <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Requests</Link>
+                        <div className='flex gap-4'>
+
+                            {/* 1st col */}
+
+                            <div>
+                                <span className="relative flex h-4 w-4 float-right mt-[-0.5rem]">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c06767] opacity-75 "></span>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#c06767] "></span>
+                                </span>
+                                <div id="toast-message-cta" className="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:bg-gray-800 dark:text-gray-400" role="alert">
+                                    <div className="flex">
+                                        <div className="ms-3 text-sm font-normal">
+                                            <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Assets Log Data</span> <br></br>
+                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({audit?.data?.count || 0})</span></span><br></br>
+                                            <div className="mb-2 text-sm text-slate-800 font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved <span className='text-sm font-semibold text-[#42ca38] dark:text-white'>({audit?.data?.count || 0})</span> for audit changes in assets data. </div>
+                                            <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center mt-3 text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Logs</Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 2nd col */}
+
+                            <div>
+                                <span className="relative flex h-4 w-4 float-right mt-[-0.5rem]">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#67c068] opacity-75 "></span>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#42ca38] "></span>
+                                </span>
+                                <div id="toast-message-cta" className="w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:bg-gray-800 dark:text-gray-400" role="alert">
+                                    <div className="flex">
+                                        <div className="ms-3 text-sm font-normal">
+                                            <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Update Request</span> <br></br>
+                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({count?.data?.count || 0})</span></span><br></br>
+                                            <span className="mb-1 text-sm font-semibold text-[#42ca38] dark:text-white"> Approved- <span className='text-slate-700'>{count?.data?.status1Items || 0} ,</span></span>
+                                            <span className="mb-1 text-sm font-semibold text-[#ca3838] dark:text-white"> Rejected- <span className='text-slate-700'>{count?.data?.statusMinus1Items || 0} , </span></span>
+                                            <span className="mb-1 text-sm font-semibold text-[#cab938] dark:text-white"> Pending- <span className='text-slate-700'>{count?.data?.statusPendingAssets || 0}</span></span>
+                                            <div className="mb-2 text-sm text-slate-800 font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved <span className='text-sm font-semibold text-[#42ca38] dark:text-white'>({count?.data?.statusPendingAssets || 0})</span> requests for some changes in assets data. </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         : null}
-                    </div>
+                </div>
 
                 <div className="flex justify-end mb-5">
                     <div className="relative">
@@ -388,8 +445,6 @@ const Approved = () => {
                             Export CSV
                         </button>
 
-
-
                         {role == 'Field Officer' ? null : (
                             <button onClick={handleClick} type="submit" className="inline-flex w-[16rem]  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
                                 + Add New Asset
@@ -417,11 +472,49 @@ const Approved = () => {
                                     <td className="px-6 py-4">{item?.khata_no}</td>
                                     <td className="px-6 py-4">{item?.area}</td>
                                     <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ? <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> : <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}</td>
-
                                     <td className="px-6 py-4">
                                         <div className='flex'>
+                                            {role == 'Field Officer' ? null : (
+                                                <Link
+                                                    href={`/apply/approve-application/${item?.id}?status=clicked`}
 
-                                            <Link
+                                                    className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="23"
+                                                        height="20"
+                                                        viewBox="0 0 23 20"
+                                                        fill="none"
+                                                    >
+                                                        <g clipPath="url(#clip0_1440_7941)">
+                                                            <rect
+                                                                x="1.63591"
+                                                                y="0.63591"
+                                                                width="18.7282"
+                                                                height="18.7282"
+                                                                rx="4.36409"
+                                                                stroke="#726E6E"
+                                                                strokeWidth="1.27182"
+                                                            />
+                                                            <path
+                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                                fill="black"
+                                                                fillOpacity="0.41"
+                                                            />
+                                                        </g>
+                                                        <defs>
+                                                            <clipPath id="clip0_1440_7941">
+                                                                <rect
+                                                                    width="22.7692"
+                                                                    height="19.7333"
+                                                                    fill="white"
+                                                                />
+                                                            </clipPath>
+                                                        </defs>
+                                                    </svg>
+                                                </Link>
+                                            )}
+                                            {/* <Link
                                                 href={`/apply/approve-application/${item?.id}?status=clicked`}
 
                                                 className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
@@ -458,7 +551,7 @@ const Approved = () => {
                                                         </clipPath>
                                                     </defs>
                                                 </svg>
-                                            </Link>
+                                            </Link> */}
 
                                             <Link
                                                 href={`/apply/approve-application/${item?.id}`}
@@ -510,35 +603,68 @@ const Approved = () => {
                                                     )}
                                                 </>
                                             )}
-
-                                            {/* <button onClick={() => handleDelete(item?.id)} className="text-sm  p-2 text-blue-600 dark:text-blue-500 hover:underline">
-
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="20"
-                                                    height="20"
-                                                    viewBox="0 0 20 20"
-                                                    fill="none"
-                                                >
-                                                    <rect
-                                                        x="0.563881"
-                                                        y="0.563881"
-                                                        width="18.362"
-                                                        height="18.1851"
-                                                        rx="5.07493"
-                                                        stroke="#726E6E"
-                                                        strokeWidth="1.12776"
-                                                    />
-                                                    <path
-                                                        d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z"
-                                                        fill="black"
-                                                        fillOpacity="0.41"
-                                                    />
-                                                </svg>
-                                            </button> */}
-
                                         </div>
                                     </td>
+                                    <td>
+                                        {item.status === 0 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
+                                            item.status === 1 ? <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Field Officer</div> :
+                                                item.status === -1 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Field Officer</div> :
+                                                    <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Field Officer</div>
+                                        }
+                                    </td>
+
+                                    {role == 'Municipal' ? (
+                                        <td>
+                                            {item.status === 0 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
+                                                item.status === 2 ? <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Admin</div> :
+                                                    item.status === -2 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Admin</div> :
+                                                        item.status === -1 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Field Officer</div> :
+                                                            <div className='text-orange-500 font-semibold text-xs ml-4'>Pending by Admin</div>
+                                            }
+                                        </td>
+                                    ) :
+                                        <> </>
+                                    }
+
+                                    {role == 'Field Officer' ? (
+                                        <td>
+                                            {item.status === 1 ? (
+                                                <td className="px-6 py-4">
+                                                    <div className='flex justify-start gap-2'>
+                                                        <button onClick={() => { handleApprove(item?.id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
+                                                        <button onClick={() => { handleReject(item?.id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
+                                                    </div>
+                                                </td>
+
+                                            ) : item.status === -1 ? <div className=' text-red-500 font-semibold text-xs ml-4'>Rejected by Field Officer</div> :
+                                                item.status === 2 ? <div className=' text-green-500 font-semibold text-xs ml-4'>Approved by Admin</div> :
+                                                    item.status === -2 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Admin</div> :
+                                                        null
+                                            }
+
+                                            {box && (
+                                                <div className="fixed inset-0 flex items-center justify-center">
+                                                    <div className="bg-white p-6 rounded shadow-md">
+                                                        <p className='text-[#4338CA] font-bold text-lg'>Are you sure you want to <span className='text-red-500 font-semibold text-xl'>{actionType}</span> this asset?</p>
+                                                        <div className="mt-4">
+                                                            <form className='w-full'>
+                                                                <input
+                                                                    type="textarea"
+                                                                    placeholder='Enter your remarks'
+                                                                    className='w-full h-[5rem] mb-4 border border-slate-300 p-4'
+                                                                    value={remarks}
+                                                                    onChange={handleInputChange}
+                                                                />
+                                                            </form>
+                                                            <br></br>
+                                                            <button onClick={handleConfirm} className="px-4 py-2 bg-red-600 text-white rounded mr-2">Yes</button>
+                                                            <button onClick={deleteApprover} className="px-4 py-2 bg-gray-300 rounded">No</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                    ) : null}
                                 </tr>
                             ))}
                         </tbody>
@@ -546,6 +672,8 @@ const Approved = () => {
                 ) : (
                     <div className="flex justify-center items-center">No data found</div>
                 )}
+
+                {/* navbar pagination */}
 
                 <nav className='mt-4'>
                     <div>Page {data?.page} of {data?.totalPages}</div>
@@ -588,8 +716,10 @@ const Approved = () => {
                         </li>
                     </ul>
                 </nav>
-            </div>
 
+                {/* navbar pagination */}
+
+            </div>
         </div>
     )
 }

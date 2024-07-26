@@ -21,6 +21,7 @@ type Urls = {
     validate?: string;
     count?: string;
     getAllData?: string;
+    getAllAudit?:string
   };
 };
 
@@ -33,6 +34,10 @@ export const ASSETS: Urls = {
     update: "/asset/update-single",
     getAll: "/assets/ulb-get",
     validate: "dms/upload-gets",
-    count:"/assets/update-list?limit=7",
+    count: "/assets/update-list?limit=7",
+    getAllData: "/assets/field-officer-list?limit=7",
+    getAllAudit: "/assets/auditlog-list?limit=10",
+    updateMany:"/assets/checker-list?limit=100"
+    
   },
 };

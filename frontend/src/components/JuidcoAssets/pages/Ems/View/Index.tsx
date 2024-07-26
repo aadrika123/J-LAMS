@@ -22,7 +22,6 @@ import InputBox from '@/components/Helpers/InputBox';
 import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
 import { Formik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
-// import { useLocation } from 'react-router-dom';
 import { useSearchParams } from 'next/navigation'
 
 
@@ -36,7 +35,8 @@ const View = ({ id }: { id: number }) => {
     const [file1, setFile1] = useState<File | null>(null);
     const [file2, setFile2] = useState<File | null>(null);
     const [role, setRole] = useState('');
-
+    const [datas, setData] = useState<any>()
+    const [datass, setDatas] = useState<any>()
 
     const togglePopup = () => {
         setIsOpen(!isOpen);
@@ -51,9 +51,43 @@ const View = ({ id }: { id: number }) => {
             return res.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
-            return [];
         }
     };
+
+    const fetchFieldOfficerData = async () => {
+        try {
+            const res = await axios({
+                url: `${ASSETS.LIST.getAllData}&id=${id}`,
+                method: "GET",
+            });
+            setData(res.data?.data)
+            return res.data?.data;
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFieldOfficerData()
+    }, [])
+
+    const fetchAdminData = async () => {
+        console.log("id323", id)
+        try {
+            const res = await axios({
+                url: `${ASSETS.LIST.updateMany}&id=${id}`,
+                method: "GET",
+            });
+            setDatas(res.data?.data)
+            return res.data?.data;
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchAdminData()
+    }, [])
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -63,7 +97,6 @@ const View = ({ id }: { id: number }) => {
             setRole(user_details?.user_type)
         }
     }, []);
-
 
     const handleUploadOwnershipDoc = async () => {
         if (file1) {
@@ -116,7 +149,6 @@ const View = ({ id }: { id: number }) => {
             if (fileUploadData2) {
                 values.blue_print = fileUploadData2.blue_print;
             }
-
             values.status = 0
 
             const res = await axios({
@@ -127,7 +159,7 @@ const View = ({ id }: { id: number }) => {
                     ...values
                 }
             });
-            
+
             if (res?.data?.status === 201) {
                 toast.success("Assets successfully send for approval.");
                 setIsOpen(false);
@@ -142,7 +174,6 @@ const View = ({ id }: { id: number }) => {
             return [];
         }
     };
-
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -173,7 +204,6 @@ const View = ({ id }: { id: number }) => {
         }
     }, [ulbId]);
 
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -191,7 +221,6 @@ const View = ({ id }: { id: number }) => {
             fetchData();
         }
     }, []);
-
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets'],
@@ -223,8 +252,8 @@ const View = ({ id }: { id: number }) => {
         ownership_doc: data?.data?.ownership_doc,
         ward_no: data?.data?.ward_no,
         address: data?.data?.address,
-        depreciation_method: "Straight Line Method",
-        apreciation_method: "Percentage Based Approach",
+        // depreciation_method: "Straight Line Method",
+        // apreciation_method: "Percentage Based Approach",
         type_of_land: data?.data?.type_of_land,
         area: data?.data?.area,
         order_date: data?.data?.order_date,
@@ -262,11 +291,6 @@ const View = ({ id }: { id: number }) => {
         setFile1(file);
     };
 
-
-    // const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //   setFile2(e.target.files?.[0] ?? null);
-    // };
-
     const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileInput = e.target;
         const file = fileInput.files?.[0] ?? null;
@@ -297,6 +321,7 @@ const View = ({ id }: { id: number }) => {
 
         setFile2(file);
     };
+
 
     return (
         <div>
@@ -346,7 +371,7 @@ const View = ({ id }: { id: number }) => {
                         <div>
                             {role === 'Field Officer' ? null :
                                 <>
-                                    Update Status - {data?.data?.status === 1 ? <div className='text-green-500'>Approved</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : null}
+                                    Update Status - {data?.data?.status === 2 ? <div className='text-green-500'>Approved by Admin</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : data?.data?.status === 1 ? <div className='text-green-500'>Approved by Field Officer</div> : <>null</>}
                                 </>
                             }
                         </div>
@@ -624,7 +649,6 @@ const View = ({ id }: { id: number }) => {
                                                         }
                                                     </>
                                                 )}
-                                                {/* <img src={data?.data?.ownership_doc} alt="img" width="20" height="20" /> */}
                                             </div>
 
                                             <div>
@@ -649,7 +673,6 @@ const View = ({ id }: { id: number }) => {
                                                         }
                                                     </>
                                                 )}
-                                                {/* <img src={data?.data?.blue_print} alt="img" width="20" height="20" /> */}
                                             </div>
 
                                             <InputBox
@@ -675,7 +698,7 @@ const View = ({ id }: { id: number }) => {
                                                 }}
                                             />
 
-                                            {values.assets_category_type === 'Land' ? (
+                                            {/* {values.assets_category_type === 'Land' ? (
                                                 <>
                                                     <InputBox
                                                         onChange={handleChange}
@@ -700,7 +723,7 @@ const View = ({ id }: { id: number }) => {
                                                     isReadOnly={true}
                                                 />
                                             )
-                                            }
+                                            } */}
 
                                         </div>
 
@@ -719,7 +742,6 @@ const View = ({ id }: { id: number }) => {
                     </div>
                 )}
             </div>
-
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
                 <div className="flex justify-between mb-10">
@@ -773,7 +795,7 @@ const View = ({ id }: { id: number }) => {
 
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto shadow-md">
                 <SubHeading>
                     <Image src={Home3} alt="employee" width={40} height={20} />
                     <span className="ml-3">Asset Detail</span>
@@ -784,49 +806,60 @@ const View = ({ id }: { id: number }) => {
 
                 <div>
                     <InnerHeading>Asset Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_assets === null ? <>No data found </> : <>{data?.data?.type_of_assets}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_assets === null ? <>No data found</> : <>{data?.data?.type_of_assets}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Sub-Category Name</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.asset_sub_category_name === null ? <>No data found </> : <>{data?.data?.asset_sub_category_name}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.asset_sub_category_name === null ? <>No data found</> : <>{data?.data?.asset_sub_category_name}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Asset Category Type</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.assets_category_type === null ? <>No data found </> : <>{data?.data?.assets_category_type}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.assets_category_type === null ? <>No data found</> : <>{data?.data?.assets_category_type}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Area</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.area === null ? <>No data found </> : <>{data?.data?.area}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.area === null ? <>No data found</> : <>{data?.data?.area}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Khata No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.khata_no === null ? <>No data found </> : <>{data?.data?.khata_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.khata_no === null ? <>No data found</> : <>{data?.data?.khata_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Plot No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.plot_no === null ? <>No data found </> : <>{data?.data?.plot_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.plot_no === null ? <>No data found</> : <>{data?.data?.plot_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Ward No.</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.ward_no === null ? <>No data found </> : <>{data?.data?.ward_no}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.ward_no === null ? <>No data found</> : <>{data?.data?.ward_no}</>}</p>
                 </div>
 
                 <div>
                     <InnerHeading>Type of Land</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_land === null ? <>No data found </> : <>{data?.data?.type_of_land}</>}</p>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_land === null ? <>No data found</> : <>{data?.data?.type_of_land}</>}</p>
+                </div>
+                <div></div>
+
+                {/* <div>
+                    <InnerHeading>Floor</InnerHeading>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.floor === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.floor : <>No floor found</>}</>}</p>
+                </div> */}
+
+                <div>
+                    <InnerHeading>Plot Count</InnerHeading>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.plotCount === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.plotCount : <>No floor found</>}</>}</p>
                 </div>
 
                 <div>
-                    <InnerHeading>Method of Depreciation</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.depreciation_method === null ? <>No data found </> : <>{data?.data?.depreciation_method}</>}</p>
+                    <InnerHeading>Plot Type</InnerHeading>
+                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.type === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.type : <>No floor found</>}</>}</p>
                 </div>
-
+               
                 <div></div>
 
                 <div>
@@ -863,7 +896,152 @@ const View = ({ id }: { id: number }) => {
                         </>
                     )}
                 </div>
+                <div></div>
+
+                {data?.data?.type_of_assets === "Building" ? (
+                <div>
+                    <InnerHeading>Floor Details</InnerHeading>
+                    <div className="mt-5">
+                        <div className="grid grid-cols-4 gap-4 w-[55rem]">
+                            {data?.data?.floorData?.map((floor: any) =>
+                                floor.details?.map((detail: any) => (
+                                    <div key={detail.id} className="bg-white shadow-md rounded-lg p-4">
+                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Floor :</span> {data?.data?.floorData[0]?.floor }</p>
+                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Plot :</span> {detail.index}</p>
+                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
+                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
+                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
+                                        <p className="text-md font-bold"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+                ): <></> }
+                
             </div>
+            <br></br>
+
+            {role === 'Municipal' ? (
+                <>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+                        <SubHeading>
+                            <Image src={Home3} alt="employee" width={40} height={20} />
+                            <span className="ml-3 text-[#4338CA] text-2xl font-bold">Field Officer Review</span>
+                        </SubHeading>
+
+                        <div></div>
+                        <div></div>
+
+                        <div>
+                            <InnerHeading>Latitute</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.lat === null ? <>Pending for Verification</> : <> {datas?.data[0]?.lat} </>}</p>
+                        </div>
+
+                        <div>
+                            <InnerHeading>Longitute</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.long === null ? <>Pending for Verification</> : <>{datas?.data[0]?.long}</>}</p>
+                        </div>
+
+                        <div>
+                            <InnerHeading>Remarks</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
+                        </div>
+
+                        <div>
+                            <InnerHeading>File Uploaded</InnerHeading>
+                            <div className='flex'>
+                                {datas?.data[0]?.image?.endsWith('.pdf') ? (
+                                    <>
+                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                            <iframe className='w-50 h-40 mt-4 overflow-x-hidden' src={datas?.data[0]?.image}></iframe>
+                                        }
+                                    </>
+                                ) : (
+                                    <>
+                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                            : <img className='w-20 h-20 mt-4' src={datas?.data[0]?.image} alt="img" width="100" height="30" />
+                                        }
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+                        <SubHeading>
+                            <Image src={Home3} alt="employee" width={40} height={20} />
+                            <span className="ml-3 text-[#4338CA] text-2xl font-bold">Admin Review</span>
+                        </SubHeading>
+
+                        <div></div>
+                        <div></div>
+                        <div>
+                            <InnerHeading>Remarks</InnerHeading>
+
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datass?.data[0]?.checker_remarks === null ? <>Pending for Verification</> : <>{datass?.data[0]?.checker_remarks}</>}</p>
+                        </div>
+                    </div>
+                </>
+
+            ) : (
+                <> </>
+            )
+            }
+
+            {role === 'Field Officer' ? (
+                <>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+                        <SubHeading>
+                            <Image src={Home3} alt="employee" width={40} height={20} />
+                            <span className="ml-3 text-[#4338CA] text-2xl font-bold">Field Officer Review</span>
+                        </SubHeading>
+
+                        <div></div>
+                        <div></div>
+
+                        <div>
+                            <InnerHeading>Latitute</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.lat === null ? <>Pending for Verification</> : <> {datas?.data[0]?.lat} </>}</p>
+                        </div>
+
+                        <div>
+                            <InnerHeading>Longitute</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.long === null ? <>Pending for Verification</> : <>{datas?.data[0]?.long}</>}</p>
+                        </div>
+
+                        <div>
+                            <InnerHeading>Remarks</InnerHeading>
+                            <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
+                        </div>
+
+
+                        <div>
+                            <InnerHeading>File Uploaded</InnerHeading>
+                            <div className='flex'>
+                                {datas?.data[0]?.image?.endsWith('.pdf') ? (
+                                    <>
+                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
+                                            <iframe className='w-50 h-40 mt-4 overflow-x-hidden' src={datas?.data[0]?.image}></iframe>
+                                        }
+                                    </>
+                                ) : (
+                                    <>
+                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
+                                            : <img className='w-20 h-20 mt-4' src={datas?.data[0]?.image} alt="img" width="100" height="30" />
+                                        }
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <>
+                </>
+            )
+            }
             <div>
             </div>
         </div>

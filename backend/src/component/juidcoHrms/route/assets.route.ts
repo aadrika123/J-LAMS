@@ -61,15 +61,34 @@ class AssetManagementRoute {
           this.ulbmasterController.get(req, res, next, "0107"),
     ); //0107
 
+    // app
+    //   .route(`${baseUrl}/assets/update-list`)
+    //   .get(
+    //     (req: Request, res: Response, next: NextFunction) =>
+    //       this.assetManagementController.getAllUpdated(req, res, next, "0108"),
+    // ); //0108
+
     app
-      .route(`${baseUrl}/assets/update-list`)
+      .route(`${baseUrl}/assets/field-officer-list`)
       .get(
         (req: Request, res: Response, next: NextFunction) =>
-          this.assetManagementController.getAllUpdated(req, res, next, "0108"),
-    ); //0108
-  }
+          this.assetManagementController.getAllFieldOfficer(req, res, next, "0109"),
+    ); //0109
 
-  
+    app
+      .route(`${baseUrl}/assets/checker-list`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getAllCheckerData(req, res, next, "0110"),
+    ); //0110
+
+     app
+      .route(`${baseUrl}/assets/auditlog-list`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getAllAuditData(req, res, next, "0110"),
+    ); //0110
+  }
 }
 
 export default AssetManagementRoute;

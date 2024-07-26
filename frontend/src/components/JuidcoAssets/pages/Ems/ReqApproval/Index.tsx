@@ -18,7 +18,8 @@ import Jhar from "@/assets/icons/jhar.png"
 import docs from '@/assets/icons/doc.svg'
 import pdf from '@/assets/icons/pdf.svg'
 import notfound from '@/assets/icons/not-found.png'
-import toast, { Toaster } from 'react-hot-toast';
+import PrimaryButton from '@/components/Helpers/Button';
+import goBack from '@/utils/helper';
 
 const ReqApproval = () => {
 
@@ -40,17 +41,15 @@ const ReqApproval = () => {
         { name: "KHATA NO." },
         { name: "AREA (sqFt.)" },
         { name: "DOCUMENTS" },
-        { name: "VIEW" },
-        { name: "ACTIONS" },
+        { name: "VIEW" }
     ]
 
     const fetchData = async (page: number, searchQuery: string, filter: string) => {
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.count}&page=${page}&search=${searchQuery}&filter=${filter}`,
+                url: `${ASSETS.LIST.getAllAudit}&page=${page}&search=${searchQuery}&filter=${filter}`,
                 method: "GET",
             });
-
             return res?.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -117,71 +116,6 @@ const ReqApproval = () => {
 
     /////////////////////////////// handleApprove & handleReject of request of assets /////////////////////////////
 
-
-    const handleApprove = async (assetId: any) => {
-        const area = data?.data[0]?.area
-        const type_of_assets = data?.data[0]?.type_of_assets
-        const assets_category_type = data?.data[0]?.assets_category_type
-        const type_of_land = data?.data[0]?.type_of_land
-        const khata_no = data?.data[0]?.khata_no
-        const blue_print = data?.data[0]?.blue_print
-        const ownership_doc = data?.data[0]?.ownership_doc
-        const asset_sub_category_name = data?.data[0]?.asset_sub_category_name
-        const plot_no = data?.data[0]?.plot_no
-        const ward_no = data?.data[0]?.ward_no
-        const address = data?.data[0]?.address
-        const depreciation_method = "Straight Line Method"
-        const apreciation_method = "Percentage Based Approach"
-        const order_date = data?.data[0]?.order_date
-        const order_no = data?.data[0]?.order_no
-
-        const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
-            method: "POST",
-            data: {
-                status: 1,
-                area,
-                type_of_assets,
-                assets_category_type,
-                type_of_land,
-                khata_no,
-                blue_print,
-                ownership_doc,
-                asset_sub_category_name,
-                plot_no,
-                ward_no,
-                address,
-                depreciation_method,
-                apreciation_method,
-                order_date,
-                order_no
-            }
-
-        });
-        if (res?.data?.status === 201) {
-            toast.success("Assets successfully updated");
-            window.location.reload()
-        } else {
-            toast.error("Please check and try again.");
-        }
-    }
-
-    const handleReject = async (assetId: any) => {
-        const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
-            method: "POST",
-            data: {
-                status: -1,
-            }
-        });
-        if (res?.data?.status === 201) {
-            toast.success("Assets update Rejected");
-            window.location.reload()
-        } else {
-            toast.error("Please check and try again.");
-        }
-    }
-
     const handleView = (item: any) => {
         setSelectedItem(item);
         setIsPopupVisible(true);
@@ -192,21 +126,66 @@ const ReqApproval = () => {
         setSelectedItem(null);
     };
 
-    /////////////////////////////// handleApprove & handleReject of request of assets /////////////////////////////
+    const formatDate = (datetime:any) => {
+    const date = new Date(datetime);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options as any);
+    };
+    
+    console.log("data", data)
+    console.log("selectedItem", selectedItem)
 
+    /////////////////////////////// handleApprove & handleReject of request of assets /////////////////////////////
 
     return (
         <div>
-            <Toaster />
-
             <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
                 <div className="flex items-center">
 
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Update Application Request
+                        Audit Log Report
                     </InnerHeading>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
+                <div className="flex items-center">
+                    <PrimaryButton
+                        buttonType="button"
+                        variant={"cancel"}
+                        onClick={goBack}
+                        className="border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center"
+                    >
+                        <i>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="25"
+                                height="20"
+                                viewBox="0 0 25 25"
+                                fill="none"
+                            >
+                                <g clipPath="url(#clip0_949_7008)">
+                                    <path
+                                        d="M10.6736 7.20536L4 13.9137L10.6736 20.622C10.7339 20.7012 10.8105 20.7665 10.8981 20.8134C10.9858 20.8604 11.0826 20.888 11.1819 20.8943C11.2812 20.9007 11.3806 20.8856 11.4736 20.8501C11.5666 20.8147 11.6508 20.7597 11.7206 20.6888C11.7905 20.618 11.8443 20.533 11.8784 20.4395C11.9125 20.3461 11.9262 20.2464 11.9184 20.1472C11.9107 20.048 11.8817 19.9517 11.8335 19.8646C11.7853 19.7776 11.7189 19.702 11.6389 19.6429L6.64583 14.6081H19.9306C20.1147 14.6081 20.2914 14.535 20.4216 14.4047C20.5518 14.2745 20.625 14.0979 20.625 13.9137C20.625 13.7295 20.5518 13.5529 20.4216 13.4227C20.2914 13.2924 20.1147 13.2193 19.9306 13.2193H6.64583L11.6389 8.18453C11.7687 8.05376 11.8413 7.87677 11.8407 7.69249C11.84 7.50821 11.7662 7.33174 11.6354 7.20189C11.5047 7.07205 11.3277 6.99946 11.1434 7.00012C10.9591 7.00077 10.7826 7.0746 10.6528 7.20536H10.6736Z"
+                                        fill="#665DD9"
+                                    />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_949_7008">
+                                        <rect
+                                            width="25"
+                                            height="25"
+                                            fill="white"
+                                            transform="matrix(0 -1 1 0 0 25)"
+                                        />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </i>
+                        Back
+                    </PrimaryButton>
                 </div>
             </div>
 
@@ -302,19 +281,6 @@ const ReqApproval = () => {
                                             </svg>
                                         </div>
                                     </td>
-
-                                    {item.status === 1 ? (
-                                        <div className='text-green-500 text-xs mt-6 ml-6 '>Approved</div>
-                                    ) : item.status === -1 ? (
-                                        <div className='text-red-500 text-xs mt-6 ml-6'>Rejected</div>
-                                    ) : (
-                                        <td className="px-6 py-4">
-                                            <div className='flex justify-start gap-2'>
-                                                <button onClick={() => { handleApprove(item?.assetId) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
-                                                <button onClick={() => { handleReject(item?.assetId) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
-                                            </div>
-                                        </td>
-                                    )}
                                 </tr>
                             ))}
                         </tbody>
@@ -373,15 +339,23 @@ const ReqApproval = () => {
                                             <span className="text-gray-600">{selectedItem?.address}</span>
                                         </p>
                                         <p className="flex justify-between items-center">
+                                            <strong className="text-gray-700">Updated At:</strong>
+                                            <span className="text-gray-600">{formatDate(selectedItem?.created_at)}</span>
+                                        </p>
+                                        <p className="flex justify-between items-center">
+                                            <strong className="text-gray-700">Updated By:</strong>
+                                            <span className="text-gray-600">{selectedItem?.role !== null ? <div className='text-[#3592FF] font-bold'>{selectedItem?.role }</div> : <div className='text-[#ff3535] font-bold'> No Role Provided</div>}</span>
+                                        </p>
+                                        <p className="flex justify-between items-center">
                                             <strong className="text-gray-700">Ownership Doc:</strong>
                                             <img src={selectedItem?.ownership_doc} alt="img" width="30" height="30" />
                                         </p>
+                                        
                                         <p className="flex justify-between items-center">
                                             <strong className="text-gray-700">Blue Print:</strong>
                                             <img src={selectedItem?.blue_print} alt="img" width="30" height="30" />
                                         </p>
                                     </div>
-
                                 </div>
                             </div>
                         )}

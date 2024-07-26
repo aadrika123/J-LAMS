@@ -175,7 +175,7 @@ const Login = () => {
                 </form>
               )}
             </Formik>
-            <div className="my-2">
+            {/* <div className="my-2">
               <div className="flex flex-col items-center justify-center flex-wrap gapx-x-2 gap-y-2 w-full poppins">
                 <span
                   className="text-gray-700 text-sm font-semibold cursor-pointer w-full text-center"
@@ -186,7 +186,7 @@ const Login = () => {
                   Forgot Password
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -12,7 +12,6 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Customer from "@/assets/icons/cv 1.png";
 import PrimaryButton from '@/components/Helpers/Button';
-// import goBack from '@/utils/helper';
 import InputBox from '@/components/Helpers/InputBox';
 import toast, { Toaster } from 'react-hot-toast';
 import { Formik, FormikHelpers } from 'formik';
@@ -22,17 +21,36 @@ import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
 import Jhar from "@/assets/icons/jhar.png"
 
-
 export const DashboardMain = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
 
-  // const randomNumber = Math.floor(Math.random() * 90) + 10;
-  // const application_no = `ASSID${randomNumber}`;
+  const [floorCount, setFloorCount] = useState(0);
+  // const [, setSavedFloorCount] = useState(0);
+  const [inputBoxes, setInputBoxes] = useState<any>([]);
+  const [isModalVisible, setIsModalVisible] = useState<any>(true);
+  const [data, setData] = useState<any>([]);
 
-  // const date = new Date().toLocaleDateString()
+
+  // const [datas, setData] = useState<any>([])
+  // const [prevState, setPrevState] = useState<any>({ inputBoxes: [], data: {} });
+  const [, setCurrentType] = useState<any>(null);
+  const [plotNo, setPlotNo] = useState<any>(0);
+  // const [unitsWithForms, setUnitsWithForms] = useState({});
+  const [, setNavigationStack] = useState([]);
+  const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
+  const [, setSessionData] = useState([]);
+
+
+
+
+
+
+
+
+
 
   const initialValues = {
     type_of_assets: "",
@@ -44,30 +62,35 @@ export const DashboardMain = () => {
     ownership_doc: "",
     ward_no: "",
     address: "",
-    depreciation_method: "Straight Line Method",
-    apreciation_method: " Percentage Based Approach",
+    // depreciation_method: "Straight Line Method",
+    // apreciation_method: " Percentage Based Approach",
     type_of_land: "",
     area: "",
     order_no: "",
     order_date: "",
     acquisition: "",
     from_whom_acquired: "",
-    mode_of_acquisition:""
+    mode_of_acquisition: "",
+    role: "Municipal",
+    building_approval_plan: "",
+    no_of_floors: floorCount
   }
 
   const employeeValidationSchema = Yup.object().shape({
     khata_no: Yup.string().required("Khata No. is Required"),
     plot_no: Yup.string().required("Plot No. is Required"),
     type_of_assets: Yup.mixed().required("Choose Asset Category Name"),
-    asset_sub_category_name: Yup.mixed().required("Choose Asset Sub Category Name"),
-    assets_category_type: Yup.mixed().required("Choose Asset Category Type"),
+    // asset_sub_category_name: Yup.mixed().required("Choose Asset Sub Category Name"),
+    // assets_category_type: Yup.mixed().required("Choose Asset Category Type"),
     area: Yup.string().required("Area. is Required"),
     type_of_land: Yup.string().required("Type of Land"),
-    // order_no: Yup.string().required("Enter order number"),
-    order_date: Yup.string().required("Enter order date"),
+    // order_date: Yup.string().required("Enter order date"),
   });
 
-   const handleUpload = async () => {
+
+
+
+  const handleUpload = async () => {
     if (file1) {
       const data = new FormData();
       data.append('file', file1);
@@ -91,7 +114,6 @@ export const DashboardMain = () => {
     }
   };
 
-
   const handleUpload2 = async () => {
     if (file2) {
       const data = new FormData();
@@ -112,13 +134,12 @@ export const DashboardMain = () => {
         toast.error("Error uploading files");
       }
     } else {
-       console.log("not uploaded")
+      console.log("not uploaded")
     }
   };
 
-
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
-    console.log("values", values)
+
     try {
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
@@ -130,18 +151,25 @@ export const DashboardMain = () => {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
 
+      values.role = initialValues.role;
+      values.no_of_floors = initialValues.no_of_floors
+      values.floorData = transformDataForAPI(data);
+
+
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
         method: "POST",
         data: values,
       });
+
+      console.log("res", res)
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
         window.location.replace("/lams/apply/approve-application");
       } else if (res?.data?.type === "DUPLICATE") {
         toast.error("Duplicate asset data found. Please check and try again.");
-        }
+      }
       else {
         toast.error("Failed to add assets");
       }
@@ -151,13 +179,19 @@ export const DashboardMain = () => {
     }
   };
 
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 500);
     return () => clearTimeout(timeout);
 
+  }, []);
+
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('unitData');
+    if (storedData) {
+      setSessionData(JSON.parse(storedData));
+    }
   }, []);
 
   if (isLoading) {
@@ -169,17 +203,13 @@ export const DashboardMain = () => {
     );
   }
 
-  // const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFile1(e.target.files?.[0] ?? null);
-  // };
-
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
     const file = fileInput.files?.[0] ?? null;
 
     if (!file) {
-        setFile1(null);
-        return;
+      setFile1(null);
+      return;
     }
 
     const fileType = file.type;
@@ -188,34 +218,29 @@ export const DashboardMain = () => {
     const acceptedFileTypes = ["image/png", "image/jpeg", "application/pdf"];
 
     if (!acceptedFileTypes.includes(fileType)) {
-        alert("Please upload a PNG, JPEG, or PDF file.");
-        setFile1(null);
-        fileInput.value = ""; 
-        return;
+      alert("Please upload a PNG, JPEG, or PDF file.");
+      setFile1(null);
+      fileInput.value = "";
+      return;
     }
 
     if (fileSize / 1024 >= 2048) {
-        alert("Cannot upload more than 2MB data!");
-        setFile1(null);
-        fileInput.value = ""; 
-        return;
+      alert("Cannot upload more than 2MB data!");
+      setFile1(null);
+      fileInput.value = "";
+      return;
     }
 
     setFile1(file);
-};
-
-
-  // const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFile2(e.target.files?.[0] ?? null);
-  // };
+  };
 
   const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
     const file = fileInput.files?.[0] ?? null;
 
     if (!file) {
-        setFile2(null);
-        return;
+      setFile2(null);
+      return;
     }
 
     const fileType = file.type;
@@ -224,25 +249,23 @@ export const DashboardMain = () => {
     const acceptedFileTypes = ["image/png", "image/jpeg", "application/pdf"];
 
     if (!acceptedFileTypes.includes(fileType)) {
-        alert("Please upload a PNG, JPEG, or PDF file.");
-        setFile2(null);
-        fileInput.value = ""; 
-        return;
+      alert("Please upload a PNG, JPEG, or PDF file.");
+      setFile2(null);
+      fileInput.value = "";
+      return;
     }
 
     if (fileSize / 1024 >= 2048) {
-        alert("Cannot upload more than 2MB data!");
-        setFile2(null);
-        fileInput.value = "";
-        return;
+      alert("Cannot upload more than 2MB data!");
+      setFile2(null);
+      fileInput.value = "";
+      return;
     }
 
     setFile2(file);
-};
+  };
 
-
- 
- const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = new Date(e.target.value);
     const currentDate = new Date();
 
@@ -254,14 +277,282 @@ export const DashboardMain = () => {
     lastYearDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < lastYearDate) {
-        toast.error("Please select a date within the last year or a future date!");
-        return false;
+      toast.error("Please select a date within the last year or a future date!");
+      return false;
     }
     return true;
- };
-  
+  };
+
   const handleBack = () => {
-   window.location.replace("/lams/apply/approve-application");
+    window.location.replace("/lams/apply/approve-application");
+  }
+
+  const handleSave = () => {
+    const boxes = Array.from({ length: floorCount }, (_, index) => (
+      <input
+        key={index}
+        type="text"
+        readOnly
+        className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA] "
+        placeholder={`${index + 1}`}
+        onClick={() => handleFloor(index)}
+      />
+    ));
+    setInputBoxes(boxes);
+    setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+  };
+
+  const handleFloor = (index: any) => {
+    if (!data[index]) {
+      setData((prevData: any) => {
+        const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+        if (!updatedData[index]) {
+          updatedData[index] = { floor: index + 1, units: {}, plotCount: 0 };
+        }
+        return updatedData;
+      });
+    }
+
+    const popup = (
+      <div key={`popup-${index}`}>
+        <input
+          key={index}
+          type="number"
+          className="border p-2 m-2"
+          placeholder={`No of plot on the floor ${index + 1}`}
+          onChange={(e) => handlePlotCountChange(e, index)}
+        />
+        <br />
+        <button
+          className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
+          onClick={() => handleTypeSelect("Commercial", index)}
+        >
+          Commercial
+        </button>
+        <button
+          className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
+          onClick={() => handleTypeSelect("Residential", index)}
+        >
+          Residential
+        </button>
+      </div>
+    );
+
+    setInputBoxes([popup]);
+    setNavigationStack((prevStack) => [...prevStack, [popup]] as any);
+  };
+
+  const handlePlotCountChange = (e: any, index: any) => {
+    const plotNumber = parseInt(e.target.value);
+    setPlotNo(plotNumber);
+
+    setData((prevData: any) => {
+      const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+      if (!updatedData[index]) {
+        updatedData[index] = { floor: index + 1, units: {}, plotCount: plotNumber };
+      } else {
+        updatedData[index].plotCount = plotNumber;
+      }
+      return updatedData;
+    });
+  };
+
+  console.log("plotNo", plotNo);
+
+  const handleTypeSelect = (type: any, index: any) => {
+    setCurrentType(type);
+    const typeBox = (
+      <input
+        key={`type-${type}`}
+        type="number"
+        className="border p-2 m-2"
+        placeholder={`Number of ${type} units`}
+        onChange={(e) => handleTypeBox(e, type, index)}
+      />
+    );
+
+    setInputBoxes([typeBox]);
+    setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
+  };
+
+  const handleTypeBox = (e: any, type: any, index: any) => {
+    const count = parseInt(e.target.value);
+    if (isNaN(count)) return;
+
+    const length = Object.keys(unitCompletion);
+    console.log("lenghtfgdfg", length)
+
+    setData((prevData: any) => {
+      const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+      const floorObj = updatedData[index];
+      if (floorObj) {
+        floorObj.units[type] = new Array(count).fill({}).map((_, unitIndex) => ({
+          index: unitIndex + 1,
+          type,
+        }));
+      }
+      return updatedData;
+    });
+
+    const newBoxes = Array.from({ length: count }, (_, boxIndex) => {
+      return (
+        <>
+          <br></br>
+          <input
+            key={`type-${type}-${index}-${boxIndex}`}
+            type="text"
+            readOnly
+            className={`border p-2 ml-2 justify-center items-center w-[3rem] text-slate-600 cursor-pointer rounded-md ${type === 'Commercial' ? 'bg-[#d6fce7]' : 'bg-[#e7e5ff]'}`}
+            placeholder={`${boxIndex + 1}`}
+            onClick={() => handleInnerFloor(index, type, boxIndex)}
+          />
+          <br></br>
+        </>
+      )
+    });
+
+    setInputBoxes((prevInputBoxes: any) => {
+      const typeBoxIndex = prevInputBoxes.findIndex(
+        (box: any) => box.key === `type-${type}`
+      );
+
+      if (typeBoxIndex !== -1) {
+        return [
+          ...prevInputBoxes.slice(0, typeBoxIndex + 1),
+          ...newBoxes,
+        ];
+      }
+
+      return [...prevInputBoxes, ...newBoxes];
+    });
+
+    setNavigationStack((prevStack) => {
+      const newStack: any = [...prevStack];
+      newStack[newStack.length - 1] = [newBoxes];
+      return newStack;
+    });
+
+  };
+
+  const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
+    const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
+    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex + 1);
+    const unitData = floorData?.units[type]?.[unitIndex] || {};
+
+    const innerBoxes = (
+      <div key={`${floorIndex}-${type}-${unitIndex}`}>
+        <input
+          type="text"
+          className="border p-2 m-2"
+          placeholder="length"
+          defaultValue={unitData.length || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
+        />
+        <input
+          type="text"
+          className="border p-2 m-2"
+          placeholder="breadth"
+          defaultValue={unitData.breadth || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
+        />
+        <input
+          type="text"
+          className="border p-2 m-2"
+          placeholder="height"
+          defaultValue={unitData.height || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
+        />
+        <input
+          type="text"
+          className="border p-2 m-2"
+          placeholder="name"
+          defaultValue={unitData.name || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
+        />
+        <br></br>
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => {
+              handleSave();
+              setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+            }}
+            className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+          >
+            Save & Move to Floor Part
+          </button>
+        </div>
+      </div>
+    );
+
+    setInputBoxes([innerBoxes]);
+    setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+  };
+
+  const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
+    const value = e.target.value;
+    setData((prevData: any) => {
+      const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex + 1);
+      if (!floorObj) {
+        floorObj = { floor: floorIndex + 1, units: {} };
+        updatedData[floorIndex] = floorObj;
+      }
+
+      if (!floorObj.units[type]) {
+        floorObj.units[type] = [];
+      }
+
+      if (!floorObj.units[type][unitIndex]) {
+        floorObj.units[type][unitIndex] = {};
+      }
+
+      const unit = floorObj.units[type][unitIndex];
+      const allFieldsFilled = unit?.length && unit?.breadth && unit?.height && unit?.name;
+
+      floorObj.units[type][unitIndex][field] = value;
+
+      if (allFieldsFilled) {
+        console.log(`Unit ${unitIndex + 1} details:`, unit);
+        sessionStorage.setItem('unitData', JSON.stringify(updatedData));
+        setUnitCompletion((prevCompletion) => ({
+          ...prevCompletion,
+          [`${unitIndex + 1}`]: allFieldsFilled,
+        }));
+      }
+
+      return updatedData;
+    });
+  };
+
+
+  const transformDataForAPI = (data: any) => {
+    return data
+      .filter((item: any) => item)
+      .flatMap((floor: any) =>
+        Object.entries(floor.units).map(([type, units]: any) => ({
+          floor: floor.floor,
+          plotCount: floor.plotCount,
+          type,
+          details: units.filter((unit: any) => unit),
+        }))
+      );
+  };
+
+  const handleBackss = () => {
+    setNavigationStack((prevStack) => {
+      if (prevStack.length > 1) {
+        const newStack = prevStack.slice(0, -1);
+        setInputBoxes(newStack[newStack.length - 1]);
+        return newStack;
+      }
+      return prevStack;
+    });
+  };
+
+
+  const handleClose = () => {
+    setIsModalVisible(false)
+    setInputBoxes('')
   }
 
 
@@ -350,55 +641,59 @@ export const DashboardMain = () => {
                   required={true}
                   placeholder={"Choose Asset Category Name"}
                   options={[
-                    
+
                     {
                       id: 1,
                       name: "Building",
                     },
                     {
                       id: 2,
-                      name: "Drainage",
-                    },
-                    {
-                      id: 3,
-                      name: "Gym",
-                    },
-                    {
-                      id: 4,
                       name: "Hall",
                     },
                     {
-                      id: 5,
+                      id: 3,
                       name: "Others",
                     }
                   ]}
                 />
-                {values?.type_of_assets === 'Drainage' &&  (
-                  <>
-                  <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.asset_sub_category_name}
-                  error={errors.asset_sub_category_name}
-                  touched={touched.asset_sub_category_name}
-                  label="Asset Sub-Category Name"
-                  name="asset_sub_category_name"
-                  required={true}
-                  placeholder={"Choose Asset Sub Category Name"}
-                  options={[
-                    
-                    {
-                      id: 1,
-                      name: "Core Asset Drainage",
-                    },
-                   
-                  ]}
-                />
-                  </>
+
+                {values.type_of_assets === 'Building' && isModalVisible && (
+                  <div className="fixed inset-0 flex items-center justify-center ">
+                    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem]">
+                      <div className='mb-[3rem]'>
+                        <button onClick={handleClose} className='bg-red-600  text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+                        {/* <button onClick={handleBacks} className='bg-[#4338CA] text-white float-right ml-4 w-20 rounded-xl'>back</button> */}
+                        <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+
+                      </div>
+
+                      <div>
+                        <input
+                          type="number"
+                          value={floorCount}
+                          onChange={(e) => setFloorCount(parseInt(e.target.value))}
+                          placeholder="Number of Floors"
+                          className="border p-2 m-2"
+                        />
+                        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
+                        <div className="flex flex-col">
+                          {inputBoxes.length > 0 ? (
+                            <div className="h-[20rem] overflow-x-auto">
+                              {inputBoxes}
+                            </div>
+                          ) : (
+                            <div>
+                              {inputBoxes}
+                            </div>
+                          )}
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
-                {values?.type_of_assets !== 'Drainage' && (
-                  <SelectForNoApi
+                <SelectForNoApi
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.asset_sub_category_name}
@@ -406,7 +701,6 @@ export const DashboardMain = () => {
                   touched={touched.asset_sub_category_name}
                   label="Asset Sub-Category Name"
                   name="asset_sub_category_name"
-                  required={true}
                   placeholder={"Choose Asset Sub Category Name"}
                   options={[
                     {
@@ -420,10 +714,25 @@ export const DashboardMain = () => {
                     {
                       id: 3,
                       name: "Parking",
+                    },
+                    {
+                      id: 4,
+                      name: "Enclosed/Non-Enclosed"
+                    },
+                    {
+                      id: 5,
+                      name: "Vacant Land"
+                    },
+                    {
+                      id: 6,
+                      name: "Gym"
+                    },
+                    {
+                      id: 7,
+                      name: "Market"
                     }
                   ]}
                 />
-                )}
 
                 <SelectForNoApi
                   onChange={handleChange}
@@ -433,21 +742,12 @@ export const DashboardMain = () => {
                   touched={touched.assets_category_type}
                   label="Asset Category Type"
                   name="assets_category_type"
-                  required={true}
                   placeholder={"Choose Asset Category Name"}
                   options={[
                     {
                       id: 1,
                       name: "Immovable",
                     },
-                    // {
-                    //   id: 2,
-                    //   name: "Movable",
-                    // },
-                    {
-                      id: 2,
-                      name: "Land",
-                    }
                   ]}
                 />
 
@@ -491,10 +791,8 @@ export const DashboardMain = () => {
                     name='blue_print'
                     className="mb-4 p-1 border border-slate-400 w-full rounded"
                     onChange={handleFile1Change}
-                    
-                  />
-                  {/* <ErrorMessage name="blue_print" component="div" className="text-red-500 text-md mt-[-8px]" /> */}
 
+                  />
                 </div>
                 <div>
                   <label>Ownership Documents </label>
@@ -505,8 +803,6 @@ export const DashboardMain = () => {
                     className="mb-4 p-1 border border-slate-400 w-full rounded"
                     onChange={handleFile2Change}
                   />
-                  {/* <ErrorMessage name="ownership_doc" component="div" className="text-red-500 text-md mt-[-8px]" /> */}
-
                 </div>
 
                 <InputBox
@@ -550,6 +846,14 @@ export const DashboardMain = () => {
                     {
                       id: 2,
                       name: "Residential Land",
+                    },
+                    {
+                      id: 3,
+                      name: "Agriculture Land",
+                    },
+                    {
+                      id: 4,
+                      name: "Mixed Land",
                     }
                   ]}
                 />
@@ -599,14 +903,14 @@ export const DashboardMain = () => {
                     }
                   }}
                 />
-                
+
                 <InputBox
                   // onChange={handleChange}
                   onChange={(e) => {
-                     if (handleDateChange(e as any)) {
-                        handleChange(e);
-                     }
-                   }}
+                    if (handleDateChange(e as any)) {
+                      handleChange(e);
+                    }
+                  }}
                   onBlur={handleBlur}
                   error={errors.order_date}
                   touched={touched.order_date}
@@ -615,7 +919,6 @@ export const DashboardMain = () => {
                   name="order_date"
                   type="date"
                   placeholder={"Enter order date"}
-                  required={true}
                   onKeyPress={(e: any) => {
                     if (
                       (
@@ -661,7 +964,7 @@ export const DashboardMain = () => {
                   placeholder={"Enter Your Acquisition"}
                   name="acquisition"
                   type="date"
-                   onKeyPress={(e: any) => {
+                  onKeyPress={(e: any) => {
                     if (
                       (
                         (e.key >= "a" || e.key >= "z") ||
@@ -675,7 +978,7 @@ export const DashboardMain = () => {
                   }}
                 />
 
-                  <SelectForNoApi
+                <SelectForNoApi
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.mode_of_acquisition}
@@ -689,22 +992,14 @@ export const DashboardMain = () => {
                     },
                     {
                       id: 2,
-                      name: "Construction",
-                    },
-                    {
-                      id: 3,
                       name: "Donation",
                     },
                     {
-                      id: 4,
+                      id: 3,
                       name: "Purchase",
                     },
                     {
-                      id: 5,
-                      name: "Tender",
-                    },
-                    {
-                      id: 6,
+                      id: 4,
                       name: "Others",
                     }
                   ]}
@@ -718,60 +1013,30 @@ export const DashboardMain = () => {
                   placeholder={"From whom Acquired"}
                   name="from_whom_acquired"
                   type="text"
+                  maxLength={50}
                 />
 
-                {values?.assets_category_type === 'Land' ? (
-                  <>
-                    <InputBox
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.apreciation_method}
-                      // error={errors.apreciation_method}
-                      // touched={touched.apreciation_method}
-                      label="Apreciation Method"
-                      placeholder={"Enter Apreciation Method"}
-                      name="apreciation_method"
-                      type="text"
-                      isReadOnly={true}
-                      maxLength={30}
-                      onKeyPress={(e: any) => {
-                        if (
-                          !(
-                            (e.key >= "a" || e.key >= "z") ||
-                            (e.key <= "A" || e.key <= "Z") ||
-                            e.key === " "
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    /></>
-                ) : (
-                  <InputBox
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.depreciation_method}
-                    // error={errors.depreciation_method}
-                    // touched={touched.depreciation_method}
-                    label="Depreciation Method"
-                    placeholder={"Enter Depreciation Method"}
-                    name="depreciation_method"
-                    type="text"
-                    isReadOnly={true}
-                  />
-                )
-                }
+                <InputBox
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.building_approval_plan}
+                  label="Building Approval Plan No. / Gift Deed No."
+                  placeholder={"Building Approval Plan No. / Gift Deed No."}
+                  name="building_approval_plan"
+                  type="text"
+                  maxLength={20}
+                />
               </div>
 
               <div className="flex items-center justify-end mt-5 gap-5">
-               <PrimaryButton
+                <PrimaryButton
                   onClick={handleReset}
                   buttonType="button"
                   variant={"cancel"}
                 >
                   Reset
                 </PrimaryButton>
-                      
+
                 <PrimaryButton buttonType="submit" variant="primary">
                   Save
                 </PrimaryButton>

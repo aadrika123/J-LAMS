@@ -11,12 +11,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model assets_list {
+//   id                      Int                      @id @default(autoincrement())
+//   type_of_assets          String?
+//   asset_sub_category_name String?
+//   assets_category_type    String?
+//   khata_no                String?
+//   plot_no                 String?
+//   ward_no                 String?
+//   address                 String?
+//   depreciation_method     String?
+//   apreciation_method      String?
+//   blue_print              String?
+//   ownership_doc           String?
+//   type_of_land            String?
+//   area                    String?
+//   order_no                String?  @unique
+//   order_date              String?
+//   acquisition             String?
+//   from_whom_acquired      String?
+//   mode_of_acquisition     String?
+//   role                    String?
+//   asset_list              assets_list_change_log[]
+//   asset_fieldOfficer      asset_fieldOfficer_req?
+
+//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+
+//   created_at DateTime @default(now()) @map("created_at")
+//   updated_at DateTime @updatedAt @map("updated_at")
+// }
+
 model assets_list {
-  id                      Int @id @default(autoincrement())
+  id                      Int                      @id @default(autoincrement())
   type_of_assets          String?
   asset_sub_category_name String?
   assets_category_type    String?
-  khata_no                String? 
+  khata_no                String?
   plot_no                 String?
   ward_no                 String?
   address                 String?
@@ -26,21 +56,48 @@ model assets_list {
   ownership_doc           String?
   type_of_land            String?
   area                    String?
-  order_no                String?
+  order_no                String?  @unique
   order_date              String?
   acquisition             String?
   from_whom_acquired      String?
   mode_of_acquisition     String?
+  role                    String?
   asset_list              assets_list_change_log[]
-  asset_update            asset_update_req[]
-  status                  Int?      @default(0) // 0: pending, 1: approved, -1: rejected
+  asset_fieldOfficer      asset_fieldOfficer_req?
+  floorData               floorData[]
+  // details                 details[]
+  
+  status Int? @default(0) // 0: pending, 1: approved, -1: rejected
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
+model floorData {
+  id         Int     @id @default(autoincrement())
+  floor      Int?
+  plotCount  Int?
+  type       String?
+  assetsList assets_list @relation(fields: [assetsListId], references: [id])
+  assetsListId Int
+  details    details[]
+}
+
+model details {
+  id         Int     @id @default(autoincrement())
+  index      Int?
+  type       String?
+  length     String?
+  breadth    String?
+  height     String?
+  name       String?
+  floorData  floorData @relation(fields: [floorDataId], references: [id])
+  floorDataId Int
+}
+
+
 model assets_list_change_log {
-  id                      Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   type_of_assets          String?
   asset_sub_category_name String?
@@ -60,40 +117,40 @@ model assets_list_change_log {
   acquisition             String?
   from_whom_acquired      String?
   mode_of_acquisition     String?
-  status                  Int?     @default(0) // 0: pending, 1: approved, -1: rejected
+  role                    String?
+  status                  Int?    @default(0) // 0: pending, 1: approved, -1: rejected
 
-  asset                   assets_list  @relation(fields: [assetId], references: [id])
-  assetId                 Int
+  asset   assets_list @relation(fields: [assetId], references: [id])
+  assetId Int
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
+model asset_checker_req {
+  id           Int                    @id @default(autoincrement())
 
-model asset_update_req {
-  id                    Int       @id @default(autoincrement())
-  type_of_assets        String?
-  asset_sub_category_name String?
-  assets_category_type  String?
-  khata_no              String?
-  plot_no               String?
-  ward_no               String?
-  address               String?
-  depreciation_method   String?
-  apreciation_method    String?
-  blue_print            String?
-  ownership_doc         String?
-  type_of_land          String?
-  area                  String?
-  order_no              String? 
-  order_date            String?
-  acquisition           String?
-  from_whom_acquired    String?
-  mode_of_acquisition   String?
-  status                Int?     @default(0) // 0: pending, 1: approved, -1: rejected
+  fieldOfficer asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId])
+  assetId      Int      @unique     
+  checker_remarks  String?         
+  
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
 
-  asset                 assets_list  @relation(fields: [assetId], references: [id])
-  assetId               Int
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+model asset_fieldOfficer_req {
+  id Int @id @default(autoincrement())
+
+  long    String?
+  lat     String?
+  remarks String?
+  image   String?
+
+  asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId Int         @unique
+
+  asset_checker_req asset_checker_req[]
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }

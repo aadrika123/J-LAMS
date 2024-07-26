@@ -11,8 +11,7 @@ import FormData from "form-data";
 import { Request, Response } from "express";
 
 const dmsUrl = "https://aadrikainfomedia.com/dms/backend/document/upload";
-const DMS_GET =
-  "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";
+const DMS_GET = "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";
 
 
 // const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";
