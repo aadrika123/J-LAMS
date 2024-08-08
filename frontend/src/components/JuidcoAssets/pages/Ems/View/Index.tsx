@@ -20,7 +20,7 @@ import PrimaryButton from '@/components/Helpers/Button';
 import goBack from '@/utils/helper';
 import InputBox from '@/components/Helpers/InputBox';
 import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
-import { Formik } from 'formik';
+import { Field, FieldArray, Formik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation'
 
@@ -151,6 +151,8 @@ const View = ({ id }: { id: number }) => {
             }
             values.status = 0
 
+            console.log("val", values)
+
             const res = await axios({
                 url: `${ASSETS.LIST.update}?id=${id}`,
                 method: "POST",
@@ -252,12 +254,31 @@ const View = ({ id }: { id: number }) => {
         ownership_doc: data?.data?.ownership_doc,
         ward_no: data?.data?.ward_no,
         address: data?.data?.address,
-        // depreciation_method: "Straight Line Method",
-        // apreciation_method: "Percentage Based Approach",
         type_of_land: data?.data?.type_of_land,
         area: data?.data?.area,
         order_date: data?.data?.order_date,
         order_no: data?.data?.order_no,
+        acquisition: data?.data?.acquisition,
+        mode_of_acquisition: data?.data?.mode_of_acquisition,
+        from_whom_acquired: data?.data?.from_whom_acquired,
+        building_approval_plan: data?.data?.building_approval_plan,
+        floorData: data?.data?.floorData.map((floor: any) => ({
+            id: floor.id,
+            floor: floor.floor,
+            plotCount: floor.plotCount,
+            type: floor.type,
+            assetsListId: floor.assetsListId,
+            details: floor.details.map((detail: any) => ({
+                id: detail.id,
+                index: detail.index,
+                length: detail.length,
+                breadth: detail.breadth,
+                height: detail.height,
+                name: detail.name,
+                type: detail.type,
+                type_of_plot: detail.type_of_plot
+            }))
+        })),
     }
 
     const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,10 +339,8 @@ const View = ({ id }: { id: number }) => {
             fileInput.value = "";
             return;
         }
-
         setFile2(file);
     };
-
 
     return (
         <div>
@@ -385,13 +404,13 @@ const View = ({ id }: { id: number }) => {
                 </div>
                 {isOpen && (
 
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto z-50 pt-10">
-                        <div className="bg-white p-16 rounded-lg h-auto bg-opacity-100 relative z-50">
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto z-50 pt-10 overflow-x-auto">
+                        <div className="bg-white p-10 rounded-lg bg-opacity-100 relative z-50 overflow-y-auto h-[50rem]">
                             <button
-                                className="mt-12 px-4 py-2 flex mb-5 bg-red-500 text-white rounded-md ml-auto"
+                                className="mt-12 px-4 py-2 flex mb-5 bg-red-700 text-white rounded-md ml-auto"
                                 onClick={togglePopup}
                             >
-                                Close
+                                X
                             </button>
 
                             <Formik
@@ -403,6 +422,7 @@ const View = ({ id }: { id: number }) => {
                                     handleChange,
                                     handleBlur,
                                     handleSubmit,
+
                                 }) => (
                                     <form onSubmit={handleSubmit} className="relative">
 
@@ -420,77 +440,62 @@ const View = ({ id }: { id: number }) => {
                                                 options={[
                                                     {
                                                         id: 1,
-                                                        name: "Bin",
-                                                    },
-                                                    {
-                                                        id: 2,
                                                         name: "Building",
                                                     },
                                                     {
-                                                        id: 3,
-                                                        name: "Drainage",
-                                                    },
-                                                    {
-                                                        id: 4,
-                                                        name: "Gym",
-                                                    },
-                                                    {
-                                                        id: 5,
+                                                        id: 2,
                                                         name: "Hall",
                                                     },
                                                     {
-                                                        id: 6,
+                                                        id: 3,
+                                                        name: "Vacant Land",
+                                                    },
+                                                    {
+                                                        id: 4,
                                                         name: "Others",
                                                     }
                                                 ]}
                                             />
-                                            {values?.type_of_assets === 'Drainage' && (
-                                                <>
-                                                    <SelectForNoApi
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.asset_sub_category_name}
-                                                        label="Asset Sub-Category Name"
-                                                        name="asset_sub_category_name"
-                                                        required={true}
-                                                        placeholder={"Choose Asset Sub Category Name"}
-                                                        options={[
 
-                                                            {
-                                                                id: 1,
-                                                                name: "Core Asset Drainage",
-                                                            },
+                                            <SelectForNoApi
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.asset_sub_category_name}
+                                                label="Asset Sub-Category Name"
+                                                name="asset_sub_category_name"
+                                                placeholder={"Choose Asset Sub Category Name"}
+                                                options={[
+                                                    {
+                                                        id: 1,
+                                                        name: "Hospitals",
+                                                    },
+                                                    {
+                                                        id: 2,
+                                                        name: "Library",
+                                                    },
+                                                    {
+                                                        id: 3,
+                                                        name: "Parking",
+                                                    },
+                                                    {
+                                                        id: 4,
+                                                        name: "Enclosed/Non-Enclosed"
+                                                    },
+                                                    {
+                                                        id: 5,
+                                                        name: "Vacant Land"
+                                                    },
+                                                    {
+                                                        id: 6,
+                                                        name: "Gym"
+                                                    },
+                                                    {
+                                                        id: 7,
+                                                        name: "Market"
+                                                    }
+                                                ]}
+                                            />
 
-                                                        ]}
-                                                    />
-                                                </>
-                                            )}
-
-                                            {values?.type_of_assets !== 'Drainage' && (
-                                                <SelectForNoApi
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.asset_sub_category_name}
-                                                    label="Asset Sub-Category Name"
-                                                    name="asset_sub_category_name"
-                                                    required={true}
-                                                    placeholder={"Choose Asset Sub Category Name"}
-                                                    options={[
-                                                        {
-                                                            id: 1,
-                                                            name: "Hospitals",
-                                                        },
-                                                        {
-                                                            id: 2,
-                                                            name: "Library",
-                                                        },
-                                                        {
-                                                            id: 3,
-                                                            name: "Parking",
-                                                        }
-                                                    ]}
-                                                />
-                                            )}
 
                                             <SelectForNoApi
                                                 onChange={handleChange}
@@ -503,15 +508,8 @@ const View = ({ id }: { id: number }) => {
                                                     {
                                                         id: 1,
                                                         name: "Immovable",
-                                                    },
-                                                    // {
-                                                    //     id: 2,
-                                                    //     name: "Movable",
-                                                    // },
-                                                    {
-                                                        id: 2,
-                                                        name: "Land",
                                                     }
+
                                                 ]}
                                             />
 
@@ -581,6 +579,14 @@ const View = ({ id }: { id: number }) => {
                                                     {
                                                         id: 2,
                                                         name: "Residential Land",
+                                                    },
+                                                    {
+                                                        id: 3,
+                                                        name: "Agriculture Land",
+                                                    },
+                                                    {
+                                                        id: 4,
+                                                        name: "Mixed Land",
                                                     }
                                                 ]}
                                             />
@@ -624,8 +630,6 @@ const View = ({ id }: { id: number }) => {
                                                     }
                                                 }}
                                             />
-
-
 
                                             <div>
                                                 <label>OwnerShip Doc</label>
@@ -698,46 +702,218 @@ const View = ({ id }: { id: number }) => {
                                                 }}
                                             />
 
-                                            {/* {values.assets_category_type === 'Land' ? (
-                                                <>
-                                                    <InputBox
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.apreciation_method}
-                                                        label="Apreciation Method"
-                                                        placeholder={"Enter Apreciation Method"}
-                                                        name="apreciation_method"
-                                                        type="text"
-                                                        isReadOnly={true}
+                                            <InputBox
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.acquisition}
+                                                label="Date of Acquisition"
+                                                placeholder={"Enter Your Acquisition"}
+                                                name="acquisition"
+                                                type="date"
+                                                onKeyPress={(e: any) => {
+                                                    if (
+                                                        (
+                                                            (e.key >= "a" || e.key >= "z") ||
+                                                            (e.key <= "A" || e.key <= "Z") ||
+                                                            (e.key <= "0" || e.key <= "9") ||
+                                                            e.key === " "
+                                                        )
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                            />
 
-                                                    /></>
-                                            ) : (
-                                                <InputBox
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.depreciation_method}
-                                                    label="Depreciation Method"
-                                                    placeholder={"Enter Depreciation Method"}
-                                                    name="depreciation_method"
-                                                    type="text"
-                                                    isReadOnly={true}
-                                                />
-                                            )
-                                            } */}
+                                            <SelectForNoApi
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.mode_of_acquisition}
+                                                label="Mode of Acquisition"
+                                                name="mode_of_acquisition"
+                                                placeholder={"Choose mode of Acquisition"}
+                                                options={[
+                                                    {
+                                                        id: 1,
+                                                        name: "Acquired",
+                                                    },
+                                                    {
+                                                        id: 2,
+                                                        name: "Donation",
+                                                    },
+                                                    {
+                                                        id: 3,
+                                                        name: "Purchase",
+                                                    },
+                                                    {
+                                                        id: 4,
+                                                        name: "Others",
+                                                    }
+                                                ]}
+                                            />
 
+                                            <InputBox
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.from_whom_acquired}
+                                                label="From whom Acquired"
+                                                placeholder={"From whom Acquired"}
+                                                name="from_whom_acquired"
+                                                type="text"
+                                                maxLength={50}
+                                            />
+
+                                            <InputBox
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.building_approval_plan}
+                                                label="Building Approval Plan No. / Gift Deed No."
+                                                placeholder={"Building Approval Plan No. / Gift Deed No."}
+                                                name="building_approval_plan"
+                                                type="text"
+                                                maxLength={20}
+                                            />
+                                        </div>
+
+                                        <div className='overflow-y-auto h-60 mt-10 '>
+                                            {values.type_of_assets === 'Building' && (
+                                                <FieldArray name="floorData">
+                                                    {({ push }) => (
+                                                        <>
+                                                            <div className="">
+                                                                {values.floorData.map((floor: any, floorIndex: any) => (
+                                                                    <div key={floorIndex} className="m-2 grid grid-cols-3 gap-3">
+                                                                        {floor?.details?.map((detail: any, detailIndex: any) => (
+                                                                            <div key={detailIndex} className="bg-white shadow-md rounded-lg p-8 border border-gray-200">
+                                                                                
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Plot:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].index`}
+                                                                                            type="number"
+                                                                                            placeholder="Plot Number"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Length:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].length`}
+                                                                                            type="text"
+                                                                                            placeholder="Length"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Breadth:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].breadth`}
+                                                                                            type="text"
+                                                                                            placeholder="Breadth"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Height:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].height`}
+                                                                                            type="text"
+                                                                                            placeholder="Height"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Name:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].name`}
+                                                                                            type="text"
+                                                                                            placeholder="Name"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700  p-2 m-2">
+                                                                                        Property Name:
+                                                                                        <Field
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].property_name`}
+                                                                                            type="text"
+                                                                                            placeholder="Name"
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700 p-2 m-2 focus:outline-none">
+                                                                                        Type of Plot:
+                                                                                        <Field
+                                                                                            as="select"
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].type_of_plot`}
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        >
+                                                                                            <option>Choose the below options</option>
+                                                                                            <option value="Enclosed">Enclosed</option>
+                                                                                            <option value="Non-Enclosed">Non-Enclosed</option>
+                                                                                        </Field>
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <div className="mb-4">
+                                                                                    <label className="block text-sm font-medium text-gray-700 p-2 m-2 focus:outline-none">
+                                                                                        Type:
+                                                                                        <Field
+                                                                                            as="select"
+                                                                                            name={`floorData[${floorIndex}].details[${detailIndex}].type`}
+                                                                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                                                                        >
+                                                                                            <option>Choose the below options</option>
+                                                                                            <option value="Commercial">Commercial</option>
+                                                                                            <option value="Residential">Residential</option>
+                                                                                        </Field>
+
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                ))}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => push({
+                                                                        // floor: '',
+                                                                        details: [{ index: '', length: '', breadth: '', height: '', name: '', property_name: '' }]
+                                                                    })}
+                                                                    className="bg-blue-500 text-white p-2 rounded-md mt-4 mx-2"
+                                                                >
+                                                                    Add Floor +
+                                                                </button>
+                                                            </div>
+
+                                                        </>
+                                                    )}
+                                                </FieldArray>
+                                            )}
                                         </div>
 
                                         <div className="flex items-center justify-end mt-5 gap-5">
-
                                             <PrimaryButton buttonType="submit" variant="primary">
                                                 Save
                                             </PrimaryButton>
-
                                         </div>
                                     </form>
                                 )}
                             </Formik>
-
                         </div>
                     </div>
                 )}
@@ -845,11 +1021,6 @@ const View = ({ id }: { id: number }) => {
                 </div>
                 <div></div>
 
-                {/* <div>
-                    <InnerHeading>Floor</InnerHeading>
-                    <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.floor === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.floor : <>No floor found</>}</>}</p>
-                </div> */}
-
                 <div>
                     <InnerHeading>Plot Count</InnerHeading>
                     <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.plotCount === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.plotCount : <>No floor found</>}</>}</p>
@@ -859,7 +1030,7 @@ const View = ({ id }: { id: number }) => {
                     <InnerHeading>Plot Type</InnerHeading>
                     <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.floorData[0]?.type === null ? <>No data found</> : <>{data?.data?.type_of_assets === "Building" ? data?.data?.floorData[0]?.type : <>No floor found</>}</>}</p>
                 </div>
-               
+
                 <div></div>
 
                 <div>
@@ -899,27 +1070,29 @@ const View = ({ id }: { id: number }) => {
                 <div></div>
 
                 {data?.data?.type_of_assets === "Building" ? (
-                <div>
-                    <InnerHeading>Floor Details</InnerHeading>
-                    <div className="mt-5">
-                        <div className="grid grid-cols-4 gap-4 w-[55rem]">
-                            {data?.data?.floorData?.map((floor: any) =>
-                                floor.details?.map((detail: any) => (
-                                    <div key={detail.id} className="bg-white shadow-md rounded-lg p-4">
-                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Floor :</span> {data?.data?.floorData[0]?.floor }</p>
-                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Plot :</span> {detail.index}</p>
-                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
-                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
-                                        <p className="text-md font-bold mb-2"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
-                                        <p className="text-md font-bold"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
-                                    </div>
-                                ))
-                            )}
+                    <div>
+                        <InnerHeading>Floor Details</InnerHeading>
+                        <div className="mt-5">
+                            <div className="grid grid-cols-3 gap-3 w-[55rem]">
+                                {data?.data?.floorData?.map((floor: any) =>
+                                    floor.details?.map((detail: any) => (
+                                        <div key={detail.id} className="bg-white shadow-md rounded-lg p-4">
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Floor :</span> {floor.floor}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Type :</span> {detail?.type}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Type of Plot :</span> {detail?.type_of_plot}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Plot :</span> {detail.index}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
+                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
+                                            <p className="text-md font-bold pb-1"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-                ): <></> }
-                
+                ) : <></>}
+
             </div>
             <br></br>
 
@@ -951,22 +1124,97 @@ const View = ({ id }: { id: number }) => {
 
                         <div>
                             <InnerHeading>File Uploaded</InnerHeading>
-                            <div className='flex'>
-                                {datas?.data[0]?.image?.endsWith('.pdf') ? (
-                                    <>
-                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
-                                            <iframe className='w-50 h-40 mt-4 overflow-x-hidden' src={datas?.data[0]?.image}></iframe>
-                                        }
-                                    </>
-                                ) : (
-                                    <>
-                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
-                                            : <img className='w-20 h-20 mt-4' src={datas?.data[0]?.image} alt="img" width="100" height="30" />
-                                        }
-                                    </>
-                                )}
+
+                            <div className="grid grid-cols-5 gap-4 mt-4 w-[50rem]">
+
+                                <div className='row'>
+                                        <span className='ml-2'>Image 1</span>
+                                        {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                </div>
+                                
+                                <div className='row '>
+                                    <span className='ml-2'>Image 2</span>
+                                    {datas?.data[0]?.image_two?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_two}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_two} alt="img2" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 3</span>
+                                    {datas?.data[0]?.image_three?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_three}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_three} alt="img3" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 4</span>
+                                    {datas?.data[0]?.image_four?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_four}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_four} alt="img4" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 5</span>
+                                    {datas?.data[0]?.image_five?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_five}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_five} alt="img5" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
                             </div>
                         </div>
+
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
@@ -974,21 +1222,17 @@ const View = ({ id }: { id: number }) => {
                             <Image src={Home3} alt="employee" width={40} height={20} />
                             <span className="ml-3 text-[#4338CA] text-2xl font-bold">Admin Review</span>
                         </SubHeading>
-
                         <div></div>
                         <div></div>
                         <div>
                             <InnerHeading>Remarks</InnerHeading>
-
                             <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datass?.data[0]?.checker_remarks === null ? <>Pending for Verification</> : <>{datass?.data[0]?.checker_remarks}</>}</p>
                         </div>
                     </div>
                 </>
-
             ) : (
                 <> </>
-            )
-            }
+            )}
 
             {role === 'Field Officer' ? (
                 <>
@@ -1016,25 +1260,98 @@ const View = ({ id }: { id: number }) => {
                             <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
                         </div>
 
-
                         <div>
                             <InnerHeading>File Uploaded</InnerHeading>
-                            <div className='flex'>
-                                {datas?.data[0]?.image?.endsWith('.pdf') ? (
-                                    <>
-                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p> :
-                                            <iframe className='w-50 h-40 mt-4 overflow-x-hidden' src={datas?.data[0]?.image}></iframe>
-                                        }
-                                    </>
-                                ) : (
-                                    <>
-                                        {datas?.data[0]?.image === null ? <p className='text-[#4338CA] mt-4 font-bold'> No image found</p>
-                                            : <img className='w-20 h-20 mt-4' src={datas?.data[0]?.image} alt="img" width="100" height="30" />
-                                        }
-                                    </>
-                                )}
+                            <div className="grid grid-cols-5 gap-4 mt-4 w-[50rem]">
+
+                                <div className='row'>
+                                        <span className='ml-2'>Image 1</span>
+                                        {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                </div>
+                                
+                                <div className='row '>
+                                    <span className='ml-2'>Image 2</span>
+                                    {datas?.data[0]?.image_two?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_two}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_two} alt="img2" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 3</span>
+                                    {datas?.data[0]?.image_three?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_three}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_three} alt="img3" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 4</span>
+                                    {datas?.data[0]?.image_four?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_four}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_four} alt="img4" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className='row '>
+                                    <span className='ml-2'>Image 5</span>
+                                    {datas?.data[0]?.image_five?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_five}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_five} alt="img5" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
+                                </div>
+
                             </div>
                         </div>
+
                     </div>
                 </>
             ) : (

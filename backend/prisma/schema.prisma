@@ -56,17 +56,18 @@ model assets_list {
   ownership_doc           String?
   type_of_land            String?
   area                    String?
-  order_no                String?  @unique
+  order_no                String?                  @unique
   order_date              String?
   acquisition             String?
   from_whom_acquired      String?
   mode_of_acquisition     String?
   role                    String?
+  no_of_floors            Int?
   asset_list              assets_list_change_log[]
   asset_fieldOfficer      asset_fieldOfficer_req?
   floorData               floorData[]
   // details                 details[]
-  
+
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
 
   created_at DateTime @default(now()) @map("created_at")
@@ -74,27 +75,35 @@ model assets_list {
 }
 
 model floorData {
-  id         Int     @id @default(autoincrement())
-  floor      Int?
-  plotCount  Int?
-  type       String?
-  assetsList assets_list @relation(fields: [assetsListId], references: [id])
+  id           Int         @id @default(autoincrement())
+  floor        Int?
+  plotCount    Int?
+  type         String?
+  assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)
   assetsListId Int
-  details    details[]
+
+  details details[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
 }
 
 model details {
-  id         Int     @id @default(autoincrement())
-  index      Int?
-  type       String?
-  length     String?
-  breadth    String?
-  height     String?
-  name       String?
-  floorData  floorData @relation(fields: [floorDataId], references: [id])
-  floorDataId Int
-}
+  id            Int       @id @default(autoincrement())
+  index         Int?
+  type          String?
+  length        String?
+  breadth       String?
+  height        String?
+  name          String?
+  property_name String?
+  type_of_plot  String?
+  floorData     floorData @relation(fields: [floorDataId], references: [id], onDelete: Cascade)
+  floorDataId   Int
 
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
 model assets_list_change_log {
   id Int @id @default(autoincrement())
@@ -118,9 +127,10 @@ model assets_list_change_log {
   from_whom_acquired      String?
   mode_of_acquisition     String?
   role                    String?
-  status                  Int?    @default(0) // 0: pending, 1: approved, -1: rejected
 
-  asset   assets_list @relation(fields: [assetId], references: [id])
+  status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+
+  asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
   assetId Int
 
   created_at DateTime @default(now()) @map("created_at")
@@ -128,29 +138,33 @@ model assets_list_change_log {
 }
 
 model asset_checker_req {
-  id           Int                    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  fieldOfficer asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId])
-  assetId      Int      @unique     
-  checker_remarks  String?         
-  
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  fieldOfficer    asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId], onDelete: Cascade)
+  assetId         Int                    @unique
+  checker_remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model asset_fieldOfficer_req {
   id Int @id @default(autoincrement())
 
-  long    String?
-  lat     String?
-  remarks String?
-  image   String?
+  long        String?
+  lat         String?
+  remarks     String?
+  image_one   String?
+  image_two   String?
+  image_three String?
+  image_four  String?
+  image_five  String?
 
   asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
   assetId Int         @unique
 
   asset_checker_req asset_checker_req[]
 
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -108,7 +108,7 @@ class DMSFileHandlerController {
 
   uploadAndGetUrl = async (
     req: Request,
-     res: Response,
+    res: Response,
     apiId: string
   ): Promise<Response> => {
     try {
@@ -130,7 +130,7 @@ class DMSFileHandlerController {
       };
 
       const response = await axios.post(dmsUrl, formData, { headers });
-            console.log("response", response)
+      console.log("response", response)
 
       const refNo = response.data.data.ReferenceNo;
       const resData: any = await axios.post(
@@ -151,6 +151,7 @@ class DMSFileHandlerController {
         data: resData.data.data.fullPath,
         
       });
+      
     } catch (error) {
       return res.status(500).json({
         status: false,

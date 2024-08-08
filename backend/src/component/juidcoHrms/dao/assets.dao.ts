@@ -108,11 +108,10 @@ class AssetsManagementDao {
         from_whom_acquired,
         mode_of_acquisition,
         role,
-        floorData 
+        floorData,
+        no_of_floors
         } = req.body;
         
-        console.log("floorData", floorData)
-
     try {
         const result = await prisma.$transaction(async (tx) => {
             const assetReq = await tx.assets_list.create({
@@ -136,6 +135,7 @@ class AssetsManagementDao {
                     from_whom_acquired,
                     mode_of_acquisition,
                     role,
+                    no_of_floors,
                     status: 0,
                     floorData: {
                         create: floorData.map((floor:any) => ({
@@ -149,15 +149,15 @@ class AssetsManagementDao {
                                     length: detail.length,
                                     breadth: detail.breadth,
                                     height: detail.height,
-                                    name: detail.name
+                                    name: detail.name,
+                                    property_name: detail.property_name,
+                                    type_of_plot:detail.type_of_plot
                                 }))
                             }
                         }))
                     }
                 }
             });
-
-            console.log("assetReq", assetReq);
 
             await tx.asset_fieldOfficer_req.create({
                 data: {
@@ -175,6 +175,7 @@ class AssetsManagementDao {
         });
 
         return generateRes(result);
+
     } catch (error) {
         console.error('Error processing request:', error);
         throw { error: 400, msg: "duplicate" }
@@ -407,8 +408,7 @@ class AssetsManagementDao {
 
     deletebyId = async (req: Request) => {
         const id = Number(req.query.id)
-        try {
-            console.log("id", id)
+        try {          
             const assetGetbyId = await prisma.assets_list.delete({
                 where: {
                     id: id
@@ -421,139 +421,372 @@ class AssetsManagementDao {
     };
 
     update = async (req: Request) => {
-        const {
-            type_of_assets,
-            asset_sub_category_name,
-            assets_category_type,
-            khata_no,
-            plot_no,
-            ward_no,
-            address,
-            depreciation_method,
-            apreciation_method,
-            blue_print,
-            ownership_doc,
-            type_of_land,
-            area,
-            order_no,
-            order_date,
-            acquisition,
-            from_whom_acquired,
-            mode_of_acquisition,
-            status,
-            
-        } = req.body;
+    const {
+        type_of_assets,
+        asset_sub_category_name,
+        assets_category_type,
+        khata_no,
+        plot_no,
+        ward_no,
+        address,
+        depreciation_method,
+        apreciation_method,
+        blue_print,
+        ownership_doc,
+        type_of_land,
+        area,
+        order_no,
+        order_date,
+        acquisition,
+        from_whom_acquired,
+        mode_of_acquisition,
+        status,
+        // floorData
+        floorData = []
+    } = req.body;
 
-        const id = Number(req.query.id);
+    const id = Number(req.query.id);
 
-        try {
-            const result = await prisma.$transaction(async (tx) => {
-                const existingAsset: any = await tx.assets_list.findUnique({
-                    where: {
-                        id
+    try {
+        const result = await prisma.$transaction(async (tx) => {
+            const existingAsset: any = await tx.assets_list.findUnique({
+                where: {
+                    id
+                },
+                include: {
+                    floorData: {
+                        include: {
+                            details: true
+                        }
                     }
-                });
-                console.log("existingAsset", existingAsset)
-
-                if (!existingAsset) {
-                    console.log("Asset not found");
                 }
+            }); 
 
-                await tx.assets_list_change_log.create({
-                    data: {
-                        assetId: id,
-                        type_of_assets: existingAsset.type_of_assets,
-                        asset_sub_category_name: existingAsset.asset_sub_category_name,
-                        assets_category_type: existingAsset.assets_category_type,
-                        khata_no: existingAsset.khata_no,
-                        plot_no: existingAsset.plot_no,
-                        ward_no: existingAsset.ward_no,
-                        address: existingAsset.address,
-                        depreciation_method: existingAsset.depreciation_method,
-                        apreciation_method: existingAsset.apreciation_method,
-                        blue_print: existingAsset.blue_print,
-                        ownership_doc: existingAsset.ownership_doc,
-                        type_of_land: existingAsset.type_of_land,
-                        area: existingAsset.area,
-                        order_no: existingAsset.order_no,
-                        order_date: existingAsset.order_date,
-                        acquisition: existingAsset.acquisition,
-                        from_whom_acquired: existingAsset.from_whom_acquired,
-                        mode_of_acquisition: existingAsset.mode_of_acquisition,
-                        status: Number(existingAsset.status),
-                        role:existingAsset.role
+            console.log("existingAsset", existingAsset)
+
+            if (!existingAsset) {
+                console.log("Asset not found");
+                throw new Error("Asset not found");
+            }
+
+            await tx.assets_list_change_log.create({
+                data: {
+                    assetId: id,
+                    type_of_assets: existingAsset.type_of_assets,
+                    asset_sub_category_name: existingAsset.asset_sub_category_name,
+                    assets_category_type: existingAsset.assets_category_type,
+                    khata_no: existingAsset.khata_no,
+                    plot_no: existingAsset.plot_no,
+                    ward_no: existingAsset.ward_no,
+                    address: existingAsset.address,
+                    depreciation_method: existingAsset.depreciation_method,
+                    apreciation_method: existingAsset.apreciation_method,
+                    blue_print: existingAsset.blue_print,
+                    ownership_doc: existingAsset.ownership_doc,
+                    type_of_land: existingAsset.type_of_land,
+                    area: existingAsset.area,
+                    order_no: existingAsset.order_no,
+                    order_date: existingAsset.order_date,
+                    acquisition: existingAsset.acquisition,
+                    from_whom_acquired: existingAsset.from_whom_acquired,
+                    mode_of_acquisition: existingAsset.mode_of_acquisition,
+                    status: Number(existingAsset.status),
+                    role: existingAsset.role,                    
+                }
+            });
+
+            const updatedAsset = await tx.assets_list.update({
+                where: {
+                    id
+                },
+                data: {
+                    type_of_assets,
+                    asset_sub_category_name,
+                    assets_category_type,
+                    khata_no,
+                    plot_no,
+                    ward_no,
+                    address,
+                    depreciation_method,
+                    apreciation_method,
+                    ownership_doc,
+                    blue_print,
+                    type_of_land,
+                    area,
+                    order_no,
+                    order_date,
+                    acquisition,
+                    from_whom_acquired,
+                    mode_of_acquisition,
+                    status: Number(status),
+                }
+            });
+
+            const existingFloorData = existingAsset.floorData;
+            const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
+            const incomingFloorIds = floorData?.map((floor: any) => floor.id);
+
+            await tx.floorData.deleteMany({
+                where: {
+                    id: {
+                        in: existingFloorIds.filter((id : any) => !incomingFloorIds?.includes(id))
                     }
-                });
+                }
+            });
 
-                const updatedAsset = await tx.assets_list.update({
-                    where: {
-                        id
-                    },
-                    data: {
-                        type_of_assets,
-                        asset_sub_category_name,
-                        assets_category_type,
-                        khata_no,
-                        plot_no,
-                        ward_no,
-                        address,
-                        depreciation_method,
-                        apreciation_method,
-                        ownership_doc,
-                        blue_print,
-                        type_of_land,
-                        area,
-                        order_no,
-                        order_date,
-                        acquisition,
-                        from_whom_acquired,
-                        mode_of_acquisition,
-                        status: Number(status)
-                    }
-                });
-
-                if (status === 1) {
-                    await tx.asset_fieldOfficer_req.update({
+            for (const floor of floorData) {
+                if (existingFloorIds?.includes(floor.id)) {
+                    await tx.floorData?.update({
                         where: {
-                            assetId: id
+                            id: floor?.id
                         },
                         data: {
-                            long: req.body.long,
-                            lat: req.body.lat,
-                            remarks: req.body.remarks,
-                            image: req.body.image
+                            floor: floor?.floor,
+                            plotCount: floor?.plotCount,
+                            type: floor?.type,
+                            details: {
+                                deleteMany: {
+                                    floorDataId: floor?.id
+                                },
+                                create: floor.details.map((detail: any) => ({
+                                    index: detail?.index,
+                                    type: detail?.type,
+                                    length: detail?.length,
+                                    breadth: detail?.breadth,
+                                    height: detail?.height,
+                                    name: detail?.name,
+                                    property_name: detail?.property_name,
+                                    type_of_plot: detail?.type_of_plot
+                                }))
+                            }
                         }
-                    })
+                    });
+                } else {
+                    await tx.floorData.create({
+                        data: {
+                            floor: floor.floor,
+                            plotCount: floor.plotCount,
+                            type: floor.type,
+                            assetsListId: id,
+                            details: {
+                                create: floor.details.map((detail: any) => ({
+                                    index: detail.index,
+                                    type: detail.type,
+                                    length: detail.length,
+                                    breadth: detail.breadth,
+                                    height: detail.height,
+                                    name: detail.name,
+                                    property_name: detail.property_name,
+                                    type_of_plot: detail.type_of_plot
+                                }))
+                            }
+                        }
+                    });
                 }
+            }
 
-                const existence: number = await prisma.asset_checker_req.count({
+            if (status === 1) {
+                await tx.asset_fieldOfficer_req.update({
                     where: {
                         assetId: id
+                    },
+                    data: {
+                        long: req.body.long,
+                        lat: req.body.lat,
+                        remarks: req.body.remarks,
+                        image_one: req.body.image_one,
+                        image_two: req.body.image_two,
+                        image_three: req.body.image_three,
+                        image_four: req.body.image_four,
+                        image_five: req.body.image_five
                     }
-                })
+                });
+            }
 
-                if (existence === 0 || status === 2 || status === -2) {
-                        await tx.asset_checker_req.update({
-                            where: {
-                                assetId: updatedAsset?.id
-                            },
-                            data: {
-                                checker_remarks: req.body.checker_remarks
-                            },
-                        })
+            const existence: number = await prisma.asset_checker_req.count({
+                where: {
+                    assetId: id
                 }
-
-                console.error("approved/rejected");
-                return updatedAsset;
             });
-            console.log("result", result)
-            return generateRes(result);
 
-        } catch (error: any) {
-            console.error("err", error);
-            return error
-        }
-    };
+            if (existence === 0 || status === 2 || status === -2) {
+                await tx.asset_checker_req.update({
+                    where: {
+                        assetId: updatedAsset?.id
+                    },
+                    data: {
+                        checker_remarks: req.body.checker_remarks
+                    }
+                });
+            }
+
+            return updatedAsset;
+        });
+
+        console.log("result", result);
+        return generateRes(result);
+    } catch (error: any) {
+        console.error("err", error);
+        return error;
+    }
+};
+
+
+    // update = async (req: Request) => {
+    //     const {
+    //         type_of_assets,
+    //         asset_sub_category_name,
+    //         assets_category_type,
+    //         khata_no,
+    //         plot_no,
+    //         ward_no,
+    //         address,
+    //         depreciation_method,
+    //         apreciation_method,
+    //         blue_print,
+    //         ownership_doc,
+    //         type_of_land,
+    //         area,
+    //         order_no,
+    //         order_date,
+    //         acquisition,
+    //         from_whom_acquired,
+    //         mode_of_acquisition,
+    //         status,
+    //         floorData
+            
+    //     } = req.body;
+
+    //     const id = Number(req.query.id);
+
+    //     try {
+    //         const result = await prisma.$transaction(async (tx) => {
+    //             const existingAsset: any = await tx.assets_list.findUnique({
+    //                 where: {
+    //                     id
+    //                 }
+    //             });
+    //             console.log("existingAsset", existingAsset)
+
+    //             if (!existingAsset) {
+    //                 console.log("Asset not found");
+    //             }
+
+    //             await tx.assets_list_change_log.create({
+    //                 data: {
+    //                     assetId: id,
+    //                     type_of_assets: existingAsset.type_of_assets,
+    //                     asset_sub_category_name: existingAsset.asset_sub_category_name,
+    //                     assets_category_type: existingAsset.assets_category_type,
+    //                     khata_no: existingAsset.khata_no,
+    //                     plot_no: existingAsset.plot_no,
+    //                     ward_no: existingAsset.ward_no,
+    //                     address: existingAsset.address,
+    //                     depreciation_method: existingAsset.depreciation_method,
+    //                     apreciation_method: existingAsset.apreciation_method,
+    //                     blue_print: existingAsset.blue_print,
+    //                     ownership_doc: existingAsset.ownership_doc,
+    //                     type_of_land: existingAsset.type_of_land,
+    //                     area: existingAsset.area,
+    //                     order_no: existingAsset.order_no,
+    //                     order_date: existingAsset.order_date,
+    //                     acquisition: existingAsset.acquisition,
+    //                     from_whom_acquired: existingAsset.from_whom_acquired,
+    //                     mode_of_acquisition: existingAsset.mode_of_acquisition,
+    //                     status: Number(existingAsset.status),
+    //                     role: existingAsset.role,
+                        
+    //                 }
+    //             });
+
+    //             const updatedAsset = await tx.assets_list.update({
+    //                 where: {
+    //                     id
+    //                 },
+    //                 data: {
+    //                     type_of_assets,
+    //                     asset_sub_category_name,
+    //                     assets_category_type,
+    //                     khata_no,
+    //                     plot_no,
+    //                     ward_no,
+    //                     address,
+    //                     depreciation_method,
+    //                     apreciation_method,
+    //                     ownership_doc,
+    //                     blue_print,
+    //                     type_of_land,
+    //                     area,
+    //                     order_no,
+    //                     order_date,
+    //                     acquisition,
+    //                     from_whom_acquired,
+    //                     mode_of_acquisition,
+    //                     status: Number(status),
+    //                     floorData: {
+    //                     create: floorData.map((floor:any) => ({
+    //                         floor: floor.floor,
+    //                         plotCount: floor.plotCount,
+    //                         type: floor.type,
+    //                         details: {
+    //                             create: floor.details.map((detail:any) => ({
+    //                                 index: detail.index,
+    //                                 type: detail.type,
+    //                                 length: detail.length,
+    //                                 breadth: detail.breadth,
+    //                                 height: detail.height,
+    //                                 name: detail.name,
+    //                                 property_name: detail.property_name,
+    //                                 type_of_plot:detail.type_of_plot
+    //                             }))
+    //                         }
+    //                     }))
+    //                 }
+    //                 }
+    //             });
+
+    //             if (status === 1) {
+    //                 await tx.asset_fieldOfficer_req.update({
+    //                     where: {
+    //                         assetId: id
+    //                     },
+    //                     data: {
+    //                         long: req.body.long,
+    //                         lat: req.body.lat,
+    //                         remarks: req.body.remarks,
+    //                         image: req.body.image
+    //                     }
+    //                 })
+    //             }
+
+    //             const existence: number = await prisma.asset_checker_req.count({
+    //                 where: {
+    //                     assetId: id
+    //                 }
+    //             })
+
+    //             if (existence === 0 || status === 2 || status === -2) {
+    //                     await tx.asset_checker_req.update({
+    //                         where: {
+    //                             assetId: updatedAsset?.id
+    //                         },
+    //                         data: {
+    //                             checker_remarks: req.body.checker_remarks
+    //                         },
+    //                     })
+    //             }
+
+    //             console.error("approved/rejected");
+    //             return updatedAsset;
+    //         });
+    //         console.log("result", result)
+    //         return generateRes(result);
+
+    //     } catch (error: any) {
+    //         console.error("err", error);
+    //         return error
+    //     }
+    // };
 
     getAllFieldOfficer = async (req: Request) => {
 
@@ -578,7 +811,14 @@ class AssetsManagementDao {
                     long: true,
                     lat: true,
                     remarks: true,
-                    image: true
+                    image_one: true,
+                    image_two: true,
+                    image_three: true,
+                    image_four: true,
+                    image_five: true
+
+                                                                                
+
                 },
                 orderBy: {
                     createdAt: 'desc'

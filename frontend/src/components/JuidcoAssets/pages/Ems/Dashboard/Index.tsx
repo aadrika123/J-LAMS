@@ -26,31 +26,15 @@ export const DashboardMain = () => {
 
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
-
   const [floorCount, setFloorCount] = useState(0);
-  // const [, setSavedFloorCount] = useState(0);
   const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
   const [data, setData] = useState<any>([]);
-
-
-  // const [datas, setData] = useState<any>([])
-  // const [prevState, setPrevState] = useState<any>({ inputBoxes: [], data: {} });
   const [, setCurrentType] = useState<any>(null);
-  const [plotNo, setPlotNo] = useState<any>(0);
-  // const [unitsWithForms, setUnitsWithForms] = useState({});
+  const [, setPlotNo] = useState<any>(0);
   const [, setNavigationStack] = useState([]);
   const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
-  const [, setSessionData] = useState([]);
-
-
-
-
-
-
-
-
-
+  const [sessionData, setSessionData] = useState([]);
 
   const initialValues = {
     type_of_assets: "",
@@ -86,9 +70,6 @@ export const DashboardMain = () => {
     type_of_land: Yup.string().required("Type of Land"),
     // order_date: Yup.string().required("Enter order date"),
   });
-
-
-
 
   const handleUpload = async () => {
     if (file1) {
@@ -317,11 +298,18 @@ export const DashboardMain = () => {
       <div key={`popup-${index}`}>
         <input
           key={index}
-          type="number"
+          type="text"
           className="border p-2 m-2"
           placeholder={`No of plot on the floor ${index + 1}`}
           onChange={(e) => handlePlotCountChange(e, index)}
+          maxLength={3}
+          onKeyPress={(e: any) => {
+            if (!(e.key >= "0" && e.key <= "9")) {
+              e.preventDefault();
+            }
+          }}
         />
+
         <br />
         <button
           className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
@@ -357,17 +345,21 @@ export const DashboardMain = () => {
     });
   };
 
-  console.log("plotNo", plotNo);
-
   const handleTypeSelect = (type: any, index: any) => {
     setCurrentType(type);
     const typeBox = (
       <input
         key={`type-${type}`}
-        type="number"
+        type="text"
         className="border p-2 m-2"
         placeholder={`Number of ${type} units`}
         onChange={(e) => handleTypeBox(e, type, index)}
+        maxLength={3}
+          onKeyPress={(e: any) => {
+            if (!(e.key >= "0" && e.key <= "9")) {
+            e.preventDefault();
+          }
+        }}
       />
     );
 
@@ -431,7 +423,6 @@ export const DashboardMain = () => {
       newStack[newStack.length - 1] = [newBoxes];
       return newStack;
     });
-
   };
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
@@ -444,31 +435,91 @@ export const DashboardMain = () => {
         <input
           type="text"
           className="border p-2 m-2"
-          placeholder="length"
+          placeholder="Length in meter"
           defaultValue={unitData.length || ""}
           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
+          maxLength={10}
+          onKeyPress={(e: any) => {
+            if (!(e.key >= "0" && e.key <= "9")) {
+              e.preventDefault();
+            }
+          }}
         />
         <input
           type="text"
           className="border p-2 m-2"
-          placeholder="breadth"
+          placeholder="Breadth in meter"
           defaultValue={unitData.breadth || ""}
           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
+          maxLength={10}
+          onKeyPress={(e: any) => {
+            if (!(e.key >= "0" && e.key <= "9")) {
+              e.preventDefault();
+            }
+          }}
         />
         <input
           type="text"
           className="border p-2 m-2"
-          placeholder="height"
+          placeholder="Height in meter"
           defaultValue={unitData.height || ""}
           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
+          maxLength={10}
+          onKeyPress={(e: any) => {
+            if (!(e.key >= "0" && e.key <= "9")) {
+              e.preventDefault();
+            }
+          }}
         />
         <input
           type="text"
           className="border p-2 m-2"
-          placeholder="name"
+          placeholder="Name"
           defaultValue={unitData.name || ""}
           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
+          maxLength={30}
+          onKeyPress={(e: any) => {
+            if (
+              !(
+                (e.key >= "a" || e.key >= "z") ||
+                (e.key <= "A" || e.key <= "Z") ||
+                e.key === " "
+              )
+            ) {
+              e.preventDefault();
+            }
+          }}
         />
+        <input
+          type="text"
+          className="border p-2 m-2"
+          placeholder="Property Name"
+          defaultValue={unitData.property_name || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
+          maxLength={10}
+          onKeyPress={(e: any) => {
+            if (
+              !(
+                (e.key >= "a" || e.key >= "z") ||
+                (e.key <= "A" || e.key <= "Z") ||
+                (e.key <= "0" || e.key <= "9") ||
+                e.key === " "
+              )
+            ) {
+              e.preventDefault();
+            }
+          }}
+        />
+
+        <select className="border p-2 m-2"
+          value={unitData.type_of_plot}
+          defaultValue={unitData.type_of_plot || ""}
+          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
+          <option>Choose the below options</option>
+          <option value="Enclosed">Enclosed</option>
+          <option value="Non-Enclosed">Non-Enclosed</option>
+        </select>
+
         <br></br>
         <div className="flex justify-center mt-4">
           <button
@@ -514,6 +565,11 @@ export const DashboardMain = () => {
       if (allFieldsFilled) {
         console.log(`Unit ${unitIndex + 1} details:`, unit);
         sessionStorage.setItem('unitData', JSON.stringify(updatedData));
+        const storedData = sessionStorage.getItem('unitData');
+        if (storedData) {
+          setSessionData(JSON.parse(storedData));
+        }
+        
         setUnitCompletion((prevCompletion) => ({
           ...prevCompletion,
           [`${unitIndex + 1}`]: allFieldsFilled,
@@ -523,7 +579,6 @@ export const DashboardMain = () => {
       return updatedData;
     });
   };
-
 
   const transformDataForAPI = (data: any) => {
     return data
@@ -549,13 +604,12 @@ export const DashboardMain = () => {
     });
   };
 
-
   const handleClose = () => {
     setIsModalVisible(false)
     setInputBoxes('')
   }
 
-
+  
   return (
     <div>
       <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
@@ -623,427 +677,473 @@ export const DashboardMain = () => {
             handleBlur,
             handleSubmit,
             handleReset,
-          }) => (
-            <form onSubmit={handleSubmit} className="relative">
-              <Toaster />
-              <div className="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-4 ">
+          }) => {
 
-                {/* ------------------------------------------------------- */}
+            useEffect(() => {
+              if (values.type_of_assets === 'Building') {
+                setIsModalVisible(true);
+              }
+            }, [values.type_of_assets]);
+            
+            
+            return (
+              <>
+                <form onSubmit={handleSubmit} className="relative">
+                  <Toaster />
+                  <div className="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-4 ">
 
-                <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.type_of_assets}
-                  error={errors.type_of_assets}
-                  touched={touched.type_of_assets}
-                  label="Asset Category Name"
-                  name="type_of_assets"
-                  required={true}
-                  placeholder={"Choose Asset Category Name"}
-                  options={[
+                    {/* ------------------------------------------------------- */}
 
-                    {
-                      id: 1,
-                      name: "Building",
-                    },
-                    {
-                      id: 2,
-                      name: "Hall",
-                    },
-                    {
-                      id: 3,
-                      name: "Others",
-                    }
-                  ]}
-                />
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.type_of_assets}
+                      error={errors.type_of_assets}
+                      touched={touched.type_of_assets}
+                      label="Asset Category Name"
+                      name="type_of_assets"
+                      required={true}
+                      placeholder={"Choose Asset Category Name"}
+                      options={[
 
-                {values.type_of_assets === 'Building' && isModalVisible && (
-                  <div className="fixed inset-0 flex items-center justify-center ">
-                    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem]">
-                      <div className='mb-[3rem]'>
-                        <button onClick={handleClose} className='bg-red-600  text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
-                        {/* <button onClick={handleBacks} className='bg-[#4338CA] text-white float-right ml-4 w-20 rounded-xl'>back</button> */}
-                        <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+                        {
+                          id: 1,
+                          name: "Building",
+                        },
+                        {
+                          id: 2,
+                          name: "Hall",
+                        },
+                        {
+                          id: 3,
+                          name: "Vacant Land",
+                        },
+                        {
+                          id: 4,
+                          name: "Others",
+                        }
+                      ]}
+                    />
 
-                      </div>
+                    {values.type_of_assets === 'Building' && isModalVisible && (
+                      <div className="fixed inset-0 flex items-center justify-center ">
+                        <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem]">
+                          <div className='mb-[3rem]'>
+                            <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+                            <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+                          </div>
 
-                      <div>
-                        <input
-                          type="number"
-                          value={floorCount}
-                          onChange={(e) => setFloorCount(parseInt(e.target.value))}
-                          placeholder="Number of Floors"
-                          className="border p-2 m-2"
-                        />
-                        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
-                        <div className="flex flex-col">
-                          {inputBoxes.length > 0 ? (
-                            <div className="h-[20rem] overflow-x-auto">
-                              {inputBoxes}
+                          <div>
+                            <input
+                              type="number"
+                              value={floorCount}
+                              onChange={(e) => setFloorCount(parseInt(e.target.value))}
+                              placeholder="Number of Floors"
+                              className="border p-2 m-2"
+                            />
+                            <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
+                            <div className="flex flex-col">
+                              {inputBoxes.length > 0 ? (
+                                <div className="h-[12rem] overflow-x-auto">
+                                  {inputBoxes}
+                                </div>
+                              ) : (
+                                <div>
+                                  {inputBoxes}
+                                </div>
+                              )}
+
                             </div>
-                          ) : (
-                            <div>
-                              {inputBoxes}
-                            </div>
-                          )}
+                            <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Entered Data- </h4>
 
+                            {inputBoxes.length > 0 ? (
+                              <div className="p-4">
+                                {sessionData.map((floorData: any, floorIndex: any) => (
+                                  <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md overflow-y-auto h-[16rem]">
+                                    <h2 className="text-lg font-bold mb-2">Floor: {floorData?.floor}</h2>
+                                    <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
+                                    {Object?.entries(floorData?.units).map(([unitType, units]: any) => (
+                                      <div key={unitType} className="mb-4">
+                                        <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
+                                        {units?.map((unit: any, unitIndex: any) => (
+                                          <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
+                                            <p><strong>Index:</strong> {unit?.index}</p>
+                                            <p><strong>Type:</strong> {unit?.type}</p>
+                                            <p><strong>Length:</strong> {unit?.length}</p>
+                                            <p><strong>Breadth:</strong> {unit?.breadth}</p>
+                                            <p><strong>Height:</strong> {unit?.height}</p>
+                                            <p><strong>Name:</strong> {unit?.name}</p>
+                                            <p><strong>Property Name:</strong> {unit?.property_name}</p>
+                                            <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                        
+                          </div>
                         </div>
                       </div>
+                    )}
+
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.asset_sub_category_name}
+                      error={errors.asset_sub_category_name}
+                      touched={touched.asset_sub_category_name}
+                      label="Asset Sub-Category Name"
+                      name="asset_sub_category_name"
+                      placeholder={"Choose Asset Sub Category Name"}
+                      options={[
+                        {
+                          id: 1,
+                          name: "Hospitals",
+                        },
+                        {
+                          id: 2,
+                          name: "Library",
+                        },
+                        {
+                          id: 3,
+                          name: "Parking",
+                        },
+                        {
+                          id: 4,
+                          name: "Enclosed/Non-Enclosed"
+                        },
+                        {
+                          id: 5,
+                          name: "Vacant Land"
+                        },
+                        {
+                          id: 6,
+                          name: "Gym"
+                        },
+                        {
+                          id: 7,
+                          name: "Market"
+                        }
+                      ]}
+                    />
+
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.assets_category_type}
+                      error={errors.assets_category_type}
+                      touched={touched.assets_category_type}
+                      label="Asset Category Type"
+                      name="assets_category_type"
+                      placeholder={"Choose Asset Category Name"}
+                      options={[
+                        {
+                          id: 1,
+                          name: "Immovable",
+                        },
+                      ]}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.khata_no}
+                      error={errors.khata_no}
+                      touched={touched.khata_no}
+                      label="Khata No."
+                      name="khata_no"
+                      type="text"
+                      required={true}
+                      placeholder={"Enter Khata No."}
+                      maxLength={10}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.plot_no}
+                      error={errors.plot_no}
+                      touched={touched.plot_no}
+                      label="Plot No."
+                      placeholder={"Enter Plot No."}
+                      name="plot_no"
+                      type="text"
+                      required={true}
+                      maxLength={10}
+                      onKeyPress={(e: any) => {
+                        if (!(e.key >= "0" && e.key <= "9")) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <div>
+                      <label>Blue print</label>
+                      <input
+                        type='file'
+                        name='blue_print'
+                        className="mb-4 p-1 border border-slate-400 w-full rounded"
+                        onChange={handleFile1Change}
+
+                      />
                     </div>
+                    <div>
+                      <label>Ownership Documents </label>
+
+                      <input
+                        type='file'
+                        name='ownership_doc'
+                        className="mb-4 p-1 border border-slate-400 w-full rounded"
+                        onChange={handleFile2Change}
+                      />
+                    </div>
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.ward_no}
+                      label="Ward No."
+                      placeholder={"Enter Your Ward No."}
+                      name="ward_no"
+                      type="text"
+                      maxLength={15}
+                      onKeyPress={(e: any) => {
+                        if (
+                          !(
+                            (e.key >= "a" || e.key >= "z") ||
+                            (e.key <= "A" || e.key <= "Z") ||
+                            (e.key <= "0" || e.key <= "9") ||
+                            e.key === " "
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.type_of_land}
+                      error={errors.type_of_land}
+                      touched={touched.type_of_land}
+                      label="Type of Land"
+                      name="type_of_land"
+                      required={true}
+                      placeholder={"Choose Type of Land"}
+                      options={[
+                        {
+                          id: 1,
+                          name: "Commercial Land",
+                        },
+                        {
+                          id: 2,
+                          name: "Residential Land",
+                        },
+                        {
+                          id: 3,
+                          name: "Agriculture Land",
+                        },
+                        {
+                          id: 4,
+                          name: "Mixed Land",
+                        }
+                      ]}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.area}
+                      error={errors.area}
+                      touched={touched.area}
+                      label="Area"
+                      name="area"
+                      type="text"
+                      placeholder={"in sqft."}
+                      required={true}
+                      maxLength={10}
+                      onKeyPress={(e: any) => {
+                        if (
+                          !(
+                            (e.key <= "0" || e.key <= "9")
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.order_no}
+                      // error={errors.order_no}
+                      // touched={touched.order_no}
+                      label="Order No."
+                      name="order_no"
+                      type="text"
+                      placeholder={"Enter order no."}
+                      // required={true}
+                      maxLength={10}
+                      onKeyPress={(e: any) => {
+                        if (
+                          !(
+                            (e.key <= "0" || e.key <= "9")
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <InputBox
+                      // onChange={handleChange}
+                      onChange={(e) => {
+                        if (handleDateChange(e as any)) {
+                          handleChange(e);
+                        }
+                      }}
+                      onBlur={handleBlur}
+                      error={errors.order_date}
+                      touched={touched.order_date}
+                      value={values.order_date}
+                      label="Order Date"
+                      name="order_date"
+                      type="date"
+                      placeholder={"Enter order date"}
+                      onKeyPress={(e: any) => {
+                        if (
+                          (
+                            (e.key >= "a" || e.key >= "z") ||
+                            (e.key <= "A" || e.key <= "Z") ||
+                            (e.key <= "0" || e.key <= "9") ||
+                            e.key === " "
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.address}
+                      label="Address"
+                      placeholder={"Enter Your Address"}
+                      name="address"
+                      type="text"
+                      maxLength={100}
+                      onKeyPress={(e: any) => {
+                        if (
+                          !(
+                            (e.key >= "a" || e.key >= "z") ||
+                            (e.key <= "A" || e.key <= "Z") ||
+                            (e.key <= "0" || e.key <= "9") ||
+                            e.key === " "
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.acquisition}
+                      label="Date of Acquisition"
+                      placeholder={"Enter Your Acquisition"}
+                      name="acquisition"
+                      type="date"
+                      onKeyPress={(e: any) => {
+                        if (
+                          (
+                            (e.key >= "a" || e.key >= "z") ||
+                            (e.key <= "A" || e.key <= "Z") ||
+                            (e.key <= "0" || e.key <= "9") ||
+                            e.key === " "
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.mode_of_acquisition}
+                      label="Mode of Acquisition"
+                      name="mode_of_acquisition"
+                      placeholder={"Choose mode of Acquisition"}
+                      options={[
+                        {
+                          id: 1,
+                          name: "Acquired",
+                        },
+                        {
+                          id: 2,
+                          name: "Donation",
+                        },
+                        {
+                          id: 3,
+                          name: "Purchase",
+                        },
+                        {
+                          id: 4,
+                          name: "Others",
+                        }
+                      ]}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.from_whom_acquired}
+                      label="From whom Acquired"
+                      placeholder={"From whom Acquired"}
+                      name="from_whom_acquired"
+                      type="text"
+                      maxLength={50}
+                    />
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.building_approval_plan}
+                      label="Building Approval Plan No. / Gift Deed No."
+                      placeholder={"Building Approval Plan No. / Gift Deed No."}
+                      name="building_approval_plan"
+                      type="text"
+                      maxLength={20}
+                    />
                   </div>
-                )}
 
-                <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.asset_sub_category_name}
-                  error={errors.asset_sub_category_name}
-                  touched={touched.asset_sub_category_name}
-                  label="Asset Sub-Category Name"
-                  name="asset_sub_category_name"
-                  placeholder={"Choose Asset Sub Category Name"}
-                  options={[
-                    {
-                      id: 1,
-                      name: "Hospitals",
-                    },
-                    {
-                      id: 2,
-                      name: "Library",
-                    },
-                    {
-                      id: 3,
-                      name: "Parking",
-                    },
-                    {
-                      id: 4,
-                      name: "Enclosed/Non-Enclosed"
-                    },
-                    {
-                      id: 5,
-                      name: "Vacant Land"
-                    },
-                    {
-                      id: 6,
-                      name: "Gym"
-                    },
-                    {
-                      id: 7,
-                      name: "Market"
-                    }
-                  ]}
-                />
+                  <div className="flex items-center justify-end mt-5 gap-5">
+                    <PrimaryButton
+                      onClick={handleReset}
+                      buttonType="button"
+                      variant={"cancel"}
+                    >
+                      Reset
+                    </PrimaryButton>
 
-                <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.assets_category_type}
-                  error={errors.assets_category_type}
-                  touched={touched.assets_category_type}
-                  label="Asset Category Type"
-                  name="assets_category_type"
-                  placeholder={"Choose Asset Category Name"}
-                  options={[
-                    {
-                      id: 1,
-                      name: "Immovable",
-                    },
-                  ]}
-                />
+                    <PrimaryButton buttonType="submit" variant="primary" onClick={() => sessionStorage.clear()}>
+                      Save
+                    </PrimaryButton>
 
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.khata_no}
-                  error={errors.khata_no}
-                  touched={touched.khata_no}
-                  label="Khata No."
-                  name="khata_no"
-                  type="text"
-                  required={true}
-                  placeholder={"Enter Khata No."}
-                  maxLength={10}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.plot_no}
-                  error={errors.plot_no}
-                  touched={touched.plot_no}
-                  label="Plot No."
-                  placeholder={"Enter Plot No."}
-                  name="plot_no"
-                  type="text"
-                  required={true}
-                  maxLength={10}
-                  onKeyPress={(e: any) => {
-                    if (!(e.key >= "0" && e.key <= "9")) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <div>
-                  <label>Blue print</label>
-                  <input
-                    type='file'
-                    name='blue_print'
-                    className="mb-4 p-1 border border-slate-400 w-full rounded"
-                    onChange={handleFile1Change}
-
-                  />
-                </div>
-                <div>
-                  <label>Ownership Documents </label>
-
-                  <input
-                    type='file'
-                    name='ownership_doc'
-                    className="mb-4 p-1 border border-slate-400 w-full rounded"
-                    onChange={handleFile2Change}
-                  />
-                </div>
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.ward_no}
-                  label="Ward No."
-                  placeholder={"Enter Your Ward No."}
-                  name="ward_no"
-                  type="text"
-                  maxLength={15}
-                  onKeyPress={(e: any) => {
-                    if (
-                      !(
-                        (e.key >= "a" || e.key >= "z") ||
-                        (e.key <= "A" || e.key <= "Z") ||
-                        (e.key <= "0" || e.key <= "9") ||
-                        e.key === " "
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.type_of_land}
-                  error={errors.type_of_land}
-                  touched={touched.type_of_land}
-                  label="Type of Land"
-                  name="type_of_land"
-                  required={true}
-                  placeholder={"Choose Type of Land"}
-                  options={[
-                    {
-                      id: 1,
-                      name: "Commercial Land",
-                    },
-                    {
-                      id: 2,
-                      name: "Residential Land",
-                    },
-                    {
-                      id: 3,
-                      name: "Agriculture Land",
-                    },
-                    {
-                      id: 4,
-                      name: "Mixed Land",
-                    }
-                  ]}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.area}
-                  error={errors.area}
-                  touched={touched.area}
-                  label="Area"
-                  name="area"
-                  type="text"
-                  placeholder={"in sqft."}
-                  required={true}
-                  maxLength={10}
-                  onKeyPress={(e: any) => {
-                    if (
-                      !(
-                        (e.key <= "0" || e.key <= "9")
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.order_no}
-                  // error={errors.order_no}
-                  // touched={touched.order_no}
-                  label="Order No."
-                  name="order_no"
-                  type="text"
-                  placeholder={"Enter order no."}
-                  // required={true}
-                  maxLength={10}
-                  onKeyPress={(e: any) => {
-                    if (
-                      !(
-                        (e.key <= "0" || e.key <= "9")
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <InputBox
-                  // onChange={handleChange}
-                  onChange={(e) => {
-                    if (handleDateChange(e as any)) {
-                      handleChange(e);
-                    }
-                  }}
-                  onBlur={handleBlur}
-                  error={errors.order_date}
-                  touched={touched.order_date}
-                  value={values.order_date}
-                  label="Order Date"
-                  name="order_date"
-                  type="date"
-                  placeholder={"Enter order date"}
-                  onKeyPress={(e: any) => {
-                    if (
-                      (
-                        (e.key >= "a" || e.key >= "z") ||
-                        (e.key <= "A" || e.key <= "Z") ||
-                        (e.key <= "0" || e.key <= "9") ||
-                        e.key === " "
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.address}
-                  label="Address"
-                  placeholder={"Enter Your Address"}
-                  name="address"
-                  type="text"
-                  maxLength={100}
-                  onKeyPress={(e: any) => {
-                    if (
-                      !(
-                        (e.key >= "a" || e.key >= "z") ||
-                        (e.key <= "A" || e.key <= "Z") ||
-                        (e.key <= "0" || e.key <= "9") ||
-                        e.key === " "
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.acquisition}
-                  label="Date of Acquisition"
-                  placeholder={"Enter Your Acquisition"}
-                  name="acquisition"
-                  type="date"
-                  onKeyPress={(e: any) => {
-                    if (
-                      (
-                        (e.key >= "a" || e.key >= "z") ||
-                        (e.key <= "A" || e.key <= "Z") ||
-                        (e.key <= "0" || e.key <= "9") ||
-                        e.key === " "
-                      )
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-
-                <SelectForNoApi
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.mode_of_acquisition}
-                  label="Mode of Acquisition"
-                  name="mode_of_acquisition"
-                  placeholder={"Choose mode of Acquisition"}
-                  options={[
-                    {
-                      id: 1,
-                      name: "Acquired",
-                    },
-                    {
-                      id: 2,
-                      name: "Donation",
-                    },
-                    {
-                      id: 3,
-                      name: "Purchase",
-                    },
-                    {
-                      id: 4,
-                      name: "Others",
-                    }
-                  ]}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.from_whom_acquired}
-                  label="From whom Acquired"
-                  placeholder={"From whom Acquired"}
-                  name="from_whom_acquired"
-                  type="text"
-                  maxLength={50}
-                />
-
-                <InputBox
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.building_approval_plan}
-                  label="Building Approval Plan No. / Gift Deed No."
-                  placeholder={"Building Approval Plan No. / Gift Deed No."}
-                  name="building_approval_plan"
-                  type="text"
-                  maxLength={20}
-                />
-              </div>
-
-              <div className="flex items-center justify-end mt-5 gap-5">
-                <PrimaryButton
-                  onClick={handleReset}
-                  buttonType="button"
-                  variant={"cancel"}
-                >
-                  Reset
-                </PrimaryButton>
-
-                <PrimaryButton buttonType="submit" variant="primary">
-                  Save
-                </PrimaryButton>
-
-              </div>
-            </form>
-          )}
+                  </div>
+                </form>
+              </>
+                 
+            )
+          }}
+       
         </Formik>
       </div>
     </div>
