@@ -68,6 +68,11 @@ const Login = () => {
             if (typeof window !== "undefined")
               window.location.replace("/lams/apply/approve-application");
           }
+          else if (data?.user_type === "Admin") {
+            dispatch(login(data)), "a";
+            if (typeof window !== "undefined")
+              window.location.replace("/lams/apply/approve-application");
+          }
           // else {
           //   dispatch(login(data));
           //   if (typeof window !== "undefined")

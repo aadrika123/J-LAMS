@@ -390,7 +390,7 @@ const View = ({ id }: { id: number }) => {
                         <div>
                             {role === 'Field Officer' ? null :
                                 <>
-                                    Update Status - {data?.data?.status === 2 ? <div className='text-green-500'>Approved by Admin</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : data?.data?.status === 1 ? <div className='text-green-500'>Approved by Field Officer</div> : <>null</>}
+                                    Update Status - {data?.data?.status === 2 ? <div className='text-green-500'>Approved by Admin</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : data?.data?.status === 1 ? <div className='text-green-500'>Approved by Field Officer</div> :data?.data?.status === 3 ? <div className='text-orange-500'>Sent back by Field Officer</div>: <>null</>}
                                 </>
                             }
                         </div>

@@ -365,7 +365,7 @@ const Approved = () => {
                         </select>
                     </div>
 
-                    {role == 'Field Officer' ?
+                    {role == 'Admin' ?
                         <div className='flex gap-4'>
 
                             {/* 1st col */}
@@ -445,7 +445,7 @@ const Approved = () => {
                             Export CSV
                         </button>
 
-                        {role == 'Field Officer' ? null : (
+                        {role == 'Admin' ? null : (
                             <button onClick={handleClick} type="submit" className="inline-flex w-[16rem]  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
                                 + Add New Asset
                             </button>
@@ -474,7 +474,7 @@ const Approved = () => {
                                     <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ? <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> : <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}</td>
                                     <td className="px-6 py-4">
                                         <div className='flex'>
-                                            {role == 'Field Officer' ? null : (
+                                            {role == 'Admin' ? null : (
                                                 <Link
                                                     href={`/apply/approve-application/${item?.id}?status=clicked`}
 
@@ -581,7 +581,7 @@ const Approved = () => {
                                                 </svg>
                                             </Link>
 
-                                            {role == 'Field Officer' ? null : (
+                                            {role == 'Admin' ? null : (
                                                 <>
                                                     <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -609,13 +609,14 @@ const Approved = () => {
                                         {item.status === 0 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
                                             item.status === 1 ? <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Field Officer</div> :
                                                 item.status === -1 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Field Officer</div> :
+                                                item.status === 3 ? <div className='text-red-500 font-semibold text-xs ml-4'>Sent back by Field Officer</div> :
                                                     <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Field Officer</div>
                                         }
                                     </td>
 
                                     {role == 'Municipal' ? (
                                         <td>
-                                            {item.status === 0 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
+                                            {item.status === 0 || item.status === 3 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
                                                 item.status === 2 ? <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Admin</div> :
                                                     item.status === -2 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Admin</div> :
                                                         item.status === -1 ? <div className='text-red-500 font-semibold text-xs ml-4'>Rejected by Field Officer</div> :
@@ -626,7 +627,7 @@ const Approved = () => {
                                         <> </>
                                     }
 
-                                    {role == 'Field Officer' ? (
+                                    {role == 'Admin' ? (
                                         <td>
                                             {item.status === 1 ? (
                                                 <td className="px-6 py-4">

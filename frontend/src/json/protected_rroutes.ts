@@ -9,7 +9,7 @@ const data = [
     ],
   },
   {
-    user_type: "Field Officer",
+    user_type: "Admin",
     paths: [
      "/lams/apply/approve-application",
       "/lams/apply/view",
