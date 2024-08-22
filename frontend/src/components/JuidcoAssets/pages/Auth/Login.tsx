@@ -11,7 +11,7 @@ import Button from "@/components/global/atoms/Button";
 import Input from "@/components/global/atoms/Input";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import axios from "@/lib/axiosConfig";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/reducers/auth.reducer";
@@ -63,21 +63,16 @@ const Login = () => {
             if (typeof window !== "undefined")
               window.location.replace("/lams/apply/approve-application");
           }
-          else if (data?.user_type === "Field Officer") {
-            dispatch(login(data)), "a";
-            if (typeof window !== "undefined")
-              window.location.replace("/lams/apply/approve-application");
-          }
           else if (data?.user_type === "Admin") {
             dispatch(login(data)), "a";
             if (typeof window !== "undefined")
               window.location.replace("/lams/apply/approve-application");
           }
-          // else {
-          //   dispatch(login(data));
-          //   if (typeof window !== "undefined")
-          //     window.location.replace("/hrms/ems/dashboard");
-          // }
+          else {
+            dispatch(login(data));
+            if (typeof window !== "undefined")
+              window.location.replace("/hrms/ems/dashboard");
+          }
         }
       } else {
         hideWorkingAnimation();
@@ -149,7 +144,7 @@ const Login = () => {
                       type="password"
                       placeholder="Password"
                       className="mt-1 border-0 focus:border-0 visible:border-0 focus:outline-none"
-                     
+
                     />
                   </div>
 
