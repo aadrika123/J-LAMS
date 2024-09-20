@@ -393,6 +393,7 @@ class AssetsManagementDao {
         const filter = req.query.filter as string || '';
 
         const status = Number(req.query.status)
+        const land = req.query.land as string || ''
 
         const skip = (page - 1) * limit;
         const status1Items = await prisma.assets_list.count({
@@ -460,6 +461,12 @@ class AssetsManagementDao {
                         (status === 0 || status) ? {
                             status: {
                                 equals: status,
+                            },
+                        } : {},
+                        land ? {
+                            type_of_land: {
+                                equals: land,
+                                mode: "insensitive",
                             },
                         } : {},
                     ]
