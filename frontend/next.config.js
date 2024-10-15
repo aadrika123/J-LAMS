@@ -4,7 +4,8 @@
 const nextConfig = {
   basePath: "/lams",
   env: {
-    backend: "http://localhost:8000",
+    // backend: "http://localhost:8000",
+    backend: "https://aadrikainfomedia.com/auth",
   },
   
 };
