@@ -70,7 +70,8 @@ function Login() {
         const data = response.data.data;
         sessionStorage.setItem("user_details", JSON.stringify(data?.userDetails));
 
-        if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "Field Officer") {
+        // if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "Field Officer") {
+          if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "TC") {
           setLocalStorageItem("token", response?.data?.data?.token);
           navigate("/field-officer");
           toast.success("Login Successful");
