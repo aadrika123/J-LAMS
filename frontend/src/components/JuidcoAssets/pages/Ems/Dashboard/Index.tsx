@@ -27,11 +27,14 @@ export const DashboardMain = () => {
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
   const [floorCount, setFloorCount] = useState(0);
+  const [builingName, setBuilingName] = useState('');
   const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
+  const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
   const [data, setData] = useState<any>([]);
-  const [, setCurrentType] = useState<any>(null);
-  const [, setPlotNo] = useState<any>(0);
+  const [currentType, setCurrentType] = useState<any>(null);
+  const [plotNo, setPlotNo] = useState<any>(0);
+  const [count, setCount] = useState<any>(0);
   const [, setNavigationStack] = useState([]);
   const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
   const [sessionData, setSessionData] = useState([]);
@@ -300,7 +303,7 @@ export const DashboardMain = () => {
           key={index}
           type="text"
           className="border p-2 m-2"
-          placeholder={`No of plot on the floor ${index + 1}`}
+          placeholder={`No of shop/flat on the floor ${index + 1}`}
           onChange={(e) => handlePlotCountChange(e, index)}
           maxLength={3}
           onKeyPress={(e: any) => {
@@ -369,7 +372,13 @@ export const DashboardMain = () => {
 
   const handleTypeBox = (e: any, type: any, index: any) => {
     const count = parseInt(e.target.value);
+    setCount(count);
     if (isNaN(count)) return;
+
+    if(type === 'Commercial' && e>10){
+      toast.error("Max 10 Floor")
+      return false;
+    }
 
     const length = Object.keys(unitCompletion);
     console.log("lenghtfgdfg", length)
@@ -609,6 +618,36 @@ export const DashboardMain = () => {
     setInputBoxes('')
   }
 
+  const handleCloseDataModal =()=>{
+    setIsModalVisibleData(false)
+  }
+
+
+  const staticData = [
+    {
+      floor: 1,
+      plotCount: 5,
+      units: [
+        { index: 1, status: 'Booked' },
+        { index: 2, status: 'Vacant' },
+        { index: 3, status: 'Booked' },
+        { index: 4, status: 'Vacant' },
+        { index: 5, status: 'Under Maintenance' },
+      ],
+    },
+    {
+      floor: 2,
+      plotCount: 4,
+      units: [
+        { index: 1, status: 'Vacant' },
+        { index: 2, status: 'Booked' },
+        { index: 3, status: 'Vacant' },
+        { index: 4, status: 'Booked' },
+      ],
+    },
+    // Add more floors as needed
+  ];
+
   
   return (
     <div>
@@ -684,6 +723,10 @@ export const DashboardMain = () => {
                 setIsModalVisible(true);
               }
             }, [values.type_of_assets]);
+
+            const handleDataModal =()=>{
+              setIsModalVisibleData(!isModalVisibleData)
+            }
             
             
             return (
@@ -725,69 +768,213 @@ export const DashboardMain = () => {
                       ]}
                     />
 
-                    {values.type_of_assets === 'Building' && isModalVisible && (
-                      <div className="fixed inset-0 flex items-center justify-center ">
-                        <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem]">
-                          <div className='mb-[3rem]'>
-                            <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
-                            <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
-                          </div>
+{values.type_of_assets === 'Building' && isModalVisible && (
+  <div className="fixed inset-0 flex items-center justify-center">
+    {/* Background Overlay for Blur Effect */}
+    <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
 
-                          <div>
-                            <input
-                              type="number"
-                              value={floorCount}
-                              onChange={(e) => setFloorCount(parseInt(e.target.value))}
-                              placeholder="Number of Floors"
-                              className="border p-2 m-2"
-                            />
-                            <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
-                            <div className="flex flex-col">
-                              {inputBoxes.length > 0 ? (
-                                <div className="h-[12rem] overflow-x-auto">
-                                  {inputBoxes}
-                                </div>
-                              ) : (
-                                <div>
-                                  {inputBoxes}
-                                </div>
-                              )}
+    {/* Modal Content */}
+    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] max-h-[80vh] overflow-auto z-20">
+      <div className='mb-[3rem]'>
+        <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+        <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+        <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button>
+      </div>
 
-                            </div>
-                            <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Entered Data- </h4>
+      <div>
+        <input
+          type="text"
+          value={builingName}
+          onChange={(e) => setBuilingName(e.target.value)}
+          placeholder="Building Name"
+          className="border p-2 m-2"
+        />
+        <input
+          type="number"
+          value={floorCount}
+          onChange={(e) => setFloorCount(parseInt(e.target.value))}
+          placeholder="Number of Floors"
+          className="border p-2 m-2"
+        />
+        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
+        
+        <div className="flex flex-col">
+          {inputBoxes.length > 0 ? (
+            <div className="h-[12rem] overflow-x-auto">
+              {inputBoxes}
+            </div>
+          ) : null}
+        </div>
+        
+        <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
+        <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
+        <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
+        {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
 
-                            {inputBoxes.length > 0 ? (
-                              <div className="p-4">
-                                {sessionData.map((floorData: any, floorIndex: any) => (
-                                  <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md overflow-y-auto h-[16rem]">
-                                    <h2 className="text-lg font-bold mb-2">Floor: {floorData?.floor}</h2>
-                                    <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
-                                    {Object?.entries(floorData?.units).map(([unitType, units]: any) => (
-                                      <div key={unitType} className="mb-4">
-                                        <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
-                                        {units?.map((unit: any, unitIndex: any) => (
-                                          <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
-                                            <p><strong>Index:</strong> {unit?.index}</p>
-                                            <p><strong>Type:</strong> {unit?.type}</p>
-                                            <p><strong>Length:</strong> {unit?.length}</p>
-                                            <p><strong>Breadth:</strong> {unit?.breadth}</p>
-                                            <p><strong>Height:</strong> {unit?.height}</p>
-                                            <p><strong>Name:</strong> {unit?.name}</p>
-                                            <p><strong>Property Name:</strong> {unit?.property_name}</p>
-                                            <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ))}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : null}
-                        
-                          </div>
+        {sessionData.length > 0 ? (
+          <div className="p-4 max-h-[40vh] overflow-y-auto">
+            {sessionData.map((floorData, floorIndex) => (
+              <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                <h2 className="text-lg font-bold mb-2">Floor: {floorData?.floor}</h2>
+                <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
+                {floorData?.units && Object.entries(floorData.units).length > 0 ? (
+                  Object.entries(floorData.units).map(([unitType, units]) => (
+                    <div key={unitType} className="mb-4">
+                      <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
+                      {units.map((unit, unitIndex) => (
+                        <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
+                          <p><strong>Index:</strong> {unit?.index}</p>
+                          <p><strong>Type:</strong> {unit?.type}</p>
+                          <p><strong>Length:</strong> {unit?.length}</p>
+                          <p><strong>Breadth:</strong> {unit?.breadth}</p>
+                          <p><strong>Height:</strong> {unit?.height}</p>
+                          <p><strong>Name:</strong> {unit?.name}</p>
+                          <p><strong>Property Name:</strong> {unit?.property_name}</p>
+                          <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
                         </div>
+                      ))}
+                    </div>
+                  ))
+                ) : (
+                  <p>No units available.</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center">No data available.</p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+{/* Data modal */}
+{/* {isModalVisibleData && (
+  <div className="fixed inset-0 flex items-center justify-center">
+    <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
+    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] z-20">
+      <div className='mb-[3rem]'>
+        <button onClick={handleCloseDataModal} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+      </div>
+
+      <div className="p-4">
+        <h2 className="text-lg font-bold mb-4">Building Status Overview</h2>
+
+        <div className="grid grid-cols-3 gap-4">
+          {staticData.map((floorData, floorIndex) => (
+            <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+              <h3 className="text-md font-semibold mb-2">Floor: {floorData.floor}</h3>
+              <p className="mb-2">Plot Count: {floorData.plotCount}</p>
+
+              <div className="flex flex-wrap">
+                {floorData.units.map((unit, unitIndex) => {
+                  let statusColor;
+                  switch (unit.status) {
+                    case 'Booked':
+                      statusColor = 'bg-red-200'; 
+                      break;
+                    case 'Vacant':
+                      statusColor = 'bg-green-200'; 
+                      break;
+                    default:
+                      statusColor = 'bg-yellow-200'; 
+                  }
+
+                  return (
+                    <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
+                      <p className="font-bold">Unit {unit.index}</p>
+                      <p>{unit.status}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)} */}
+
+
+{/* Data Modal */}
+{isModalVisibleData && (
+  <div className="fixed inset-0 flex items-center justify-center">
+    {/* Background Overlay for Blur Effect */}
+    <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
+
+    {/* Modal Content */}
+    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] z-20 max-h-[80vh] overflow-auto">
+      <div className='mb-[3rem]'>
+        <button onClick={handleCloseDataModal} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+      </div>
+
+      {sessionData.length > 0 ? (
+        <div className="p-4">
+          <h2 className="text-lg font-bold mb-4">Building Status Overview</h2>
+
+          <div className="grid grid-cols-3 gap-4">
+            {sessionData.map((floorData, floorIndex) => {
+              if (!floorData) return null; // Skip null entries
+              return (
+                <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                  <h3 className="text-md font-semibold mb-2">Floor: {floorData.floor}</h3>
+                  <p className="mb-2">Plot Count: {floorData.plotCount}</p>
+
+                  <div className="flex flex-wrap">
+                    {floorData.units && Object.entries(floorData.units).map(([unitType, units]) => (
+                      <div key={unitType} className="mb-4">
+                        <h4 className="font-semibold">{unitType} Units:</h4>
+                        {units.length > 0 ? (
+                          units.map((unit, unitIndex) => {
+                            const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
+                            const statusColor = isBooked ? 'bg-red-200' : 'bg-green-200'; // Red for booked, green for vacant
+
+                            return (
+                              <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
+                                <p className="font-bold">Unit {unit.index}</p>
+                                <p>Type: {unit.type}</p>
+                                {isBooked && (
+                                  <>
+                                    <p>Length: {unit.length}</p>
+                                    <p>Breadth: {unit.breadth}</p>
+                                    <p>Height: {unit.height}</p>
+                                    <p>Name: {unit.name}</p>
+                                    {unit.property_name && <p>Property Name: {unit.property_name}</p>}
+                                  </>
+                                )}
+                                {!isBooked && <p>Status: Vacant</p>}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className={`m-2 p-2 border rounded bg-green-200 text-center`}>
+                            <p className="font-bold">No Units Available</p>
+                            <p>Status: Vacant</p>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <p className="text-center">No data available.</p>
+      )}
+    </div>
+  </div>
+)}
+
+
+
+
+
 
                     <SelectForNoApi
                       onChange={handleChange}
