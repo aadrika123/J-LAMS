@@ -26,8 +26,8 @@ export const DashboardMain = () => {
 
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
-  const [floorCount, setFloorCount] = useState(0);
-  const [builingName, setBuilingName] = useState('');
+  const [floorCount, setFloorCount] = useState('');
+  const [buildingName, setBuildingName] = useState('');
   const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
   const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
@@ -38,6 +38,17 @@ export const DashboardMain = () => {
   const [, setNavigationStack] = useState([]);
   const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
   const [sessionData, setSessionData] = useState([]);
+  const [floorDisable, setFloorDisable] = useState(false);
+
+  // const [floorCount, setFloorCount] = useState(3); // Example: Number of floors
+  const [plotNos, setPlotNos] = useState<Array<number | string>>([]); // Initialize plot numbers
+  const [selectedFloor, setSelectedFloor] = useState(null);
+
+
+  useEffect(() => {
+    const numericFloorCount = parseInt(floorCount) || 0; 
+    setPlotNos(Array(numericFloorCount).fill("")); 
+  }, [floorCount]);
 
   const initialValues = {
     type_of_assets: "",
@@ -60,7 +71,8 @@ export const DashboardMain = () => {
     mode_of_acquisition: "",
     role: "Municipal",
     building_approval_plan: "",
-    no_of_floors: floorCount
+    no_of_floors: floorCount,
+    building_name:buildingName
   }
 
   const employeeValidationSchema = Yup.object().shape({
@@ -138,6 +150,8 @@ export const DashboardMain = () => {
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors
       values.floorData = transformDataForAPI(data);
+
+      values.building_name = buildingName;
 
 
       const res = await axios({
@@ -273,20 +287,24 @@ export const DashboardMain = () => {
 
   const handleSave = () => {
     const boxes = Array.from({ length: floorCount }, (_, index) => (
-      <input
-        key={index}
-        type="text"
-        readOnly
-        className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA] "
-        placeholder={`${index + 1}`}
-        onClick={() => handleFloor(index)}
-      />
+      // <input
+      //   key={index}
+      //   type="text"
+      //   readOnly
+      //   className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA] "
+      //   placeholder={`${index + 1}`}
+      //   onClick={() => handleFloor(index)}
+      // />
+      <>
+      </>
     ));
-    setInputBoxes(boxes);
+    setFloorDisable(true)
+    // setInputBoxes(boxes);
     setNavigationStack((prevStack) => [...prevStack, boxes] as any);
   };
 
   const handleFloor = (index: any) => {
+    setSelectedFloor(index); 
     if (!data[index]) {
       setData((prevData: any) => {
         const updatedData = Array.isArray(prevData) ? [...prevData] : [];
@@ -298,35 +316,36 @@ export const DashboardMain = () => {
     }
 
     const popup = (
-      <div key={`popup-${index}`}>
-        <input
-          key={index}
-          type="text"
-          className="border p-2 m-2"
-          placeholder={`No of shop/flat on the floor ${index + 1}`}
-          onChange={(e) => handlePlotCountChange(e, index)}
-          maxLength={3}
-          onKeyPress={(e: any) => {
-            if (!(e.key >= "0" && e.key <= "9")) {
-              e.preventDefault();
-            }
-          }}
-        />
+      // <div key={`popup-${index}`}>
+      //   <input
+      //     key={index}
+      //     type="text"
+      //     className="border p-2 m-2"
+      //     placeholder={`No of shop/flat on the floor ${index + 1}`}
+      //     onChange={(e) => handlePlotCountChange(e, index)}
+      //     maxLength={3}
+      //     onKeyPress={(e: any) => {
+      //       if (!(e.key >= "0" && e.key <= "9")) {
+      //         e.preventDefault();
+      //       }
+      //     }}
+      //   />
 
-        <br />
-        <button
-          className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
-          onClick={() => handleTypeSelect("Commercial", index)}
-        >
-          Commercial
-        </button>
-        <button
-          className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
-          onClick={() => handleTypeSelect("Residential", index)}
-        >
-          Residential
-        </button>
-      </div>
+      //   <br />
+      //   <button
+      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
+      //     onClick={() => handleTypeSelect("Commercial", index)}
+      //   >
+      //     Commercial
+      //   </button>
+      //   <button
+      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
+      //     onClick={() => handleTypeSelect("Residential", index)}
+      //   >
+      //     Residential
+      //   </button>
+      // </div>
+      <></>
     );
 
     setInputBoxes([popup]);
@@ -336,6 +355,12 @@ export const DashboardMain = () => {
   const handlePlotCountChange = (e: any, index: any) => {
     const plotNumber = parseInt(e.target.value);
     setPlotNo(plotNumber);
+
+    setPlotNos((prev) => {
+      const newPlotNos = [...prev];
+      newPlotNos[index] = plotNumber; // Update the specific index
+      return newPlotNos;
+    });
 
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
@@ -784,10 +809,11 @@ export const DashboardMain = () => {
       <div>
         <input
           type="text"
-          value={builingName}
-          onChange={(e) => setBuilingName(e.target.value)}
+          value={buildingName}
+          onChange={(e) => setBuildingName(e.target.value)}
           placeholder="Building Name"
           className="border p-2 m-2"
+          disabled={floorDisable}
         />
         <input
           type="number"
@@ -795,8 +821,57 @@ export const DashboardMain = () => {
           onChange={(e) => setFloorCount(parseInt(e.target.value))}
           placeholder="Number of Floors"
           className="border p-2 m-2"
+          disabled={floorDisable}
         />
-        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]">Add Floor</button>
+        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
+
+{floorDisable ?
+        <div className='flex flex-row'>
+     
+      {Array.from({ length: floorCount }, (_, index) => (
+        <div key={index}  >
+          <input
+            type="text"
+            readOnly
+            className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA]"
+            placeholder={`${index + 1}`} 
+            onClick={() => handleFloor(index)}
+          />
+        </div>
+      ))}
+    </div> :""}
+
+    {selectedFloor !== null && (
+        <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder={`No of shop/flat on the floor ${selectedFloor + 1}`}
+            value={plotNos[selectedFloor]} // Show saved plot number
+            onChange={(e) => handlePlotCountChange(e, selectedFloor)}
+            maxLength={3}
+            onKeyPress={(e) => {
+              if (!(e.key >= "0" && e.key <= "9")) {
+                e.preventDefault();
+              }
+            }}
+          />
+
+          <button
+            className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
+            onClick={() => handleTypeSelect("Commercial", selectedFloor)}
+          >
+            Commercial
+          </button>
+          <button
+            className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
+            onClick={() => handleTypeSelect("Residential", selectedFloor)}
+          >
+            Residential
+          </button>
+        </div>
+      )}
+      
         
         <div className="flex flex-col">
           {inputBoxes.length > 0 ? (
@@ -804,7 +879,7 @@ export const DashboardMain = () => {
               {inputBoxes}
             </div>
           ) : null}
-        </div>
+        </div> 
         
         <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
         <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
@@ -931,7 +1006,7 @@ export const DashboardMain = () => {
                         {units.length > 0 ? (
                           units.map((unit, unitIndex) => {
                             const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
-                            const statusColor = isBooked ? 'bg-red-200' : 'bg-green-200'; // Red for booked, green for vacant
+                            const statusColor = isBooked ? 'bg-yellow-200' : 'bg-green-200'; // Red for booked, green for vacant
 
                             return (
                               <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
