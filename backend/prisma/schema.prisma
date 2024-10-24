@@ -50,6 +50,7 @@ model assets_list {
   plot_no                 String?
   ward_no                 String?
   address                 String?
+  building_name           String?
   depreciation_method     String?
   apreciation_method      String?
   blue_print              String?

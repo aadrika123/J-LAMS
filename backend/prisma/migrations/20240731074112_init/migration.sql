@@ -8,6 +8,7 @@ CREATE TABLE "assets_list" (
     "plot_no" TEXT,
     "ward_no" TEXT,
     "address" TEXT,
+    "building_name" TEXT,
     "depreciation_method" TEXT,
     "apreciation_method" TEXT,
     "blue_print" TEXT,
