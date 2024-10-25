@@ -298,9 +298,14 @@ export const DashboardMain = () => {
       <>
       </>
     ));
-    setFloorDisable(true)
+    if(floorCount>0){
+   setFloorDisable(true)
+   
+ 
+    setInputBoxes([]);
     // setInputBoxes(boxes);
     setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+  }
   };
 
   const handleFloor = (index: any) => {
@@ -309,7 +314,7 @@ export const DashboardMain = () => {
       setData((prevData: any) => {
         const updatedData = Array.isArray(prevData) ? [...prevData] : [];
         if (!updatedData[index]) {
-          updatedData[index] = { floor: index + 1, units: {}, plotCount: 0 };
+          updatedData[index] = { floor: index, units: {}, plotCount: 0 };
         }
         return updatedData;
       });
@@ -381,8 +386,9 @@ export const DashboardMain = () => {
         type="text"
         className="border p-2 m-2"
         placeholder={`Number of ${type} units`}
-        onChange={(e) => handleTypeBox(e, type, index)}
-        maxLength={3}
+        onChange={(e) =>
+           handleTypeBox(e, type, index)}
+        maxLength={2}
           onKeyPress={(e: any) => {
             if (!(e.key >= "0" && e.key <= "9")) {
             e.preventDefault();
@@ -400,7 +406,7 @@ export const DashboardMain = () => {
     setCount(count);
     if (isNaN(count)) return;
 
-    if(type === 'Commercial' && e>10){
+    if(type === 'Commercial' && count>10){
       toast.error("Max 10 Floor")
       return false;
     }
@@ -461,11 +467,16 @@ export const DashboardMain = () => {
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
     const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
-    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex + 1);
+    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex );
     const unitData = floorData?.units[type]?.[unitIndex] || {};
 
     const innerBoxes = (
+      <>
+      
+
+      <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex +1 }</span></h4></div>
       <div key={`${floorIndex}-${type}-${unitIndex}`}>
+       
         <input
           type="text"
           className="border p-2 m-2"
@@ -567,6 +578,7 @@ export const DashboardMain = () => {
           </button>
         </div>
       </div>
+      </>
     );
 
     setInputBoxes([innerBoxes]);
@@ -577,9 +589,9 @@ export const DashboardMain = () => {
     const value = e.target.value;
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
-      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex + 1);
+      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex );
       if (!floorObj) {
-        floorObj = { floor: floorIndex + 1, units: {} };
+        floorObj = { floor: floorIndex , units: {} };
         updatedData[floorIndex] = floorObj;
       }
 
@@ -597,7 +609,7 @@ export const DashboardMain = () => {
       floorObj.units[type][unitIndex][field] = value;
 
       if (allFieldsFilled) {
-        console.log(`Unit ${unitIndex + 1} details:`, unit);
+        console.log(`Unit ${unitIndex } details:`, unit);
         sessionStorage.setItem('unitData', JSON.stringify(updatedData));
         const storedData = sessionStorage.getItem('unitData');
         if (storedData) {
@@ -606,7 +618,7 @@ export const DashboardMain = () => {
         
         setUnitCompletion((prevCompletion) => ({
           ...prevCompletion,
-          [`${unitIndex + 1}`]: allFieldsFilled,
+          [`${unitIndex }`]: allFieldsFilled,
         }));
       }
 
@@ -647,31 +659,6 @@ export const DashboardMain = () => {
     setIsModalVisibleData(false)
   }
 
-
-  const staticData = [
-    {
-      floor: 1,
-      plotCount: 5,
-      units: [
-        { index: 1, status: 'Booked' },
-        { index: 2, status: 'Vacant' },
-        { index: 3, status: 'Booked' },
-        { index: 4, status: 'Vacant' },
-        { index: 5, status: 'Under Maintenance' },
-      ],
-    },
-    {
-      floor: 2,
-      plotCount: 4,
-      units: [
-        { index: 1, status: 'Vacant' },
-        { index: 2, status: 'Booked' },
-        { index: 3, status: 'Vacant' },
-        { index: 4, status: 'Booked' },
-      ],
-    },
-    // Add more floors as needed
-  ];
 
   
   return (
@@ -814,40 +801,57 @@ export const DashboardMain = () => {
           placeholder="Building Name"
           className="border p-2 m-2"
           disabled={floorDisable}
-        />
-        <input
-          type="number"
-          value={floorCount}
-          onChange={(e) => setFloorCount(parseInt(e.target.value))}
-          placeholder="Number of Floors"
-          className="border p-2 m-2"
-          disabled={floorDisable}
-        />
-        <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
-
-{floorDisable ?
-        <div className='flex flex-row'>
-     
-      {Array.from({ length: floorCount }, (_, index) => (
-        <div key={index}  >
-          <input
-            type="text"
-            readOnly
-            className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA]"
-            placeholder={`${index + 1}`} 
-            onClick={() => handleFloor(index)}
           />
-        </div>
-      ))}
-    </div> :""}
+<input
+  type="number"
+  value={floorCount}
+  onChange={(e) => {
+    const value = parseInt(e.target.value);
+    // Only update state if the value is valid (1 to 10)
+    if (!isNaN(value) && value >= 1 && value <= 10) {
+      setFloorCount(value);
+    } else if (e.target.value === '') {
+      // Allow empty input to clear the value
+      setFloorCount('');
+    }
+  }}
+  placeholder="Number of Floors"
+  className="border p-2 m-2"
+  disabled={floorDisable}
+  min={1} // Minimum value set to 1
+  max={10} // Maximum value set to 10
+/>
+
+
+
+                            <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
+
+                            {floorDisable ? (
+  <div className='flex flex-row'>
+    {Array.from({ length: floorCount  + 1}, (_, index) => (
+      <div key={index}>
+        <input
+          type="text"
+          readOnly
+          className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md ${
+            selectedFloor === index ? 'bg-[#d6fce7]' : 'bg-[#4338CA]'
+          }`} // Change background color based on selection
+          placeholder={`${index}`} 
+          onClick={() => handleFloor(index)}
+        />
+      </div>
+    ))}
+  </div>
+) : ""}
+
 
     {selectedFloor !== null && (
         <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
           <input
             type="text"
             className="border p-2 m-2"
-            placeholder={`No of shop/flat on the floor ${selectedFloor + 1}`}
-            value={plotNos[selectedFloor]} // Show saved plot number
+            placeholder={`No of shop/flat on the floor ${selectedFloor}`}
+            value={plotNos[selectedFloor] || ''}  
             onChange={(e) => handlePlotCountChange(e, selectedFloor)}
             maxLength={3}
             onKeyPress={(e) => {
@@ -857,18 +861,19 @@ export const DashboardMain = () => {
             }}
           />
 
-          <button
-            className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
-            onClick={() => handleTypeSelect("Commercial", selectedFloor)}
-          >
-            Commercial
-          </button>
-          <button
-            className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
-            onClick={() => handleTypeSelect("Residential", selectedFloor)}
-          >
-            Residential
-          </button>
+<button
+  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
+  onClick={() => handleTypeSelect("Commercial", selectedFloor)}
+>
+  Commercial
+</button>
+<button
+  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
+  onClick={() => handleTypeSelect("Residential", selectedFloor)}
+>
+  Residential
+</button>
+
         </div>
       )}
       
@@ -989,7 +994,7 @@ export const DashboardMain = () => {
 
       {sessionData.length > 0 ? (
         <div className="p-4">
-          <h2 className="text-lg font-bold mb-4">Building Status Overview</h2>
+          <h2 className="text-lg font-bold mb-4">Building Status Overview (with units)</h2>
 
           <div className="grid grid-cols-3 gap-4">
             {sessionData.map((floorData, floorIndex) => {
