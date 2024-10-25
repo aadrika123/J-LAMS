@@ -22,6 +22,25 @@ import axios from "@/lib/axiosConfig";
 import Jhar from "@/assets/icons/jhar.png"
 
 export const DashboardMain = () => {
+
+  interface Unit {
+    index: number;
+    type: string;
+    length: number;
+    breadth: number;
+    height: number;
+    name: string;
+    property_name: string;
+    type_of_plot: string;
+  }
+  
+  interface FloorData {
+    floor: number;
+    plotCount: number;
+    units: Record<string, Unit[]>; 
+  }
+
+
   const [isLoading, setIsLoading] = useState(true);
 
   const [file1, setFile1] = useState<File | null>(null);
@@ -37,7 +56,7 @@ export const DashboardMain = () => {
   const [count, setCount] = useState<any>(0);
   const [, setNavigationStack] = useState([]);
   const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
-  const [sessionData, setSessionData] = useState([]);
+  const [sessionData, setSessionData] = useState<FloorData[]>([]);
   const [floorDisable, setFloorDisable] = useState(false);
 
   // const [floorCount, setFloorCount] = useState(3); // Example: Number of floors
@@ -286,27 +305,25 @@ export const DashboardMain = () => {
   }
 
   const handleSave = () => {
-    const boxes = Array.from({ length: floorCount }, (_, index) => (
-      // <input
-      //   key={index}
-      //   type="text"
-      //   readOnly
-      //   className="border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md bg-[#4338CA] "
-      //   placeholder={`${index + 1}`}
-      //   onClick={() => handleFloor(index)}
-      // />
-      <>
-      </>
-    ));
-    if(floorCount>0){
-   setFloorDisable(true)
-   
- 
-    setInputBoxes([]);
-    // setInputBoxes(boxes);
-    setNavigationStack((prevStack) => [...prevStack, boxes] as any);
-  }
-  };
+    const numericFloorCount = Number(floorCount);
+    
+    if (isNaN(numericFloorCount) || numericFloorCount < 0) {
+        console.error("Invalid floor count");
+        return;
+    }
+
+    const boxes = Array.from({ length: numericFloorCount }, () => (
+      <></> // Return an empty fragment
+  ));
+
+    // Only proceed if floorCount is greater than 0
+    if (numericFloorCount > 0) {
+        setFloorDisable(true);
+        setInputBoxes(boxes);
+        setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+    }
+};
+
 
   const handleFloor = (index: any) => {
     setSelectedFloor(index); 
@@ -809,7 +826,7 @@ export const DashboardMain = () => {
     const value = parseInt(e.target.value);
     // Only update state if the value is valid (1 to 10)
     if (!isNaN(value) && value >= 1 && value <= 10) {
-      setFloorCount(value);
+      setFloorCount(value.toString()); // Convert number to string
     } else if (e.target.value === '') {
       // Allow empty input to clear the value
       setFloorCount('');
@@ -818,9 +835,10 @@ export const DashboardMain = () => {
   placeholder="Number of Floors"
   className="border p-2 m-2"
   disabled={floorDisable}
-  min={1} // Minimum value set to 1
-  max={10} // Maximum value set to 10
+  min={1} 
+  max={10} 
 />
+
 
 
 
@@ -828,21 +846,23 @@ export const DashboardMain = () => {
 
                             {floorDisable ? (
   <div className='flex flex-row'>
-    {Array.from({ length: floorCount  + 1}, (_, index) => (
+    {Array.from({ length: Math.max(Number(floorCount), 0) + 1 }, (_, index) => ( 
       <div key={index}>
         <input
           type="text"
           readOnly
           className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md ${
             selectedFloor === index ? 'bg-[#d6fce7]' : 'bg-[#4338CA]'
-          }`} // Change background color based on selection
+          }`}
           placeholder={`${index}`} 
           onClick={() => handleFloor(index)}
         />
       </div>
     ))}
   </div>
-) : ""}
+) : null}
+
+
 
 
     {selectedFloor !== null && (
