@@ -387,7 +387,7 @@ export const DashboardMain = () => {
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
       if (!updatedData[index]) {
-        updatedData[index] = { floor: index + 1, units: {}, plotCount: plotNumber };
+        updatedData[index] = { floor: index + 2, units: {}, plotCount: plotNumber };
       } else {
         updatedData[index].plotCount = plotNumber;
       }
@@ -843,10 +843,10 @@ export const DashboardMain = () => {
 
 
                             <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
-
+                         
                             {floorDisable ? (
   <div className='flex flex-row'>
-    {Array.from({ length: Math.max(Number(floorCount), 0) + 1 }, (_, index) => ( 
+    {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => ( 
       <div key={index}>
         <input
           type="text"
@@ -854,7 +854,7 @@ export const DashboardMain = () => {
           className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md ${
             selectedFloor === index ? 'bg-[#d6fce7]' : 'bg-[#4338CA]'
           }`}
-          placeholder={`${index}`} 
+          placeholder={index === 0 ? 'B' : (index - 1).toString()} // Adjust placeholder
           onClick={() => handleFloor(index)}
         />
       </div>
@@ -865,37 +865,39 @@ export const DashboardMain = () => {
 
 
 
-    {selectedFloor !== null && (
-        <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder={`No of shop/flat on the floor ${selectedFloor}`}
-            value={plotNos[selectedFloor] || ''}  
-            onChange={(e) => handlePlotCountChange(e, selectedFloor)}
-            maxLength={3}
-            onKeyPress={(e) => {
-              if (!(e.key >= "0" && e.key <= "9")) {
-                e.preventDefault();
-              }
-            }}
-          />
 
-<button
-  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
-  onClick={() => handleTypeSelect("Commercial", selectedFloor)}
->
-  Commercial
-</button>
-<button
-  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
-  onClick={() => handleTypeSelect("Residential", selectedFloor)}
->
-  Residential
-</button>
+{selectedFloor !== null && (
+  <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
+    <input
+      type="text"
+      className="border p-2 m-2"
+      placeholder={`No of shop/flat on the floor ${selectedFloor === 0 ? 'B' : selectedFloor - 1}`}
+      value={plotNos[selectedFloor] || ''}  
+      onChange={(e) => handlePlotCountChange(e, selectedFloor)}
+      maxLength={3}
+      onKeyPress={(e) => {
+        if (!(e.key >= "0" && e.key <= "9")) {
+          e.preventDefault();
+        }
+      }}
+    />
 
-        </div>
-      )}
+    <button
+      className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
+      onClick={() => handleTypeSelect("Commercial", selectedFloor)}
+    >
+      Commercial
+    </button>
+    
+    <button
+      className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
+      onClick={() => handleTypeSelect("Residential", selectedFloor)}
+    >
+      Residential
+    </button>
+  </div>
+)}
+
       
         
         <div className="flex flex-col">
@@ -912,38 +914,47 @@ export const DashboardMain = () => {
         {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
 
         {sessionData.length > 0 ? (
-          <div className="p-4 max-h-[40vh] overflow-y-auto">
-            {sessionData.map((floorData, floorIndex) => (
-              <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
-                <h2 className="text-lg font-bold mb-2">Floor: {floorData?.floor}</h2>
-                <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
-                {floorData?.units && Object.entries(floorData.units).length > 0 ? (
-                  Object.entries(floorData.units).map(([unitType, units]) => (
-                    <div key={unitType} className="mb-4">
-                      <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
-                      {units.map((unit, unitIndex) => (
-                        <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
-                          <p><strong>Index:</strong> {unit?.index}</p>
-                          <p><strong>Type:</strong> {unit?.type}</p>
-                          <p><strong>Length:</strong> {unit?.length}</p>
-                          <p><strong>Breadth:</strong> {unit?.breadth}</p>
-                          <p><strong>Height:</strong> {unit?.height}</p>
-                          <p><strong>Name:</strong> {unit?.name}</p>
-                          <p><strong>Property Name:</strong> {unit?.property_name}</p>
-                          <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ))
-                ) : (
-                  <p>No units available.</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center">No data available.</p>
-        )}
+    <div className="p-4 max-h-[40vh] overflow-y-auto">
+        {sessionData.map((floorData, floorIndex) => {
+            if (!floorData) return null; // Skip null entries
+            
+            // Determine the display label for the floor
+            const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
+
+            return (
+                <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                    <h2 className="text-lg font-bold mb-2">{floorLabel}</h2>
+                    <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
+                    
+                    {floorData?.units && Object.entries(floorData.units).length > 0 ? (
+                        Object.entries(floorData.units).map(([unitType, units]) => (
+                            <div key={unitType} className="mb-4">
+                                <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
+                                {units.map((unit, unitIndex) => (
+                                    <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
+                                        <p><strong>Index:</strong> {unit?.index}</p>
+                                        <p><strong>Type:</strong> {unit?.type}</p>
+                                        <p><strong>Length:</strong> {unit?.length}</p>
+                                        <p><strong>Breadth:</strong> {unit?.breadth}</p>
+                                        <p><strong>Height:</strong> {unit?.height}</p>
+                                        <p><strong>Name:</strong> {unit?.name}</p>
+                                        <p><strong>Property Name:</strong> {unit?.property_name}</p>
+                                        <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ))
+                    ) : (
+                        <p>No units available.</p>
+                    )}
+                </div>
+            );
+        })}
+    </div>
+) : (
+    <p className="text-center">No data available.</p>
+)}
+
       </div>
     </div>
   </div>
@@ -1013,60 +1024,65 @@ export const DashboardMain = () => {
       </div>
 
       {sessionData.length > 0 ? (
-        <div className="p-4">
-          <h2 className="text-lg font-bold mb-4">Building Status Overview (with units)</h2>
+    <div className="p-4">
+        <h2 className="text-lg font-bold mb-4">Building Status Overview (with units)</h2>
 
-          <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4">
             {sessionData.map((floorData, floorIndex) => {
-              if (!floorData) return null; // Skip null entries
-              return (
-                <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
-                  <h3 className="text-md font-semibold mb-2">Floor: {floorData.floor}</h3>
-                  <p className="mb-2">Plot Count: {floorData.plotCount}</p>
+                if (!floorData) return null; // Skip null entries
+                
+                // Determine the display label for the floor
+                const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
 
-                  <div className="flex flex-wrap">
-                    {floorData.units && Object.entries(floorData.units).map(([unitType, units]) => (
-                      <div key={unitType} className="mb-4">
-                        <h4 className="font-semibold">{unitType} Units:</h4>
-                        {units.length > 0 ? (
-                          units.map((unit, unitIndex) => {
-                            const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
-                            const statusColor = isBooked ? 'bg-yellow-200' : 'bg-green-200'; // Red for booked, green for vacant
+                return (
+                    <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                        <h3 className="text-md font-semibold mb-2">{floorLabel}</h3>
+                        <p className="mb-2">Plot Count: {floorData.plotCount}</p>
 
-                            return (
-                              <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
-                                <p className="font-bold">Unit {unit.index}</p>
-                                <p>Type: {unit.type}</p>
-                                {isBooked && (
-                                  <>
-                                    <p>Length: {unit.length}</p>
-                                    <p>Breadth: {unit.breadth}</p>
-                                    <p>Height: {unit.height}</p>
-                                    <p>Name: {unit.name}</p>
-                                    {unit.property_name && <p>Property Name: {unit.property_name}</p>}
-                                  </>
-                                )}
-                                {!isBooked && <p>Status: Vacant</p>}
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className={`m-2 p-2 border rounded bg-green-200 text-center`}>
-                            <p className="font-bold">No Units Available</p>
-                            <p>Status: Vacant</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
+                        <div className="flex flex-wrap">
+                            {floorData.units && Object.entries(floorData.units).map(([unitType, units]) => (
+                                <div key={unitType} className="mb-4">
+                                    <h4 className="font-semibold">{unitType} Units:</h4>
+                                    {units.length > 0 ? (
+                                        units.map((unit, unitIndex) => {
+                                            const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
+                                            const statusColor = isBooked ? 'bg-yellow-200' : 'bg-green-200'; // Red for booked, green for vacant
+
+                                            return (
+                                                <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
+                                                    <p className="font-bold">Unit {unit.index}</p>
+                                                    <p>Type: {unit.type}</p>
+                                                    {isBooked && (
+                                                        <>
+                                                            <p>Length: {unit.length}</p>
+                                                            <p>Breadth: {unit.breadth}</p>
+                                                            <p>Height: {unit.height}</p>
+                                                            <p>Name: {unit.name}</p>
+                                                            {unit.property_name && <p>Property Name: {unit.property_name}</p>}
+                                                        </>
+                                                    )}
+                                                    {!isBooked && <p>Status: Vacant</p>}
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className={`m-2 p-2 border rounded bg-green-200 text-center`}>
+                                            <p className="font-bold">No Units Available</p>
+                                            <p>Status: Vacant</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
             })}
-          </div>
         </div>
-      ) : (
-        <p className="text-center">No data available.</p>
-      )}
+    </div>
+) : (
+    <p className="text-center">No data available.</p>
+)}
+
     </div>
   </div>
 )}
