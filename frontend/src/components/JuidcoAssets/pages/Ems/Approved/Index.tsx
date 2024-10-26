@@ -28,6 +28,7 @@ import Papa from 'papaparse';
 
 
 import { jsPDF } from "jspdf";
+// import { combineSlices } from '@reduxjs/toolkit';
 
 
 const Approved = () => {
@@ -50,6 +51,25 @@ const Approved = () => {
 
     const queryClient = useQueryClient();
 
+    const [ulbID, setUlbID] = useState<string | null>();
+
+    useEffect(() => {
+      const storedUserDetails = sessionStorage.getItem("user_details");
+      if (storedUserDetails) {
+        try {
+          const userDetails = JSON.parse(storedUserDetails);
+          if(userDetails?.ulb_id !== undefined){
+            setUlbID(userDetails.ulb_id || null); 
+          }
+         
+        } catch (error) {
+          console.error('Error parsing user details:', error);
+        }
+      }
+    }, [ulbID]);
+
+  
+
     const COLUMN = [
         { name: "#" },
         { name: "ASSET NAME" },
@@ -66,7 +86,7 @@ const Approved = () => {
     const fetchData = async (page: number, searchQuery: string, filter: string) => {
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}`,
+                url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -121,10 +141,18 @@ const Approved = () => {
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets', currentPage, debouncedSearch, filter],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter),
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter) ,
         staleTime: 1000,
     });
 
+    
+    const { isLoading: isExportLoading, error: exportError, data: exportData } = useQuery({
+        queryKey: ['exportAssets', currentPage, debouncedSearch, filter],
+        queryFn: () => handleExportCSV(currentPage, debouncedSearch, filter),
+        staleTime: 1000,
+    });
+    
+    
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
@@ -245,7 +273,15 @@ const Approved = () => {
         setFilter(e.target.value);
     };
 
-    const handleExportCSV = () => {
+    const handleExportCSV = async(page: number, searchQuery: string, filter: string) => {
+
+
+        const res = await axios({
+            url: `${ASSETS.LIST.getcsvdata}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+            method: "GET",
+        });
+
+        console.log("data",res)
         const csvData = data?.data?.map((row: any) => [row.id, row.type_of_assets, row.assets_category_type, row.type_of_land, row.khata_no, row.area]);
 
         csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
@@ -360,7 +396,10 @@ const Approved = () => {
                             <option disabled selected> by Asset Type</option>
                             <option value="">All</option>
                             <option value="Immovable">Immovable</option>
-                            <option value="Land">Land</option>
+                            <option value="Building">Building</option>
+                            <option value="Hall">Hall</option>
+                            <option value="Vacant Land">Vacant Land</option>
+                            <option value="Others">Others</option> 
 
                         </select>
                     </div>
@@ -580,6 +619,7 @@ const Approved = () => {
                                                     />
                                                 </svg>
                                             </Link>
+                                            {role}
 
                                             {role == 'Admin' ? null : (
                                                 <>

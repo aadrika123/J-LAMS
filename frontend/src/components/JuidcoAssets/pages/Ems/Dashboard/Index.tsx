@@ -64,6 +64,21 @@ export const DashboardMain = () => {
   const [selectedFloor, setSelectedFloor] = useState(null);
 
 
+  const [ulbID, setUlbID] = useState<string | null>();
+
+  useEffect(() => {
+    const storedUserDetails = sessionStorage.getItem("user_details");
+    if (storedUserDetails) {
+      try {
+        const userDetails = JSON.parse(storedUserDetails);
+        setUlbID(userDetails.ulb_id || null); 
+      } catch (error) {
+        console.error('Error parsing user details:', error);
+      }
+    }
+  }, []);
+
+
   useEffect(() => {
     const numericFloorCount = parseInt(floorCount) || 0; 
     setPlotNos(Array(numericFloorCount).fill("")); 
@@ -90,8 +105,10 @@ export const DashboardMain = () => {
     mode_of_acquisition: "",
     role: "Municipal",
     building_approval_plan: "",
-    no_of_floors: floorCount,
-    building_name:buildingName
+    no_of_floors: parseInt(floorCount),
+    building_name:buildingName,
+    ulb_id:ulbID,
+    location:"",
   }
 
   const employeeValidationSchema = Yup.object().shape({
@@ -156,6 +173,7 @@ export const DashboardMain = () => {
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
 
     try {
+
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
@@ -172,14 +190,11 @@ export const DashboardMain = () => {
 
       values.building_name = buildingName;
 
-
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
         method: "POST",
         data: values,
       });
-
-      console.log("res", res)
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
@@ -1092,46 +1107,48 @@ export const DashboardMain = () => {
 
 
 
-                    <SelectForNoApi
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.asset_sub_category_name}
-                      error={errors.asset_sub_category_name}
-                      touched={touched.asset_sub_category_name}
-                      label="Asset Sub-Category Name"
-                      name="asset_sub_category_name"
-                      placeholder={"Choose Asset Sub Category Name"}
-                      options={[
-                        {
-                          id: 1,
-                          name: "Hospitals",
-                        },
-                        {
-                          id: 2,
-                          name: "Library",
-                        },
-                        {
-                          id: 3,
-                          name: "Parking",
-                        },
-                        {
-                          id: 4,
-                          name: "Enclosed/Non-Enclosed"
-                        },
-                        {
-                          id: 5,
-                          name: "Vacant Land"
-                        },
-                        {
-                          id: 6,
-                          name: "Gym"
-                        },
-                        {
-                          id: 7,
-                          name: "Market"
-                        }
-                      ]}
-                    />
+<SelectForNoApi
+  onChange={handleChange}
+  onBlur={handleBlur}
+  value={values.asset_sub_category_name}
+  error={errors.asset_sub_category_name}
+  touched={touched.asset_sub_category_name}
+  label="Asset Sub-Category Name"
+  name="asset_sub_category_name"
+  placeholder={"Choose Asset Sub Category Name"}
+  options={[
+    {
+      id: 1,
+      name: "Hospitals",
+    },
+    {
+      id: 2,
+      name: "Library",
+    },
+    {
+      id: 3,
+      name: "Parking",
+    },
+    {
+      id: 4,
+      name: "Enclosed/Non-Enclosed",
+    },
+    ...(values.type_of_assets === "Building" ? [] : [
+      {
+        id: 5,
+        name: "Vacant Land",
+      },
+    ]),
+    {
+      id: 6,
+      name: "Gym",
+    },
+    {
+      id: 7,
+      name: "Market",
+    },
+  ]}
+/>
 
                     <SelectForNoApi
                       onChange={handleChange}
@@ -1204,7 +1221,7 @@ export const DashboardMain = () => {
                       />
                     </div>
 
-                    <InputBox
+                    {/* <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.ward_no}
@@ -1225,7 +1242,7 @@ export const DashboardMain = () => {
                           e.preventDefault();
                         }
                       }}
-                    />
+                    /> */}
 
                     <SelectForNoApi
                       onChange={handleChange}
@@ -1425,6 +1442,35 @@ export const DashboardMain = () => {
                       type="text"
                       maxLength={20}
                     />
+
+                <SelectForNoApi
+                 onChange={handleChange}
+                 onBlur={handleBlur}
+                 // value={values.mode_of_acquisition}
+                  label="Word no."
+                   name="ward_no"
+                   value={values.ward_no}
+                  placeholder={"Word no."}
+                  options={Array.from({ length: 55 }, (_, index) => ({
+                  id: index + 1,
+                   name: `${index + 1}`, 
+                     }))}
+                   />
+
+
+                    <InputBox
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.location}
+                      label="Location"
+                      placeholder={"Location"}
+                      name="location"
+                      type="text"
+                      maxLength={100}
+                    />
+                    
+
+
                   </div>
 
                   <div className="flex items-center justify-end mt-5 gap-5">
