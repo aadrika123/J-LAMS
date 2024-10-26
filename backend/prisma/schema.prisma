@@ -49,9 +49,11 @@ model assets_list {
   khata_no                String?
   plot_no                 String?
   ward_no                 String?
-  address                 String?
   building_name           String?
+  address                 String?
+  ulb_id                  Int?  
   depreciation_method     String?
+  location                String?
   apreciation_method      String?
   blue_print              String?
   ownership_doc           String?
@@ -70,6 +72,7 @@ model assets_list {
   // details                 details[]
 
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")

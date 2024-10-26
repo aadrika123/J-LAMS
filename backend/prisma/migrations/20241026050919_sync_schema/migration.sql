@@ -9,6 +9,7 @@ CREATE TABLE "assets_list" (
     "ward_no" TEXT,
     "address" TEXT,
     "building_name" TEXT,
+    "ulb_id" INTEGER,
     "depreciation_method" TEXT,
     "apreciation_method" TEXT,
     "blue_print" TEXT,
@@ -84,8 +85,6 @@ CREATE TABLE "assets_list_change_log" (
     "role" TEXT,
     "status" INTEGER DEFAULT 0,
     "assetId" INTEGER NOT NULL,
-    "floorDataId" INTEGER NOT NULL,
-    "detailsId" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -109,7 +108,11 @@ CREATE TABLE "asset_fieldOfficer_req" (
     "long" TEXT,
     "lat" TEXT,
     "remarks" TEXT,
-    "image" TEXT,
+    "image_one" TEXT,
+    "image_two" TEXT,
+    "image_three" TEXT,
+    "image_four" TEXT,
+    "image_five" TEXT,
     "assetId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -127,22 +130,16 @@ CREATE UNIQUE INDEX "asset_checker_req_assetId_key" ON "asset_checker_req"("asse
 CREATE UNIQUE INDEX "asset_fieldOfficer_req_assetId_key" ON "asset_fieldOfficer_req"("assetId");
 
 -- AddForeignKey
-ALTER TABLE "floorData" ADD CONSTRAINT "floorData_assetsListId_fkey" FOREIGN KEY ("assetsListId") REFERENCES "assets_list"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "floorData" ADD CONSTRAINT "floorData_assetsListId_fkey" FOREIGN KEY ("assetsListId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "details" ADD CONSTRAINT "details_floorDataId_fkey" FOREIGN KEY ("floorDataId") REFERENCES "floorData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "details" ADD CONSTRAINT "details_floorDataId_fkey" FOREIGN KEY ("floorDataId") REFERENCES "floorData"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assets_list_change_log" ADD CONSTRAINT "assets_list_change_log_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets_list"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "assets_list_change_log" ADD CONSTRAINT "assets_list_change_log_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assets_list_change_log" ADD CONSTRAINT "assets_list_change_log_floorDataId_fkey" FOREIGN KEY ("floorDataId") REFERENCES "floorData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "assets_list_change_log" ADD CONSTRAINT "assets_list_change_log_detailsId_fkey" FOREIGN KEY ("detailsId") REFERENCES "details"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "asset_checker_req" ADD CONSTRAINT "asset_checker_req_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "asset_fieldOfficer_req"("assetId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "asset_checker_req" ADD CONSTRAINT "asset_checker_req_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "asset_fieldOfficer_req"("assetId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "asset_fieldOfficer_req" ADD CONSTRAINT "asset_fieldOfficer_req_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -59,6 +59,7 @@ class AssetManagementController {
 
         try {
             const data = await this.assetsManagementDao.getAll(req);
+
             return res.json({
                 "status": true,
                 "message": "Assets fetched Succesfully",
@@ -69,6 +70,7 @@ class AssetManagementController {
                 },
                 data: data
             })
+           
             
         } catch (error) {
               return res.json({
@@ -288,6 +290,43 @@ class AssetManagementController {
               return res.json({
                 "status": false,
                 "message": "Error occured while fetching Audit Log",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            })
+        }
+    };
+
+
+
+    getcsvdatall = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.getcsvdatall(req);
+
+            return res.json({
+                "status": true,
+                "message": "Assets fetched CSV Data Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data
+            })
+           
+            
+        } catch (error) {
+              return res.json({
+                "status": false,
+                "message": "Error occured while fetching Assets",
                 "meta-data": {
                     apiId,
                     action: "GET",

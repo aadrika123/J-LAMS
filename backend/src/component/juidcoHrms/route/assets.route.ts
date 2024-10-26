@@ -88,6 +88,14 @@ class AssetManagementRoute {
         (req: Request, res: Response, next: NextFunction) =>
           this.assetManagementController.getAllAuditData(req, res, next, "0110"),
     ); //0110
+
+
+    app
+    .route(`${baseUrl}/asset/getcsvdata`)
+    .get(
+      (req: Request, res: Response, next: NextFunction) =>
+        this.assetManagementController.getcsvdatall(req, res, next, "0111"),
+    ); //0102
   }
 }
 

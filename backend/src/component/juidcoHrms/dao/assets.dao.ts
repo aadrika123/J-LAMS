@@ -109,7 +109,10 @@ class AssetsManagementDao {
             mode_of_acquisition,
             role,
             floorData,
-            no_of_floors
+            no_of_floors,
+            building_name,
+            ulb_id,
+            location
         } = req.body;
 
         try {
@@ -123,8 +126,10 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name,
+                        building_name:building_name, 
+                        ulb_id:ulb_id,
                         depreciation_method,
+                        location,
                         apreciation_method,
                         ownership_doc,
                         blue_print,
@@ -384,14 +389,16 @@ class AssetsManagementDao {
 
     // };
 
+    
     getAll = async (req: Request) => {
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
-        const count = await prisma.assets_list.count();
-        const totalPages = Math.ceil(count / limit);
+
+  
         const filter = req.query.filter as string || '';
+        const id =  Number(req.query.id) || 1;
 
         const status = Number(req.query.status)
         const land = req.query.land as string || ''
@@ -414,6 +421,37 @@ class AssetsManagementDao {
         });
 
         try {
+
+            const count = await prisma.assets_list.count({
+                where: {
+                    ulb_id: id,
+                    ...(search && {
+                        OR: [
+                            { type_of_assets: { contains: search, mode: "insensitive" } },
+                            { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                            { khata_no: { contains: search, mode: "insensitive" } },
+                            { assets_category_type: { contains: search, mode: "insensitive" } },
+                            { area: { contains: search, mode: "insensitive" } },
+                        ],
+                    }),
+                    ...(filter && {
+                        OR: [
+                            {assets_category_type: { equals: filter,mode: "insensitive", },},
+                            { type_of_assets: {  equals: filter,  mode: "insensitive", },
+                            },
+                        ],
+                    }),
+                    ...(status !== undefined && {
+                        status: { equals: status },
+                    }),
+                    ...(land && {
+                        type_of_land: { equals: land, mode: "insensitive" },
+                    }),
+                },
+            });
+    
+            const totalPages = Math.ceil(count / limit);
+    
             const assetGet = await prisma.assets_list.findMany({
                 skip: skip,
                 take: limit,
@@ -452,12 +490,23 @@ class AssetsManagementDao {
                             }
                         ]
                         : undefined,
+                    ulb_id: id,
                     AND: [
                         filter ? {
-                            assets_category_type: {
-                                equals: filter,
-                                mode: "insensitive",
-                            },
+                            OR: [
+                                {
+                                    assets_category_type: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    type_of_assets: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                            ],
                         } : {},
                         (status === 0 || status) ? {
                             status: {
@@ -471,6 +520,7 @@ class AssetsManagementDao {
                             },
                         } : {},
                     ]
+                    
 
 
                 },
@@ -624,7 +674,6 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name,
                         depreciation_method,
                         apreciation_method,
                         ownership_doc,
@@ -1056,6 +1105,131 @@ class AssetsManagementDao {
                 totalPages,
                 count,
                 page,
+                data: assetGet,
+            });
+        } catch (err) {
+            console.log(err);
+        }
+
+    };
+
+
+    // csv data
+
+    getcsvdatall = async (req: Request) => {
+        const limit = Number(req.query.limit) || 10;
+        const search = req.query.search as string || '';
+
+  
+        const filter = req.query.filter as string || '';
+        const id =  Number(req.query.id) || 1;
+
+        const status = Number(req.query.status)
+        const land = req.query.land as string || ''
+        const status1Items = await prisma.assets_list.count({
+            where: {
+                status: 2,
+            },
+        });
+        const statusMinus1Items = await prisma.assets_list.count({
+            where: {
+                status: -2,
+            },
+        });
+        const statusPendingAssets = await prisma.assets_list.count({
+            where: {
+                status: 1,
+            },
+        });
+
+        try {
+
+    
+            const assetGet = await prisma.assets_list.findMany({
+                where: {
+                    OR: search
+                        ? [
+                            {
+                                type_of_assets: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                asset_sub_category_name: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                khata_no: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                assets_category_type: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                area: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            }
+                        ]
+                        : undefined,
+                    ulb_id: id,
+                    AND: [
+                        filter ? {
+                            OR: [
+                                {
+                                    assets_category_type: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    type_of_assets: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                            ],
+                        } : {},
+                        (status === 0 || status) ? {
+                            status: {
+                                equals: status,
+                            },
+                        } : {},
+                        land ? {
+                            type_of_land: {
+                                equals: land,
+                                mode: "insensitive",
+                            },
+                        } : {},
+                    ]
+                    
+
+
+                },
+                include: {
+                    floorData: {
+                        include: {
+                            details: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    created_at: 'desc'
+                }
+            });
+            return generateRes({
+                status1Items,
+                statusMinus1Items,
+                statusPendingAssets,
                 data: assetGet,
             });
         } catch (err) {
