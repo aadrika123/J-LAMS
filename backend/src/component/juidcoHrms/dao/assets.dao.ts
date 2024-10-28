@@ -117,6 +117,8 @@ class AssetsManagementDao {
 
         try {
             const result = await prisma.$transaction(async (tx) => {
+
+                
                 const assetReq = await tx.assets_list.create({
                     data: {
                         type_of_assets,
@@ -395,8 +397,6 @@ class AssetsManagementDao {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
-
-  
         const filter = req.query.filter as string || '';
         const id =  Number(req.query.id) || 1;
 
@@ -423,31 +423,98 @@ class AssetsManagementDao {
         try {
 
             const count = await prisma.assets_list.count({
-                where: {
-                    ulb_id: id,
-                    ...(search && {
-                        OR: [
-                            { type_of_assets: { contains: search, mode: "insensitive" } },
-                            { asset_sub_category_name: { contains: search, mode: "insensitive" } },
-                            { khata_no: { contains: search, mode: "insensitive" } },
-                            { assets_category_type: { contains: search, mode: "insensitive" } },
-                            { area: { contains: search, mode: "insensitive" } },
-                        ],
-                    }),
-                    ...(filter && {
-                        OR: [
-                            {assets_category_type: { equals: filter,mode: "insensitive", },},
-                            { type_of_assets: {  equals: filter,  mode: "insensitive", },
-                            },
-                        ],
-                    }),
-                    ...(status !== undefined && {
-                        status: { equals: status },
-                    }),
-                    ...(land && {
-                        type_of_land: { equals: land, mode: "insensitive" },
-                    }),
-                },
+
+                    where: {
+                        OR: search
+                            ? [
+                                {
+                                    type_of_assets: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    asset_sub_category_name: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    khata_no: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    assets_category_type: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    area: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                }
+                            ]
+                            : undefined,
+                        ulb_id: id,
+                        AND: [
+                            filter ? {
+                                OR: [
+                                    {
+                                        assets_category_type: {
+                                            equals: filter,
+                                            mode: "insensitive",
+                                        },
+                                    },
+                                    {
+                                        type_of_assets: {
+                                            equals: filter,
+                                            mode: "insensitive",
+                                        },
+                                    },
+                                ],
+                            } : {},
+                            (status === 0 || status) ? {
+                                status: {
+                                    equals: status,
+                                },
+                            } : {},
+                            land ? {
+                                type_of_land: {
+                                    equals: land,
+                                    mode: "insensitive",
+                                },
+                            } : {},
+                        ]
+                        
+    
+    
+                    },
+                    // ...(search && {
+                    //     OR: [
+                    //         { type_of_assets: { contains: search, mode: "insensitive" } },
+                    //         { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                    //         { khata_no: { contains: search, mode: "insensitive" } },
+                    //         { assets_category_type: { contains: search, mode: "insensitive" } },
+                    //         { area: { contains: search, mode: "insensitive" } },
+                    //     ],
+                    // }),
+                    // ...(filter && {
+                    //     OR: [
+                    //         {assets_category_type: { equals: filter,mode: "insensitive", },},
+                    //         { type_of_assets: {  equals: filter,  mode: "insensitive", },
+                    //         },
+                    //     ],
+                    // }),
+                    // ...(status !== undefined && {
+                    //     status: { equals: status },
+                    // }),
+                    // ...(land && {
+                    //     type_of_land: { equals: land, mode: "insensitive" },
+                    // }),
             });
     
             const totalPages = Math.ceil(count / limit);
