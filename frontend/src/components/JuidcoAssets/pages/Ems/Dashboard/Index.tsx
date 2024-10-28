@@ -1205,6 +1205,7 @@ export const DashboardMain = () => {
                       <input
                         type='file'
                         name='blue_print'
+                        accept="image/*,.pdf"
                         className="mb-4 p-1 border border-slate-400 w-full rounded"
                         onChange={handleFile1Change}
 
@@ -1216,6 +1217,7 @@ export const DashboardMain = () => {
                       <input
                         type='file'
                         name='ownership_doc'
+                         accept="image/*,.pdf"
                         className="mb-4 p-1 border border-slate-400 w-full rounded"
                         onChange={handleFile2Change}
                       />

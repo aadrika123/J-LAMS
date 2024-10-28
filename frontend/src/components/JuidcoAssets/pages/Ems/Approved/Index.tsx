@@ -28,6 +28,7 @@ import Papa from 'papaparse';
 
 
 import { jsPDF } from "jspdf";
+import ModalComp from '@/components/modal/Modal';
 // import { combineSlices } from '@reduxjs/toolkit';
 
 
@@ -54,6 +55,8 @@ const Approved = () => {
     const queryClient = useQueryClient();
 
     const [ulbID, setUlbID] = useState<number | null >();
+
+    const [isLoadingCSV, setIsLoadingCSV] = useState(false);
 
     useEffect(() => {
       const storedUserDetails = localStorage.getItem("user_details");
@@ -82,7 +85,8 @@ const Approved = () => {
         { name: "LAND TYPE" },
         { name: "KHATA NO." },
         { name: "AREA (sqFt.)" },
-        { name: "DOCUMENTS" },
+        { name: "Blue Print" },
+        { name: "Owner Doc" },
         { name: "ACTIONS" },
         { name: "FIELD OFFICER STATUS" },
         { name: "APPROVER STATUS" },
@@ -281,20 +285,17 @@ const Approved = () => {
     };
 
     const handleExportCSV = async (page: number, searchQuery: string, filter: string) => {
+        setIsLoadingCSV(true);
         try {
             const res = await axios({
                 url: `${ASSETS.LIST.getcsvdata}page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
                 method: "GET",
             });
-    
-            // Access the appropriate data structure
+
             const dataToMap = res?.data?.data?.data;
-    
-            // Check if the data is null or not an array
             if (!dataToMap || !Array.isArray(dataToMap)) {
                 throw new Error("No valid data available to export");
             }
-            // Map over the data array to create CSV rows
             const csvData = dataToMap.map((row: any) => [
                 row?.id,
                 row?.type_of_assets,
@@ -304,10 +305,8 @@ const Approved = () => {
                 row?.area
             ]);
     
-            // Add header row
             csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
-    
-            // Convert to CSV
+
             const csv = Papa.unparse(csvData);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -322,6 +321,9 @@ const Approved = () => {
             document.body.removeChild(link);
         } catch (error:any) {
             console.error("Error exporting CSV:", error?.message);
+        }
+        finally {
+            setIsLoadingCSV(false);
         }
     };
     
@@ -393,6 +395,14 @@ const Approved = () => {
 
     console.log("audit", audit)
 
+    const isPDF = (url: string) => url.endsWith('.pdf');
+
+    const handleOpenModal = (isOpen:any, onRequestClose:any, url:string) => {
+        // Your modal logic to open the PDF
+        console.log(`Opening PDF: ${url}`,isOpen,onRequestClose);
+        // <ModalComp  isOpen={isOpen} onRequestClose={onRequestClose} url={url}/>
+    };
+
     return (
         <div>
             <Toaster />
@@ -427,6 +437,26 @@ const Approved = () => {
                             <option value="Others">Others</option> 
 
                         </select>
+                    </div>
+                    
+                    <div className="max-w-md">
+                        <div className='flex gap-3 mb-9'>
+                            {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
+                            <SubHeading>Word No.</SubHeading>
+                        </div>
+
+                        <select 
+                            onChange={handleFilterChange}
+                            value={filter}
+                            className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                        >
+                            {Array.from({ length: 55 }, (_, index) => (
+                                <option key={index + 1} value={index + 1}>
+                                    {index + 1}
+                                </option>
+                            ))}
+                        </select>
+
                     </div>
 
                     {role == 'Admin' ?
@@ -505,9 +535,52 @@ const Approved = () => {
                             Export PDF
                         </button>
 
-                        <button  onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
-                            Export CSV
-                        </button>
+                        <button 
+            onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} 
+            type="submit" 
+            className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" 
+            disabled={isLoadingCSV}
+        >
+            {isLoadingCSV ? (
+                <>
+                    <span className="loader"></span>  <svg
+        width="20"
+        height="20"
+        viewBox="0 0 38 38"
+        className="loader"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <defs>
+            <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="gradient">
+                <stop stopColor="#3498db" offset="0%" />
+                <stop stopColor="#9b59b6" offset="100%" />
+            </linearGradient>
+        </defs>
+        <circle
+            stroke="url(#gradient)"
+            strokeWidth="2"
+            fill="none"
+            cx="19"
+            cy="19"
+            r="18"
+            strokeDasharray="90, 150"
+            strokeDashoffset="0"
+            transform="rotate(115 19 19)"
+        >
+            <animate
+                attributeName="stroke-dashoffset"
+                values="0; 90; 0"
+                dur="1.5s"
+                repeatCount="indefinite"
+            />
+        </circle>
+    </svg>
+                    Loading...
+                </>
+            ) : (
+                'Export CSV'
+            )}
+        </button>
 
                         {role == 'Admin' ? null : (
                             <button onClick={handleClick} type="submit" className="inline-flex w-[16rem]  items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
@@ -535,7 +608,47 @@ const Approved = () => {
                                     <td className="px-6 py-4">{item?.type_of_land}</td>
                                     <td className="px-6 py-4">{item?.khata_no}</td>
                                     <td className="px-6 py-4">{item?.area}</td>
-                                    <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ? <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> : <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}</td>
+                                    {/* <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ?
+                                      <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> :
+                                      <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}
+                                    </td> */}
+
+                                <td className="px-6 py-4">
+                                {item?.blue_print ? (
+                                    isPDF(item.blue_print) ? (
+                                        <Image
+                                            src={pdf}
+                                            alt="Blueprint PDF"
+                                            onClick={() => handleOpenModal(item.blue_print)} // Open PDF in modal
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    ) : (
+                                        <Image src={docs} alt="Blueprint Document" />
+                                    )
+                                ) : (
+                                    <div className='ml-3'>
+                                        <Image src={notfound} alt="Not Found" width={30} height={30} />
+                                    </div>
+                                )}
+                            </td>
+                            <td className="px-6 py-4">
+                                {item?.ownership_doc ? (
+                                    isPDF(item.ownership_doc) ? (
+                                        <Image
+                                        src={pdf}
+                                            alt="Ownership PDF"
+                                            onClick={() => handleOpenModal(item.ownership_doc)} // Open PDF in modal
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    ) : (
+                                        <Image src={docs} alt="Ownership Document" />
+                                    )
+                                ) : (
+                                    <div className='ml-3'>
+                                        <Image src={notfound} alt="Not Found" width={30} height={30} />
+                                    </div>
+                                )}
+                            </td>
                                     <td className="px-6 py-4">
                                         <div className='flex'>
                                             {role == 'Admin' ? null : (
