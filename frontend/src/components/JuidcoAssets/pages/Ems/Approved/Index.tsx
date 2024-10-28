@@ -53,7 +53,7 @@ const Approved = () => {
 
     const queryClient = useQueryClient();
 
-    const [ulbID, setUlbID] = useState<number | null>();
+    const [ulbID, setUlbID] = useState<number | null >();
 
     useEffect(() => {
       const storedUserDetails = localStorage.getItem("user_details");
@@ -147,7 +147,7 @@ const Approved = () => {
 
     const { isLoading, error, data } = useQuery({
         queryKey: ['assets', currentPage, debouncedSearch, filter,itemsPerPage,ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID) ,
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID as number) ,
         enabled: !!ulbID ,
         staleTime: 1000,
     });
@@ -275,7 +275,7 @@ const Approved = () => {
         setFilter(e.target.value);
     };
 
-    const handleItemsPerPageChange = (e) => {
+    const handleItemsPerPageChange = (e:any) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1); 
     };
