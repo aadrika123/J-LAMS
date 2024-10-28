@@ -27,7 +27,7 @@ import { useSearchParams } from 'next/navigation'
 
 const View = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     const status = params.get('status');
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
