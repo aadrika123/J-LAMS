@@ -83,8 +83,8 @@ const ViewByIdList = () => {
                   <div className="text-green-500">Approved by Admin</div>
                 ) : viewData?.status === 0 ? (
                   <div className="text-orange-500">Pending or Not Updated</div>
-                ) : viewData?.status === -1 ? (
-                  <div className="text-red-500">Rejected</div>
+                // ) : viewData?.status === -1 ? (
+                //   <div className="text-red-500">Rejected</div>
                 ) : viewData?.status === 1 ? (
                   <div className="text-green-500">
                     Approved by Field Officer

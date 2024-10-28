@@ -240,6 +240,7 @@ const ImageUploader = () => {
   };
 
   const handleOpenModal = (message, action) => {
+    console.log("message",message)
     setModalMessage(message);
     setActionHandler(() => action);
    

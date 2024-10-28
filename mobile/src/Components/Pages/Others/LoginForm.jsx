@@ -31,11 +31,11 @@ const LoginForm = () => {
       });
 
       const data = res.data.data;
-      sessionStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+      localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
 
       if (data) {
         if (typeof window !== "undefined") {
-          const storedData = sessionStorage.getItem("user_details");
+          const storedData = localStorage.getItem("user_details");
           const userDetails = storedData && JSON.parse(storedData);
           setUserType(userDetails?.user_type);
         }

@@ -68,7 +68,7 @@ function Login() {
         console.log("message check login ", response.data);
 
         const data = response.data.data;
-        sessionStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+        localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
 
         // if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "Field Officer") {
           if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "TC") {
@@ -92,7 +92,7 @@ function Login() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const data = sessionStorage.getItem("user_details");
+      const data = localStorage.getItem("user_details");
       if (data) {
         try {
           const user_details = JSON.parse(data);
@@ -107,7 +107,7 @@ function Login() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const data = sessionStorage.getItem("user_details");
+      const data = localStorage.getItem("user_details");
       if (data) {
         try {
           const userDetails = JSON.parse(data);

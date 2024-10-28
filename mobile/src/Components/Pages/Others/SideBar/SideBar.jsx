@@ -66,7 +66,7 @@ const SideBar = (props) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const data = sessionStorage.getItem("user_details");
+      const data = localStorage.getItem("user_details");
       if (data) {
         try {
           const user_details = JSON.parse(data);
