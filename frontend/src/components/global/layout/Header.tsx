@@ -18,7 +18,7 @@ const Header: React.FC<SideBarProps> = (props) => {
   
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const user_det = sessionStorage.getItem("user_details");
+      const user_det = localStorage.getItem("user_details");
       if (user_det) {
         const ulb_id = JSON.parse(user_det as string)?.ulb_id;
         setUlbId(ulb_id);

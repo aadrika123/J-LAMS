@@ -49,14 +49,14 @@ const Login = () => {
       });
 
       const data = res.data.data;
-      sessionStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+      localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
       Cookies.set("emp_id", data?.userDetails?.emp_id);
 
       if (data) {
         Cookies.set("accesstoken", data?.token);
 
         if (typeof window !== "undefined") {
-          const storedData = sessionStorage.getItem("user_details");
+          const storedData = localStorage.getItem("user_details");
           const data = storedData && JSON.parse(storedData);
           if (data?.user_type === "Municipal") {
             dispatch(login(data)), "a";

@@ -72,7 +72,6 @@ const View = ({ id }: { id: number }) => {
     }, [])
 
     const fetchAdminData = async () => {
-        console.log("id323", id)
         try {
             const res = await axios({
                 url: `${ASSETS.LIST.updateMany}&id=${id}`,
@@ -91,9 +90,8 @@ const View = ({ id }: { id: number }) => {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const data = sessionStorage.getItem("user_details");
+            const data = localStorage.getItem("user_details");
             const user_details = JSON.parse(data as string);
-            console.log(user_details?.user_type, "user");
             setRole(user_details?.user_type)
         }
     }, []);
@@ -112,7 +110,6 @@ const View = ({ id }: { id: number }) => {
                     toast.error("Failed to upload files");
                 }
             } catch (error) {
-                console.error("Error uploading files:", error);
                 toast.error("Error uploading files");
             }
         }
@@ -132,7 +129,6 @@ const View = ({ id }: { id: number }) => {
                     toast.error("Failed to upload files");
                 }
             } catch (error) {
-                console.error("Error uploading files:", error);
                 toast.error("Error uploading files");
             }
         }
@@ -151,7 +147,6 @@ const View = ({ id }: { id: number }) => {
             }
             values.status = 0
 
-            console.log("val", values)
 
             const res = await axios({
                 url: `${ASSETS.LIST.update}?id=${id}`,
@@ -179,7 +174,7 @@ const View = ({ id }: { id: number }) => {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const user_det = sessionStorage.getItem("user_details");
+            const user_det = localStorage.getItem("user_details");
             if (user_det) {
                 const ulb_id = JSON.parse(user_det as string)?.ulb_id;
                 setUlbId(ulb_id);

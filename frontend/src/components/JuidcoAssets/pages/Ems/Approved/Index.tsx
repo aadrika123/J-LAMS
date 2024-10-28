@@ -28,6 +28,7 @@ import Papa from 'papaparse';
 
 
 import { jsPDF } from "jspdf";
+import Select from '@/components/global/atoms/Select';
 // import { combineSlices } from '@reduxjs/toolkit';
 
 
@@ -46,18 +47,21 @@ const Approved = () => {
     const [remarks, setRemarks] = useState<any>('')
     const [currentAssetId, setCurrentAssetId] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
-    const [audit, setAudit]= useState<any>()
+    const [audit, setAudit]= useState<any>();
+
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
 
     const queryClient = useQueryClient();
 
-    const [ulbID, setUlbID] = useState<string | null>();
+    const [ulbID, setUlbID] = useState<number | null>();
 
     useEffect(() => {
-      const storedUserDetails = sessionStorage.getItem("user_details");
+      const storedUserDetails = localStorage.getItem("user_details");
       if (storedUserDetails) {
         try {
           const userDetails = JSON.parse(storedUserDetails);
+        
           if(userDetails?.ulb_id !== undefined){
             setUlbID(userDetails.ulb_id || null); 
           }
@@ -68,6 +72,8 @@ const Approved = () => {
       }
     }, [ulbID]);
 
+
+    console.log("userDetails?.ulb_id",ulbID)
   
 
     const COLUMN = [
@@ -83,10 +89,11 @@ const Approved = () => {
         { name: "APPROVER STATUS" },
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string) => {
+    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number) => {
+        console.log("ulbIDulbID",ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -140,18 +147,14 @@ const Approved = () => {
     
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter) ,
+        queryKey: ['assets', currentPage, debouncedSearch, filter,itemsPerPage,ulbID],
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID) ,
+        enabled: !!ulbID ,
         staleTime: 1000,
     });
 
     
-    const { isLoading: isExportLoading, error: exportError, data: exportData } = useQuery({
-        queryKey: ['exportAssets', currentPage, debouncedSearch, filter],
-        queryFn: () => handleExportCSV(currentPage, debouncedSearch, filter),
-        staleTime: 1000,
-    });
-    
+
     
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -165,7 +168,7 @@ const Approved = () => {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const data = sessionStorage.getItem("user_details");
+            const data = localStorage.getItem("user_details");
             const user_details = JSON.parse(data as string);
             console.log(user_details?.user_type, "user");
             setRole(user_details?.user_type)
@@ -273,33 +276,56 @@ const Approved = () => {
         setFilter(e.target.value);
     };
 
-    const handleExportCSV = async(page: number, searchQuery: string, filter: string) => {
+    const handleItemsPerPageChange = (e) => {
+        setItemsPerPage(Number(e.target.value));
+        setCurrentPage(1); 
+    };
 
-
-        const res = await axios({
-            url: `${ASSETS.LIST.getcsvdata}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
-            method: "GET",
-        });
-
-        console.log("data",res)
-        const csvData = data?.data?.map((row: any) => [row.id, row.type_of_assets, row.assets_category_type, row.type_of_land, row.khata_no, row.area]);
-
-        csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
-
-        const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'assets_data.csv');
-        link.style.visibility = 'hidden';
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
+    const handleExportCSV = async (page: number, searchQuery: string, filter: string) => {
+        try {
+            const res = await axios({
+                url: `${ASSETS.LIST.getcsvdata}page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                method: "GET",
+            });
+    
+            // Access the appropriate data structure
+            const dataToMap = res?.data?.data?.data;
+    
+            // Check if the data is null or not an array
+            if (!dataToMap || !Array.isArray(dataToMap)) {
+                throw new Error("No valid data available to export");
+            }
+            // Map over the data array to create CSV rows
+            const csvData = dataToMap.map((row: any) => [
+                row?.id,
+                row?.type_of_assets,
+                row?.assets_category_type,
+                row?.type_of_land,
+                row?.khata_no,
+                row?.area
+            ]);
+    
+            // Add header row
+            csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
+    
+            // Convert to CSV
+            const csv = Papa.unparse(csvData);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+    
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'assets_data.csv');
+            link.style.visibility = 'hidden';
+    
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error:any) {
+            console.error("Error exporting CSV:", error?.message);
+        }
+    };
+    
     const handleConfirm = () => {
         if (actionType === 'approve') {
             appApprover(currentAssetId);
@@ -480,7 +506,7 @@ const Approved = () => {
                             Export PDF
                         </button>
 
-                        <button onClick={handleExportCSV} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
+                        <button  onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
                             Export CSV
                         </button>
 
@@ -718,6 +744,16 @@ const Approved = () => {
 
                 <nav className='mt-4'>
                     <div>Page {data?.page} of {data?.totalPages}</div>
+                <select
+                    onChange={handleItemsPerPageChange}
+                    value={itemsPerPage}
+                    className="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                </select>
                     <ul className="flex items-center -space-x-px h-8 text-sm justify-end">
                         <li>
                             <button

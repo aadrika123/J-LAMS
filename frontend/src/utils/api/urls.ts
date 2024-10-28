@@ -28,7 +28,7 @@ type Urls = {
 
 export const ASSETS: Urls = {
   LIST: {
-    get: "/asset/get?limit=7",
+    get: "/asset/get",
     create: "/asset/create",
     getById: "/asset/get-single",
     delete: "/asset/delete-single",

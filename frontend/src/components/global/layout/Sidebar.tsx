@@ -30,7 +30,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
   useEffect(() => {
       if (typeof window !== "undefined") {
-          const data = sessionStorage.getItem("user_details");
+          const data = localStorage.getItem("user_details");
           const user_details = JSON.parse(data as string);       
               if (user_details?.user_type !== "Employee") {
                   setSidebarLink(sidebarLinks);
@@ -50,7 +50,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const data = sessionStorage.getItem("user_details");
+      const data = localStorage.getItem("user_details");
       const user_details = JSON.parse(data as string);
       console.log(user_details, "user");
     }
@@ -58,7 +58,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const data = sessionStorage.getItem("user_details");
+      const data = localStorage.getItem("user_details");
       const user_details = JSON.parse(data as string);
       setUserDetails(user_details);
     }

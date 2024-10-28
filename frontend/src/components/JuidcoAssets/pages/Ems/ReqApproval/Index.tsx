@@ -75,7 +75,7 @@ const ReqApproval = () => {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const data = sessionStorage.getItem("user_details");
+            const data = localStorage.getItem("user_details");
             const user_details = JSON.parse(data as string);
             console.log(user_details?.user_type, "user");
             setRole(user_details?.user_type)

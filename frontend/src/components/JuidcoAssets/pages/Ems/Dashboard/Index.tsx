@@ -67,7 +67,7 @@ export const DashboardMain = () => {
   const [ulbID, setUlbID] = useState<string | null>();
 
   useEffect(() => {
-    const storedUserDetails = sessionStorage.getItem("user_details");
+    const storedUserDetails = localStorage.getItem("user_details");
     if (storedUserDetails) {
       try {
         const userDetails = JSON.parse(storedUserDetails);
