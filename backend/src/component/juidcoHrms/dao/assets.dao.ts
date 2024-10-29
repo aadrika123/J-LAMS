@@ -1304,6 +1304,9 @@ class AssetsManagementDao {
         }
 
     };
+
+
+    
 }
 
 export default AssetsManagementDao;

@@ -130,7 +130,6 @@ class DMSFileHandlerController {
       };
 
       const response = await axios.post(dmsUrl, formData, { headers });
-      console.log("response", response)
 
       const refNo = response.data.data.ReferenceNo;
       const resData: any = await axios.post(
