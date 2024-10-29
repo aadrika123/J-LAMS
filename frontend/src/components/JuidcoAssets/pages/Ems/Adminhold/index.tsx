@@ -549,7 +549,7 @@ const Adminhold = () => {
                             </button>
                         </div>
 
-                        <button onClick={handleDownload} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
+                        <button onClick={handleDownload} type="submit"  disabled={isLoadingCSV || count == 0 ? true : false} className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700">
                             Export PDF
                         </button>
 
@@ -557,7 +557,7 @@ const Adminhold = () => {
             onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} 
             type="submit" 
             className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" 
-            disabled={isLoadingCSV}
+            disabled={isLoadingCSV || count == 0 ? true : false}
         >
             {isLoadingCSV ? (
                 <>
@@ -617,11 +617,11 @@ const Adminhold = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
-                                    <td className="px-6 py-4">{item?.type_of_assets}</td>
-                                    <td className="px-6 py-4">{item?.assets_category_type}</td>
-                                    <td className="px-6 py-4">{item?.type_of_land}</td>
-                                    <td className="px-6 py-4">{item?.khata_no}</td>
-                                    <td className="px-6 py-4">{item?.area}</td>
+                                    <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
+                                    <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
+                                    <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
+                                    <td className="px-6 py-4">{item?.khata_no || "---"}</td>
+                                    <td className="px-6 py-4">{item?.area || "---"}</td>
                                     {/* <td className="px-6 py-4">{item?.blue_print?.length && item?.ownership_doc?.length ?
                                       <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> :
                                       <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}
@@ -666,46 +666,89 @@ const Adminhold = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className='flex'>
-                                            {role == 'Admin' ? null : (
-                                                <Link
-                                                    href={`/apply/approve-application/${item?.id}?status=clicked`}
+                                        {role === 'Admin' ? null : (
+                       item.status === 3 ? (
+                        <Link
+            href={`/apply/approve-application/${item?.id}?status=clicked`}
+            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
+        >
 
-                                                    className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="23"
-                                                        height="20"
-                                                        viewBox="0 0 23 20"
-                                                        fill="none"
-                                                    >
-                                                        <g clipPath="url(#clip0_1440_7941)">
-                                                            <rect
-                                                                x="1.63591"
-                                                                y="0.63591"
-                                                                width="18.7282"
-                                                                height="18.7282"
-                                                                rx="4.36409"
-                                                                stroke="#726E6E"
-                                                                strokeWidth="1.27182"
-                                                            />
-                                                            <path
-                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                                                                fill="black"
-                                                                fillOpacity="0.41"
-                                                            />
-                                                        </g>
-                                                        <defs>
-                                                            <clipPath id="clip0_1440_7941">
-                                                                <rect
-                                                                    width="22.7692"
-                                                                    height="19.7333"
-                                                                    fill="white"
-                                                                />
-                                                            </clipPath>
-                                                        </defs>
-                                                    </svg>
-                                                </Link>
-                                            )}
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="23"
+                height="20"
+                viewBox="0 0 23 20"
+                fill="none"
+            >
+                <g clipPath="url(#clip0_1440_7941)">
+                    <rect
+                        x="1.63591"
+                        y="0.63591"
+                        width="18.7282"
+                        height="18.7282"
+                        rx="4.36409"
+                        stroke="#726E6E"
+                        strokeWidth="1.27182"
+                    />
+                    <path
+                        d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                        fill="black"
+                        fillOpacity="0.41"
+                    />
+                </g>
+                <defs>
+                    <clipPath id="clip0_1440_7941">
+                        <rect
+                            width="22.7692"
+                            height="19.7333"
+                            fill="white"
+                        />
+                    </clipPath>
+                </defs>
+            </svg>
+          
+            </Link>
+    ) : (
+        <Link
+            href={`/apply/approve-application/${item?.id}?status=clicked`}
+            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="23"
+                height="20"
+                viewBox="0 0 23 20"
+                fill="none"
+            >
+                <g clipPath="url(#clip0_1440_7941)">
+                    <rect
+                        x="1.63591"
+                        y="0.63591"
+                        width="18.7282"
+                        height="18.7282"
+                        rx="4.36409"
+                        stroke="#726E6E"
+                        strokeWidth="1.27182"
+                    />
+                    <path
+                        d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                        fill="black"
+                        fillOpacity="0.41"
+                    />
+                </g>
+                <defs>
+                    <clipPath id="clip0_1440_7941">
+                        <rect
+                            width="22.7692"
+                            height="19.7333"
+                            fill="white"
+                        />
+                    </clipPath>
+                </defs>
+            </svg>
+        </Link>
+    )
+)}
                                             {/* <Link
                                                 href={`/apply/approve-application/${item?.id}?status=clicked`}
 
@@ -772,11 +815,11 @@ const Adminhold = () => {
                                                     />
                                                 </svg>
                                             </Link>
-                                            {role}
+                                            
 
                                             {role == 'Admin' ? null : (
                                                 <>
-                                                    <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
+                                                    <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed" disabled>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                             <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
                                                             <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
