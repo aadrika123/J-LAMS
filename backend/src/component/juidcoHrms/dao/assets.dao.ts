@@ -118,9 +118,39 @@ class AssetsManagementDao {
         try {
             const result = await prisma.$transaction(async (tx) => {
 
-                
+                const lastAsset = await tx.assets_list.findFirst({
+                    orderBy: {
+                        created_at: 'desc',
+                    },
+                    select: {
+                        id: true,
+                    },
+                });
+
+                const numericMatch = lastAsset?.id?.match(/(\d{3})$/);
+                const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
+            
+                const newIncrementId = lastId + 1;
+                const formattedIds = newIncrementId.toString().padStart(3, '0'); 
+   
+                const validUlbId = ulb_id ? String(ulb_id).trim() : '';
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
+
+                const formattedId = validUlbId && validAssetType 
+                    ? `${validUlbId}${validAssetType}${formattedIds}`
+                    : 'invalid-id'; 
+            
+                const existingAsset = await tx.assets_list.findUnique({
+                    where: { id: formattedId },
+                });
+            
+                if (existingAsset) {
+                    throw new Error(`Asset with ID ${formattedId} already exists`);
+                }
+ 
                 const assetReq = await tx.assets_list.create({
                     data: {
+                        id:formattedId,
                         type_of_assets,
                         asset_sub_category_name,
                         assets_category_type,
@@ -618,7 +648,7 @@ class AssetsManagementDao {
     };
 
     getAllbyId = async (req: Request) => {
-        const id = Number(req.query.id)
+        const id = String(req.query.id)
         try {
             const assetGetbyId = await prisma.assets_list.findFirst({
                 where: {
@@ -641,7 +671,7 @@ class AssetsManagementDao {
     };
 
     deletebyId = async (req: Request) => {
-        const id = Number(req.query.id)
+        const id = String(req.query.id)
         try {
             const assetGetbyId = await prisma.assets_list.delete({
                 where: {
@@ -679,7 +709,7 @@ class AssetsManagementDao {
             floorData = []
         } = req.body;
 
-        const id = Number(req.query.id);
+        const id = String(req.query.id);
 
         try {
             const result = await prisma.$transaction(async (tx) => {
@@ -1029,7 +1059,7 @@ class AssetsManagementDao {
         const count = await prisma.asset_fieldOfficer_req.count();
         const totalPages = Math.ceil(count / limit);
         const skip = (page - 1) * limit;
-        const id = Number(req.query.id)
+        const id = String(req.query.id)
 
 
         try {
@@ -1076,7 +1106,7 @@ class AssetsManagementDao {
         const count = await prisma.asset_checker_req.count();
         const totalPages = Math.ceil(count / limit);
         const skip = (page - 1) * limit;
-        const id = Number(req.query.id)
+        const id = String(req.query.id)
 
         try {
             const assetGet = await prisma.asset_checker_req.findMany({

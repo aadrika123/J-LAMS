@@ -42,7 +42,7 @@ datasource db {
 // }
 
 model assets_list {
-  id                      Int                      @id @default(autoincrement())
+  id                      String @id @default(cuid())
   type_of_assets          String?
   asset_sub_category_name String?
   assets_category_type    String?
@@ -84,7 +84,7 @@ model floorData {
   plotCount    Int?
   type         String?
   assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)
-  assetsListId Int
+  assetsListId String 
 
   details details[]
 
@@ -135,7 +135,7 @@ model assets_list_change_log {
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
 
   asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  assetId Int
+  assetId String 
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
@@ -145,7 +145,7 @@ model asset_checker_req {
   id Int @id @default(autoincrement())
 
   fieldOfficer    asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId], onDelete: Cascade)
-  assetId         Int                    @unique
+  assetId         String                     @unique
   checker_remarks String?
 
   createdAt DateTime @default(now())
@@ -165,7 +165,7 @@ model asset_fieldOfficer_req {
   image_five  String?
 
   asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  assetId Int         @unique
+  assetId String          @unique
 
   asset_checker_req asset_checker_req[]
 
