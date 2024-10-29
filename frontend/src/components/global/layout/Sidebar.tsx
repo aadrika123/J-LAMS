@@ -9,6 +9,8 @@ import { InnerHeading } from "@/components/Helpers/Heading";
 import ProfileIcon from "@/assets/icons/profile_new.png";
 // import HomeIcon from "@/assets/icons/sidebar/hrms.svg";
 import DashboardIcon from "@/assets/icons/sidebar/ion_home.svg";
+import MunicipalHoldIcon from "@/assets/icons/sidebar/MunicipalHoldIcon.svg";
+import FieldOfficerHoldIcon from "@/assets/icons/sidebar/FieldOfficerHoldIcon.svg";
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
   className: string;
@@ -82,13 +84,34 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
           </div>
 
-          <Link href="/apply/approve-application" className="text-xl text-white">
+                   <Link href="/apply/approve-application" className="text-xl text-white">
 
                   <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
                     <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white"/>
                   <InnerHeading  className="text-xl text-white">Home</InnerHeading>
                     </div>
                     </Link>
+
+
+                    <Link href="/hold/fieldofficer" className="text-xl text-white">
+
+                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+                    <Image src={FieldOfficerHoldIcon} alt="finance" width={30} height={30} className="text-white"/>
+                  <InnerHeading  className="text-xl text-white">Hold by Field Officer</InnerHeading>
+                    </div>
+                    </Link>
+
+
+
+                    <Link href="/hold/admin" className="text-xl text-white">
+
+                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+                    <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white"/>
+                  <InnerHeading  className="text-xl text-white">Hold by Admin </InnerHeading>
+                    </div>
+                    </Link>
+
+                    
 {/* 
           <div>
             {sidebarLink?.modules?.map(() => {

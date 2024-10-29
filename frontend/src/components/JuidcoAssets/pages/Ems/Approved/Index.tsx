@@ -28,11 +28,18 @@ import Papa from 'papaparse';
 
 
 import { jsPDF } from "jspdf";
-import ModalComp from '@/components/modal/Modal';
+import Modal from '@/components/Modal/Modal';
 // import { combineSlices } from '@reduxjs/toolkit';
+
+interface ModalContent {
+    type: "image" | "pdf";
+    src: string;
+}
+
 
 
 const Approved = () => {
+    
 
     const router = useRouter()
     const [currentPage, setCurrentPage] = useState(1);
@@ -57,6 +64,11 @@ const Approved = () => {
     const [ulbID, setUlbID] = useState<number | null >();
 
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
+
+    
+    const [modalClose, setModalClose] = useState(false);
+    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });;
+    const isPDF = (url: string) => url.endsWith('.pdf');
 
     useEffect(() => {
       const storedUserDetails = localStorage.getItem("user_details");
@@ -395,13 +407,19 @@ const Approved = () => {
 
     console.log("audit", audit)
 
-    const isPDF = (url: string) => url.endsWith('.pdf');
-
-    const handleOpenModal = (isOpen:any, onRequestClose:any, url:string) => {
-        // Your modal logic to open the PDF
-        console.log(`Opening PDF: ${url}`,isOpen,onRequestClose);
-        // <ModalComp  isOpen={isOpen} onRequestClose={onRequestClose} url={url}/>
-    };
+ 
+    const handleOpenModal = (url:string) => {
+        console.log(`Opening PDF: ${url}`);
+        setModalContent({
+          type: isPDF(url) ? 'pdf' : 'image',
+          src: url,
+        });
+        setModalClose(true);
+      };
+    
+      const handleCloseModal = () => {
+        setModalClose(false);
+      };
 
     return (
         <div>
@@ -612,43 +630,44 @@ const Approved = () => {
                                       <div className='flex gap-3'><Image src={docs} alt="docs" /> <Image src={pdf} alt={pdf} /></div> :
                                       <div className='ml-3'><Image src={notfound} alt="error" width={30} height={30} /></div>}
                                     </td> */}
-
-                                <td className="px-6 py-4">
-                                {item?.blue_print ? (
-                                    isPDF(item.blue_print) ? (
-                                        <Image
-                                            src={pdf}
-                                            alt="Blueprint PDF"
-                                            onClick={() => handleOpenModal(item.blue_print)} // Open PDF in modal
-                                            style={{ cursor: 'pointer' }}
-                                        />
-                                    ) : (
-                                        <Image src={docs} alt="Blueprint Document" />
-                                    )
-                                ) : (
-                                    <div className='ml-3'>
-                                        <Image src={notfound} alt="Not Found" width={30} height={30} />
-                                    </div>
-                                )}
-                            </td>
-                            <td className="px-6 py-4">
-                                {item?.ownership_doc ? (
-                                    isPDF(item.ownership_doc) ? (
-                                        <Image
-                                        src={pdf}
-                                            alt="Ownership PDF"
-                                            onClick={() => handleOpenModal(item.ownership_doc)} // Open PDF in modal
-                                            style={{ cursor: 'pointer' }}
-                                        />
-                                    ) : (
-                                        <Image src={docs} alt="Ownership Document" />
-                                    )
-                                ) : (
-                                    <div className='ml-3'>
-                                        <Image src={notfound} alt="Not Found" width={30} height={30} />
-                                    </div>
-                                )}
-                            </td>
+                                    <td className="px-6 py-4">
+                                        {item?.blue_print ? (
+                                            isPDF(item.blue_print) ? (
+                                                <Image
+                                                    src={pdf}
+                                                    alt="Blueprint PDF"
+                                                    onClick={() => handleOpenModal(item.blue_print)} // Open PDF in modal
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                            ) : (
+                                                <Image src={docs} alt="Blueprint Document" onClick={() => handleOpenModal(item.blue_print)} // Open PDF in modal
+                                                style={{ cursor: 'pointer' }} />
+                                            )
+                                        ) : (
+                                            <div className='ml-3'>
+                                                <Image src={notfound} alt="Not Found" width={30} height={30} style={{ cursor: 'not-allowed' }}  />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {item?.ownership_doc ? (
+                                            isPDF(item.ownership_doc) ? (
+                                                <Image
+                                                    src={pdf}
+                                                    alt="Ownership PDF"
+                                                    onClick={() => handleOpenModal(item.ownership_doc)} // Open PDF in modal
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                            ) : (
+                                                <Image src={docs} alt="Ownership Document" onClick={() => handleOpenModal(item.ownership_doc)} // Open PDF in modal
+                                                style={{ cursor: 'pointer' }} />
+                                            )
+                                        ) : (
+                                            <div className='ml-3'>
+                                                <Image src={notfound} alt="Not Found" width={30} height={30} style={{ cursor: 'not-allowed' }}  />
+                                            </div>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4">
                                         <div className='flex'>
                                             {role == 'Admin' ? null : (
@@ -909,6 +928,13 @@ const Approved = () => {
                 {/* navbar pagination */}
 
             </div>
+
+            {/* <Modal isOpen={modalClose} onClose={setModalClose} /> */}
+            <Modal 
+        isOpen={modalClose} 
+        onClose={handleCloseModal} 
+        content={modalContent} 
+      />
         </div>
     )
 }

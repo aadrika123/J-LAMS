@@ -4,6 +4,7 @@ import { SidebarLinksProps } from "@/utils/types/types";
 import HomeIcon from "@/assets/icons/sidebar/hrms.svg";
 import EmployeeManagementIcon from "@/assets/icons/sidebar/employee.svg";
 import DashboardIcon from "@/assets/icons/sidebar/ion_home.svg";
+
 // import OnBoardIcon from "@/assets/icons/sidebar/mdi_user-add.svg";
 // import Apply from "@/assets/icons/sidebar/employee.svg";
 
@@ -33,7 +34,7 @@ export const sidebarLinks: SidebarLinksProps = {
                     dropdown: true,
                     subModules: [
                          {
-                            moduleName: "Home",
+                            moduleName: "Homes",
                             path: `${url}/apply/approve-application`,
                             icon: (
                                 <Image

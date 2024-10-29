@@ -5,6 +5,9 @@ const data = [
     "/lams/apply/approve-application",
     "/lams/apply/view",
       "/lams/apply/form",
+
+      "/lams/hold/admin",
+      "/lams/hold/fieldofficer",
     
     ],
   },
