@@ -70,6 +70,12 @@ export const DashboardMain = () => {
   const [commercialCount, setCommercialCount] = useState<any>(0);
   const [residentialCount, setResidentialCount] = useState<any>(0);
 
+
+  const [isCommercialChecked, setIsCommercialChecked] = useState(false);
+  const [isResidentialChecked, setIsResidentialChecked] = useState(false);
+
+
+
   useEffect(() => {
     const storedUserDetails = localStorage.getItem("user_details");
     if (storedUserDetails) {
@@ -228,7 +234,7 @@ export const DashboardMain = () => {
     if (storedData) {
       setSessionData(JSON.parse(storedData));
     }
-  }, []);
+  }, [isModalVisibleData]);
 
   if (isLoading) {
     return (
@@ -323,7 +329,7 @@ export const DashboardMain = () => {
     window.location.replace("/lams/apply/approve-application");
   }
 
-  const handleSave = () => {
+  const handleSave = (value:boolean) => {
 
     if(buildingName?.length === 0 && floorCount?.length === 0 ){
       toast.error("Building Name & Floor Cannot be Empty")
@@ -356,8 +362,11 @@ export const DashboardMain = () => {
         // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
 
         setNavigationStack((prevStack) => [...prevStack, boxes] as any);
-        handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
+        if(value){
+                  handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
         handleTypeBox({ target: { value: numericFloorCount } }, 'Commercial', 0);
+        }
+
     }
 
 };
@@ -457,6 +466,7 @@ export const DashboardMain = () => {
   }
 
   const handleTypeBox = (e: any, type: string, index: number) => {
+    console.log("this is called without calling it ")
     const count = parseInt(e?.target?.value) || e || 0; // Default to 0 if NaN
   
     if (isNaN(count)) return;
@@ -643,7 +653,7 @@ export const DashboardMain = () => {
         <div className="flex justify-center mt-4">
           <button
             onClick={() => {
-              handleSave();
+              handleSave(true);
               setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
             }}
             className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
@@ -943,7 +953,7 @@ export const DashboardMain = () => {
 
 
 
-                            <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
+                            <button onClick={()=>{handleSave(false)}} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
 
                             {floorDisable ? (
                               <div className='flex flex-row'>
@@ -998,47 +1008,73 @@ export const DashboardMain = () => {
                               </div>
                             )}
 
+{plotNo >0 && 
+  <div>
+            <input
+                key={`type-Commercial`}
+                type="text"
+                className="border p-2 m-2"
+                placeholder={`Number of Commercial units`}
+                onChange={(e) => {
+                    handleCommercial(parseInt(e.target.value));
+                    handleTypeBox(e, 'Commercial', null);
+                }}
+                maxLength={2}
+                onKeyPress={(e) => {
+                    if (!(e.key >= "0" && e.key <= "9")) {
+                        e.preventDefault();
+                    }
+                }}
+                disabled={isCommercialChecked} // Disable if checked
+            />
+            <input
+                type="checkbox"
+                id="vehicle1"
+                name="vehicle1"
+                value="Bike"
+                checked={isCommercialChecked}
+                onChange={() => {
+                    setIsCommercialChecked(!isCommercialChecked);
+                    if (isCommercialChecked) {
+                        // Reset count or other logic if necessary
+                        setCommercialCount(0);
+                    }
+                }}
+            />
 
-<div>
-  <input
-    key={`type-Commercial`}
-    type="text"
-    className="border p-2 m-2"
-    placeholder={`Number of Commercial units`}
-    onChange={(e) => {
-      handleCommercial(parseInt(e.target.value))
-      handleTypeBox(e, 'Commercial', null); // First function call
-     
-    }}
-    maxLength={2}
-    onKeyPress={(e: any) => {
-      if (!(e.key >= "0" && e.key <= "9")) {
-        e.preventDefault();
-      }
-    }}
-  />
-  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
+            <input
+                key={`type-Residential`}
+                type="text"
+                className="border p-2 m-2"
+                placeholder={`Number of Residential units`}
+                onChange={(e) => {
+                    handleresidential(parseInt(e.target.value));
+                    handleTypeBox(e, 'Residential', null);
+                }}
+                maxLength={2}
+                onKeyPress={(e) => {
+                    if (!(e.key >= "0" && e.key <= "9")) {
+                        e.preventDefault();
+                    }
+                }}
+                disabled={isResidentialChecked} // Disable if checked
+            />
+            <input
+                type="checkbox"
+                id="vehicle2"
+                name="vehicle2"
+                value="Bike"
+                checked={isResidentialChecked}
+                onChange={() => {
+                    setIsResidentialChecked(!isResidentialChecked);
+                    if (isResidentialChecked) {
+                        // Reset count or other logic if necessary
+                        setResidentialCount(0);
+                    }
+                }}
+            />
+        </div>}
 
-  <input
-    key={`type-Residential`}
-    type="text"
-    className="border p-2 m-2"
-    placeholder={`Number of Residential units`}
-    onChange={(e) => {
-      handleresidential(parseInt(e.target.value) ); // Second function call
-      handleTypeBox(e, 'Residential', null); // First function call
-      
-    }}
-    maxLength={2}
-    onKeyPress={(e: any) => {
-      if (!(e.key >= "0" && e.key <= "9")) {
-        e.preventDefault();
-      }
-    }}
-  />
-
-  <input type="checkbox" id="vehicle2" name="vehicle2" value="Bike" />
-</div>
 
 
 
