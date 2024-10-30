@@ -66,6 +66,10 @@ export const DashboardMain = () => {
 
   const [ulbID, setUlbID] = useState<string | null>();
 
+
+  const [commercialCount, setCommercialCount] = useState<any>(0);
+  const [residentialCount, setResidentialCount] = useState<any>(0);
+
   useEffect(() => {
     const storedUserDetails = localStorage.getItem("user_details");
     if (storedUserDetails) {
@@ -320,8 +324,22 @@ export const DashboardMain = () => {
   }
 
   const handleSave = () => {
-    const numericFloorCount = Number(floorCount);
+
+    if(buildingName?.length === 0 && floorCount?.length === 0 ){
+      toast.error("Building Name & Floor Cannot be Empty")
+      return false;
+    }else if(buildingName?.length ==0){
+      toast.error("Building Name Cannot be Empty")
+      return false;
+    }else if(floorCount?.length ==0){
+      toast.error("Floor Cannot be Empty")
+      return false;
+    }
     
+
+    const numericFloorCount = Number(floorCount);
+
+
     if (isNaN(numericFloorCount) || numericFloorCount < 0) {
         console.error("Invalid floor count");
         return;
@@ -335,8 +353,13 @@ export const DashboardMain = () => {
     if (numericFloorCount > 0) {
         setFloorDisable(true);
         setInputBoxes(boxes);
+        // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+
         setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+        handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
+        handleTypeBox({ target: { value: numericFloorCount } }, 'Commercial', 0);
     }
+
 };
 
 
@@ -413,39 +436,47 @@ export const DashboardMain = () => {
   const handleTypeSelect = (type: any, index: any) => {
     setCurrentType(type);
     const typeBox = (
-      <input
-        key={`type-${type}`}
-        type="text"
-        className="border p-2 m-2"
-        placeholder={`Number of ${type} units`}
-        onChange={(e) =>
-           handleTypeBox(e, type, index)}
-        maxLength={2}
-          onKeyPress={(e: any) => {
-            if (!(e.key >= "0" && e.key <= "9")) {
-            e.preventDefault();
-          }
-        }}
-      />
+      <>
+      
+
+      </>
+      
     );
 
     setInputBoxes([typeBox]);
     setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
   };
 
-  const handleTypeBox = (e: any, type: any, index: any) => {
-    const count = parseInt(e.target.value);
-    setCount(count);
+  const handleCommercial=(val:any)=>{
+    setCommercialCount(parseInt(val) || 0);
+  }
+
+  
+  const handleresidential=(val:any)=>{
+    setResidentialCount(parseInt(val) || 0); 
+  }
+
+  const handleTypeBox = (e: any, type: string, index: number) => {
+    const count = parseInt(e?.target?.value) || e || 0; // Default to 0 if NaN
+  
     if (isNaN(count)) return;
-
-    if(type === 'Commercial' && count>10){
-      toast.error("Max 10 Floor")
-      return false;
+  
+    setCount(count);
+  
+    let ResidentialData = 0;
+    let commercialData = 0;
+  
+    if (type === 'Residential') {
+      ResidentialData = count;
+    } else if (type === 'Commercial') {
+      commercialData = count;
+      if (count > 10) {
+        toast.error("Max 10 Floors");
+        return; // Stop execution if the count exceeds 10
+      }
     }
-
-    const length = Object.keys(unitCompletion);
-    console.log("lenghtfgdfg", length)
-
+  
+    // Update the data based on the type and index
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
       const floorObj = updatedData[index];
@@ -457,45 +488,56 @@ export const DashboardMain = () => {
       }
       return updatedData;
     });
-
-    const newBoxes = Array.from({ length: count }, (_, boxIndex) => {
-      return (
-        <>
-          <br></br>
+  
+    const newBoxes = Array.from({ length: count }, (_, boxIndex) => (
+      <div key={`box-${index}-${boxIndex}`} className='flex flex-column'>
+        <br />
+        {type === 'Commercial' && (
           <input
-            key={`type-${type}-${index}-${boxIndex}`}
             type="text"
             readOnly
-            className={`border p-2 ml-2 justify-center items-center w-[3rem] text-slate-600 cursor-pointer rounded-md ${type === 'Commercial' ? 'bg-[#d6fce7]' : 'bg-[#e7e5ff]'}`}
+            className={`border p-2 ml-2 justify-center items-center w-[3rem] text-slate-600 cursor-pointer rounded-md bg-[#d6fce7]`}
             placeholder={`${boxIndex + 1}`}
-            onClick={() => handleInnerFloor(index, type, boxIndex)}
+            onClick={() => handleInnerFloor(index, 'Commercial', boxIndex)} 
           />
-          <br></br>
-        </>
-      )
-    });
-
+        )}
+        {type === 'Residential' && (
+          <input
+            type="text"
+            readOnly
+            className={`border p-2 ml-2 justify-center items-center w-[3rem] text-slate-600 cursor-pointer rounded-md bg-[#e7e5ff]`}
+            placeholder={`${boxIndex + 1}`}
+            onClick={() => handleInnerFloor(index, 'Residential', boxIndex)}
+          />
+        )}
+        <br />
+      </div>
+    ));
+  
+    // Update the input boxes based on the type
     setInputBoxes((prevInputBoxes: any) => {
-      const typeBoxIndex = prevInputBoxes.findIndex(
+      const typeBoxIndex = prevInputBoxes?.findIndex(
         (box: any) => box.key === `type-${type}`
       );
-
+  
       if (typeBoxIndex !== -1) {
         return [
           ...prevInputBoxes.slice(0, typeBoxIndex + 1),
           ...newBoxes,
         ];
       }
-
+  
       return [...prevInputBoxes, ...newBoxes];
     });
-
+  
+    // Update the navigation stack
     setNavigationStack((prevStack) => {
-      const newStack: any = [...prevStack];
+      const newStack = [...prevStack];
       newStack[newStack.length - 1] = [newBoxes];
       return newStack;
     });
   };
+  
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
     const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
@@ -617,46 +659,90 @@ export const DashboardMain = () => {
     setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
   };
 
+  // const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
+  //   const value = e.target.value;
+  //   setData((prevData: any) => {
+  //     const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+  //     let floorObj = updatedData.find((floor) => floor?.floor === floorIndex );
+  //     if (!floorObj) {
+  //       floorObj = { floor: floorIndex , units: {} };
+  //       updatedData[floorIndex] = floorObj;
+  //     }
+
+  //     if (!floorObj.units[type]) {
+  //       floorObj.units[type] = [];
+  //     }
+
+  //     if (!floorObj.units[type][unitIndex]) {
+  //       floorObj.units[type][unitIndex] = {};
+  //     }
+
+  //     const unit = floorObj.units[type][unitIndex];
+  //     const allFieldsFilled = unit?.length && unit?.breadth && unit?.height && unit?.name;
+
+  //     floorObj.units[type][unitIndex][field] = value;
+
+  //     if (allFieldsFilled) {
+  //       console.log(`Unit ${unitIndex } details:`, unit);
+  //       sessionStorage.setItem('unitData', JSON.stringify(updatedData));
+  //       const storedData = sessionStorage.getItem('unitData');
+  //       if (storedData) {
+  //         setSessionData(JSON.parse(storedData));
+  //       }
+        
+  //       setUnitCompletion((prevCompletion) => ({
+  //         ...prevCompletion,
+  //         [`${unitIndex }`]: allFieldsFilled,
+  //       }));
+  //     }
+
+  //     return updatedData;
+  //   });
+  // };
+
+
   const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
     const value = e.target.value;
+  
     setData((prevData: any) => {
-      const updatedData = Array.isArray(prevData) ? [...prevData] : [];
-      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex );
+      // Get existing data from sessionStorage
+      const storedData = sessionStorage.getItem('unitData');
+      const initialData = storedData ? JSON.parse(storedData) : [];
+  
+      // Create a copy of the initial data
+      const updatedData = Array.isArray(prevData) ? [...prevData] : [...initialData];
+  
+      // Find or create floor object
+      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex);
       if (!floorObj) {
-        floorObj = { floor: floorIndex , units: {} };
-        updatedData[floorIndex] = floorObj;
+        floorObj = { floor: floorIndex, units: {}, plotCount: 0 };
+        updatedData.push(floorObj); // Use push instead of setting at an index
       }
-
+  
+      // Ensure the units object for the specific type exists
       if (!floorObj.units[type]) {
         floorObj.units[type] = [];
       }
-
-      if (!floorObj.units[type][unitIndex]) {
-        floorObj.units[type][unitIndex] = {};
+  
+      // Check if unit already exists for the specified unitIndex
+      let unit = floorObj.units[type].find((u) => u.index === unitIndex);
+      if (!unit) {
+        // If not, create a new unit
+        unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
+        floorObj.units[type].push(unit);
       }
-
-      const unit = floorObj.units[type][unitIndex];
-      const allFieldsFilled = unit?.length && unit?.breadth && unit?.height && unit?.name;
-
-      floorObj.units[type][unitIndex][field] = value;
-
-      if (allFieldsFilled) {
-        console.log(`Unit ${unitIndex } details:`, unit);
-        sessionStorage.setItem('unitData', JSON.stringify(updatedData));
-        const storedData = sessionStorage.getItem('unitData');
-        if (storedData) {
-          setSessionData(JSON.parse(storedData));
-        }
-        
-        setUnitCompletion((prevCompletion) => ({
-          ...prevCompletion,
-          [`${unitIndex }`]: allFieldsFilled,
-        }));
-      }
-
+  
+      // Update the field value for the specific unit
+      unit[field] = value;
+  
+      // Save updated data to sessionStorage
+      sessionStorage.setItem('unitData', JSON.stringify(updatedData));
+  
+      // Return the updated data for the state
       return updatedData;
     });
   };
+  
 
   const transformDataForAPI = (data: any) => {
     return data
@@ -812,154 +898,197 @@ export const DashboardMain = () => {
                       ]}
                     />
 
-{values.type_of_assets === 'Building' && isModalVisible && (
-  <div className="fixed inset-0 flex items-center justify-center">
-    {/* Background Overlay for Blur Effect */}
-    <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
+                    {values.type_of_assets === 'Building' && isModalVisible && (
+                      <div className="fixed inset-0 flex items-center justify-center">
+                        {/* Background Overlay for Blur Effect */}
+                        <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
 
-    {/* Modal Content */}
-    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] max-h-[80vh] overflow-auto z-20">
-      <div className='mb-[3rem]'>
-        <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
-        <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
-        <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button>
-      </div>
+                        {/* Modal Content */}
+                        <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] max-h-[80vh] overflow-auto z-20">
+                          <div className='mb-[3rem]'>
+                            <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+                            <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+                            <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button>
+                          </div>
 
-      <div>
-        <input
-          type="text"
-          value={buildingName}
-          onChange={(e) => setBuildingName(e.target.value)}
-          placeholder="Building Name"
-          className="border p-2 m-2"
-          disabled={floorDisable}
-          />
-<input
-  type="number"
-  value={floorCount}
-  onChange={(e) => {
-    const value = parseInt(e.target.value);
-    // Only update state if the value is valid (1 to 10)
-    if (!isNaN(value) && value >= 1 && value <= 10) {
-      setFloorCount(value.toString()); // Convert number to string
-    } else if (e.target.value === '') {
-      // Allow empty input to clear the value
-      setFloorCount('');
-    }
-  }}
-  placeholder="Number of Floors"
-  className="border p-2 m-2"
-  disabled={floorDisable}
-  min={1} 
-  max={10} 
-/>
+                          <div>
+                            <input
+                              type="text"
+                              value={buildingName}
+                              onChange={(e) => setBuildingName(e.target.value)}
+                              placeholder="Building Name"
+                              className="border p-2 m-2"
+                              disabled={floorDisable}
+                            />
+                            <input
+                              type="number"
+                              value={floorCount}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                // Only update state if the value is valid (1 to 10)
+                                if (!isNaN(value) && value >= 1 && value <= 10) {
+                                  setFloorCount(value.toString()); // Convert number to string
+                                } else if (e.target.value === '') {
+                                  // Allow empty input to clear the value
+                                  setFloorCount('');
+                                }
+                              }}
+                              placeholder="Number of Floors"
+                              className="border p-2 m-2"
+                              disabled={floorDisable}
+                              min={1}
+                              max={10}
+                            />
 
 
 
 
                             <button onClick={handleSave} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
-                         
+
                             {floorDisable ? (
-  <div className='flex flex-row'>
-    {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => ( 
-      <div key={index}>
-        <input
-          type="text"
-          readOnly
-          className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md ${
-            selectedFloor === index ? 'bg-[#d6fce7]' : 'bg-[#4338CA]'
-          }`}
-          placeholder={index === 0 ? 'B' : (index - 1).toString()} // Adjust placeholder
-          onClick={() => handleFloor(index)}
-        />
-      </div>
-    ))}
-  </div>
-) : null}
-
-
-
-
-
-{selectedFloor !== null && (
-  <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
-    <input
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`No of shop/flat on the floor ${selectedFloor === 0 ? 'B' : selectedFloor - 1}`}
-      value={plotNos[selectedFloor] || ''}  
-      onChange={(e) => handlePlotCountChange(e, selectedFloor)}
-      maxLength={3}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-
-    <button
-      className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
-      onClick={() => handleTypeSelect("Commercial", selectedFloor)}
-    >
-      Commercial
-    </button>
-    
-    <button
-      className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
-      onClick={() => handleTypeSelect("Residential", selectedFloor)}
-    >
-      Residential
-    </button>
-  </div>
-)}
-
-      
-        
-        <div className="flex flex-col">
-          {inputBoxes.length > 0 ? (
-            <div className="h-[12rem] overflow-x-auto">
-              {inputBoxes}
-            </div>
-          ) : null}
-        </div> 
-        
-        <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
-        <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
-        <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
-        {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
-
-        {sessionData.length > 0 ? (
-    <div className="p-4 max-h-[40vh] overflow-y-auto">
-        {sessionData.map((floorData, floorIndex) => {
-            if (!floorData) return null; // Skip null entries
-            
-            // Determine the display label for the floor
-            const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
-
-            return (
-                <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
-                    <h2 className="text-lg font-bold mb-2">{floorLabel}</h2>
-                    <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
-                    
-                    {floorData?.units && Object.entries(floorData.units).length > 0 ? (
-                        Object.entries(floorData.units).map(([unitType, units]) => (
-                            <div key={unitType} className="mb-4">
-                                <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
-                                {units.map((unit, unitIndex) => (
-                                    <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
-                                        <p><strong>Index:</strong> {unit?.index}</p>
-                                        <p><strong>Type:</strong> {unit?.type}</p>
-                                        <p><strong>Length:</strong> {unit?.length}</p>
-                                        <p><strong>Breadth:</strong> {unit?.breadth}</p>
-                                        <p><strong>Height:</strong> {unit?.height}</p>
-                                        <p><strong>Name:</strong> {unit?.name}</p>
-                                        <p><strong>Property Name:</strong> {unit?.property_name}</p>
-                                        <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
-                                    </div>
+                              <div className='flex flex-row'>
+                                {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => (
+                                  <div key={index}>
+                                    <input
+                                      type="text"
+                                      readOnly
+                                      className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white cursor-pointer rounded-md ${selectedFloor === index ? 'bg-[#d6fce7]' : 'bg-[#4338CA]'
+                                        }`}
+                                      placeholder={index === 0 ? 'B' : (index - 1).toString()} // Adjust placeholder
+                                      onClick={() => handleFloor(index)}
+                                    />
+                                  </div>
                                 ))}
+                              </div>
+                            ) : null}
+
+
+
+
+
+                            {selectedFloor !== null && (
+                              <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`No of shop/flat on the floor ${selectedFloor === 0 ? 'B' : selectedFloor - 1}`}
+                                  value={plotNos[selectedFloor] || ''}
+                                  onChange={(e) => handlePlotCountChange(e, selectedFloor)}
+                                  maxLength={3}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                />
+
+                                <button
+                                  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
+                                  onClick={() => handleTypeSelect("Commercial", selectedFloor)}
+                                >
+                                  Commercial
+                                </button>
+
+                                <button
+                                  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
+                                  onClick={() => handleTypeSelect("Residential", selectedFloor)}
+                                >
+                                  Residential
+                                </button>
+                              </div>
+                            )}
+
+
+<div>
+  <input
+    key={`type-Commercial`}
+    type="text"
+    className="border p-2 m-2"
+    placeholder={`Number of Commercial units`}
+    onChange={(e) => {
+      handleCommercial(parseInt(e.target.value))
+      handleTypeBox(e, 'Commercial', null); // First function call
+     
+    }}
+    maxLength={2}
+    onKeyPress={(e: any) => {
+      if (!(e.key >= "0" && e.key <= "9")) {
+        e.preventDefault();
+      }
+    }}
+  />
+  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
+
+  <input
+    key={`type-Residential`}
+    type="text"
+    className="border p-2 m-2"
+    placeholder={`Number of Residential units`}
+    onChange={(e) => {
+      handleresidential(parseInt(e.target.value) ); // Second function call
+      handleTypeBox(e, 'Residential', null); // First function call
+      
+    }}
+    maxLength={2}
+    onKeyPress={(e: any) => {
+      if (!(e.key >= "0" && e.key <= "9")) {
+        e.preventDefault();
+      }
+    }}
+  />
+
+  <input type="checkbox" id="vehicle2" name="vehicle2" value="Bike" />
+</div>
+
+
+
+
+
+                            <div className="flex flex-col">
+                              {inputBoxes.length > 0 ? (
+                                <div className="h-[12rem] overflow-x-auto">
+                                  {inputBoxes}
+                                </div>
+                              ) : null}
                             </div>
-                        ))
-                    ) : (
+
+                            <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
+                            <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
+                            <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
+                            {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
+
+                            {sessionData.length > 0 ? (
+                              <div className="p-4 max-h-[40vh] overflow-y-auto">
+                                {sessionData.map((floorData, floorIndex) => {
+                                  if (!floorData) return null; // Skip null entries
+
+                                  // Determine the display label for the floor
+                                  const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
+
+                                  return (
+                                    <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                                      <h2 className="text-lg font-bold mb-2">{floorLabel}</h2>
+                                      <p className="mb-2">Plot Count: {floorData?.plotCount}</p>
+
+                                      {floorData?.units && Object.entries(floorData.units).length > 0 ? (
+                                        Object.entries(floorData.units).map(([unitType, units]) => (
+                                          <div key={unitType} className="mb-4">
+                                            <h3 className="text-md font-semibold mb-2">{unitType} Units</h3>
+                                            {units.map((unit, unitIndex) => (
+                                              <div key={unitIndex} className="mb-2 p-2 border rounded grid grid-cols-3 gap-4">
+                                                <p><strong>Index:</strong> {unit?.index}</p>
+                                                <p><strong>Type:</strong> {unit?.type}</p>
+                                                <p><strong>Length:</strong> {unit?.length}</p>
+                                                <p><strong>Breadth:</strong> {unit?.breadth}</p>
+                                                <p><strong>Height:</strong> {unit?.height}</p>
+                                                <p><strong>Name:</strong> {unit?.name}</p>
+                                                <p><strong>Property Name:</strong> {unit?.property_name}</p>
+                                                <p><strong>Type of Plot:</strong> {unit?.type_of_plot}</p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ))
+                                      ) : (
                         <p>No units available.</p>
                     )}
                 </div>
