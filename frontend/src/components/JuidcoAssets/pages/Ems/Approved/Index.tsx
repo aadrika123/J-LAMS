@@ -67,7 +67,7 @@ const Approved = () => {
 
     
     const [modalClose, setModalClose] = useState(false);
-    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });;
+    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });
     const isPDF = (url: string) => url.endsWith('.pdf');
 
     useEffect(() => {

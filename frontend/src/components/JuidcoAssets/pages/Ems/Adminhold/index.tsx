@@ -22,7 +22,7 @@ import pdf from '@/assets/icons/pdf.svg'
 import notfound from '@/assets/icons/not-found.png'
 // import goBack from '@/utils/helper';
 import autoTable from 'jspdf-autotable'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast';
 import Papa from 'papaparse';
 
@@ -41,7 +41,7 @@ interface ModalContent {
 const Adminhold = () => {
     
 
-    const router = useRouter()
+    // const router = useRouter()
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
@@ -67,7 +67,7 @@ const Adminhold = () => {
 
     
     const [modalClose, setModalClose] = useState(false);
-    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });;
+    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });
     const isPDF = (url: string) => url.endsWith('.pdf');
 
     useEffect(() => {
@@ -282,9 +282,9 @@ const Adminhold = () => {
 
     /////////////////// download pdf //////////////////
 
-    const handleClick = () => {
-        router.replace('/apply/form')
-    }
+    // const handleClick = () => {
+    //     router.replace('/apply/form')
+    // }
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setFilter(e.target.value);

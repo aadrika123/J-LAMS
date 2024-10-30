@@ -40,6 +40,7 @@ export const DashboardMain = () => {
     units: Record<string, Unit[]>; 
   }
 
+  type NavigationStackType = React.ReactNode[][]; 
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,8 +55,8 @@ export const DashboardMain = () => {
   const [currentType, setCurrentType] = useState<any>(null);
   const [plotNo, setPlotNo] = useState<any>(0);
   const [count, setCount] = useState<any>(0);
-  const [, setNavigationStack] = useState([]);
-  const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
+  const [, setNavigationStack] = useState<NavigationStackType>([]);
+  // const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
   const [sessionData, setSessionData] = useState<FloorData[]>([]);
   const [floorDisable, setFloorDisable] = useState(false);
 
@@ -87,6 +88,9 @@ export const DashboardMain = () => {
       }
     }
   }, []);
+
+  console.log("residentialCount",residentialCount)
+  console.log("commercialCount",commercialCount)
 
 
   useEffect(() => {
@@ -442,7 +446,7 @@ export const DashboardMain = () => {
     });
   };
 
-  const handleTypeSelect = (type: any, index: any) => {
+  const handleTypeSelect = (type: any) => {
     setCurrentType(type);
     const typeBox = (
       <>
@@ -465,7 +469,7 @@ export const DashboardMain = () => {
     setResidentialCount(parseInt(val) || 0); 
   }
 
-  const handleTypeBox = (e: any, type: string, index: number) => {
+  const handleTypeBox = (e: any, type: string, index: number | null) => {
     console.log("this is called without calling it ")
     const count = parseInt(e?.target?.value) || e || 0; // Default to 0 if NaN
   
@@ -485,10 +489,13 @@ export const DashboardMain = () => {
         return; // Stop execution if the count exceeds 10
       }
     }
+    console.log("ResidentialData",ResidentialData)
+    console.log("commercialData",commercialData)
   
     // Update the data based on the type and index
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
+      if (index !== null && index >= 0 && index < updatedData.length) {
       const floorObj = updatedData[index];
       if (floorObj) {
         floorObj.units[type] = new Array(count).fill({}).map((_, unitIndex) => ({
@@ -496,6 +503,9 @@ export const DashboardMain = () => {
           type,
         }));
       }
+    } else {
+      console.error("Invalid index:", index);
+  }
       return updatedData;
     });
   
@@ -735,7 +745,7 @@ export const DashboardMain = () => {
       }
   
       // Check if unit already exists for the specified unitIndex
-      let unit = floorObj.units[type].find((u) => u.index === unitIndex);
+      let unit = floorObj.units[type].find((u:any) => u.index === unitIndex);
       if (!unit) {
         // If not, create a new unit
         unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
@@ -994,14 +1004,14 @@ export const DashboardMain = () => {
 
                                 <button
                                   className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
-                                  onClick={() => handleTypeSelect("Commercial", selectedFloor)}
+                                  onClick={() => handleTypeSelect("Commercial")}
                                 >
                                   Commercial
                                 </button>
 
                                 <button
                                   className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
-                                  onClick={() => handleTypeSelect("Residential", selectedFloor)}
+                                  onClick={() => handleTypeSelect("Residential")}
                                 >
                                   Residential
                                 </button>
