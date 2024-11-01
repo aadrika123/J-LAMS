@@ -1624,10 +1624,10 @@ export const DashboardMain = () => {
                  onChange={handleChange}
                  onBlur={handleBlur}
                  // value={values.mode_of_acquisition}
-                  label="Word no."
+                  label="Ward no."
                    name="ward_no"
                    value={values.ward_no}
-                  placeholder={"Word no."}
+                  placeholder={"Ward no."}
                   options={Array.from({ length: 55 }, (_, index) => ({
                   id: index + 1,
                    name: `${index + 1}`, 

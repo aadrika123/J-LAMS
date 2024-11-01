@@ -46,6 +46,7 @@ const Fieldofficer = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
+    const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -290,6 +291,10 @@ const Fieldofficer = () => {
         setFilter(e.target.value);
     };
 
+    const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        // setFilterWard(e.target.value);
+    };
+
     const handleItemsPerPageChange = (e:any) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1); 
@@ -459,12 +464,12 @@ const Fieldofficer = () => {
                     <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
                             {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
-                            <SubHeading>Word No.</SubHeading>
+                            <SubHeading>Ward No.</SubHeading>
                         </div>
 
                         <select 
-                            onChange={handleFilterChange}
-                            value={filter}
+                            onChange={handleFilterWardChange}
+                            value={filterWard}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (

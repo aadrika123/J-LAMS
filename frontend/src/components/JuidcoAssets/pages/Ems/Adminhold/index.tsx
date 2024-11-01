@@ -459,7 +459,7 @@ const Adminhold = () => {
                     <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
                             {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
-                            <SubHeading>Word No.</SubHeading>
+                            <SubHeading>Ward No.</SubHeading>
                         </div>
 
                         <select 
