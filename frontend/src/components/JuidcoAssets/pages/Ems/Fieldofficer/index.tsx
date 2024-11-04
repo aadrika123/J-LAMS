@@ -292,7 +292,8 @@ const Fieldofficer = () => {
     };
 
     const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        // setFilterWard(e.target.value);
+        setFilterWard(e.target.value);
+        console.log("filterWard",filterWard)
     };
 
     const handleItemsPerPageChange = (e:any) => {
@@ -469,7 +470,7 @@ const Fieldofficer = () => {
 
                         <select 
                             onChange={handleFilterWardChange}
-                            value={filterWard}
+                            // value={filterWard}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (
