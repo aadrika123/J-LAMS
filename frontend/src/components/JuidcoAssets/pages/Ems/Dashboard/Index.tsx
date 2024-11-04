@@ -470,8 +470,7 @@ export const DashboardMain = () => {
   }
 
   const handleTypeBox = (e: any, type: string, index: number | null) => {
-    console.log("this is called without calling it ")
-    const count = parseInt(e?.target?.value) || e || 0; // Default to 0 if NaN
+    const count = parseInt(e?.target?.value) || e || 0; 
   
     if (isNaN(count)) return;
   
@@ -486,7 +485,7 @@ export const DashboardMain = () => {
       commercialData = count;
       if (count > 10) {
         toast.error("Max 10 Floors");
-        return; // Stop execution if the count exceeds 10
+        return; 
       }
     }
     console.log("ResidentialData",ResidentialData)
@@ -798,6 +797,8 @@ export const DashboardMain = () => {
   }
 
 
+  console.log("setCommercialCount",commercialCount)
+  console.log("residentialCount",residentialCount)
   
   return (
     <div>
@@ -1038,16 +1039,16 @@ export const DashboardMain = () => {
                 disabled={isCommercialChecked} // Disable if checked
             />
             <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
+                type="commercial"
+                id="commercial"
+                name="commercial"
+                value="commercial"
                 checked={isCommercialChecked}
                 onChange={() => {
                     setIsCommercialChecked(!isCommercialChecked);
                     if (isCommercialChecked) {
                         // Reset count or other logic if necessary
-                        setCommercialCount(0);
+                        setCommercialCount(commercialCount);
                     }
                 }}
             />
@@ -1070,16 +1071,16 @@ export const DashboardMain = () => {
                 disabled={isResidentialChecked} // Disable if checked
             />
             <input
-                type="checkbox"
-                id="vehicle2"
-                name="vehicle2"
-                value="Bike"
+                type="residential"
+                id="residential"
+                name="residential"
+                value="residential"
                 checked={isResidentialChecked}
                 onChange={() => {
                     setIsResidentialChecked(!isResidentialChecked);
                     if (isResidentialChecked) {
                         // Reset count or other logic if necessary
-                        setResidentialCount(0);
+                        setResidentialCount(residentialCount);
                     }
                 }}
             />
@@ -1240,7 +1241,7 @@ export const DashboardMain = () => {
 
                                             return (
                                                 <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
-                                                    <p className="font-bold">Unit {unit.index}</p>
+                                                    <p className="font-bold">Unit {unit.index + 1}</p>
                                                     <p>Type: {unit.type}</p>
                                                     {isBooked && (
                                                         <>
