@@ -8,6 +8,7 @@ const data = [
 
       "/lams/hold/admin",
       "/lams/hold/fieldofficer",
+      "/lams/hold/marketmaster",
     
     ],
   },
