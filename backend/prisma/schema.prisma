@@ -172,3 +172,27 @@ model asset_fieldOfficer_req {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+
+
+model market {
+  id           Int      @id @default(autoincrement())
+  circle_id    Int
+  market_name  String
+  is_active    Boolean
+  created_at   DateTime
+  updated_at   DateTime
+  shop_counter Int
+  toll_counter Int
+  ulb_id       Int
+}
+
+model circle {
+  id           Int      @id @default(autoincrement())
+  location     String? @unique
+  ulb_id       Int
+  is_active    Boolean
+  created_at   DateTime? @db.Timestamp  
+  updated_at   DateTime? @db.Timestamp
+}

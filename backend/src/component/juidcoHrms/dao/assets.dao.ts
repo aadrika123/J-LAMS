@@ -1336,6 +1336,77 @@ class AssetsManagementDao {
     };
 
 
+
+    marketcircle = async (req: Request) => {
+        const id =  Number(req.query.id) || 1;
+        try {
+            const circleGet = await prisma.circle.findMany({
+                where: {
+                    ulb_id: id,
+                },
+                orderBy: {
+                    created_at: 'desc'
+                }
+            });
+            return generateRes({
+                data: circleGet,
+            });
+        } catch (err) {
+            console.log(err);
+        }
+
+    };
+
+
+
+
+    locationAdd = async (req: Request) => {
+        const locationdata = req.body.location;
+        const ids = req.body.id;
+        console.log("req.body",req.body)
+    console.log("datacheck",location, ids)
+
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                const existingAsset = await tx.circle.findUnique({
+                    where: { location: locationdata }, 
+                });
+    
+                console.log('existingAsset', existingAsset);
+    
+                if (existingAsset) {
+                    // If the location already exists, throw an error
+                    throw new Error(`${location} already exists`);
+                }
+    
+                console.log("Proceeding to add new data");
+    
+                // Create a new asset record in the 'circle' table
+                const assetReq = await tx.circle.create({
+                    data: {
+                        ulb_id: ids, 
+                        location: locationdata,
+                        is_active: true, 
+                        created_at: new Date(), 
+                        updated_at: new Date(), 
+                    },
+                });
+    
+                console.log("assetReq", assetReq); 
+    
+                return assetReq; 
+            });
+    
+            // Return the successful response from the transaction
+            return generateRes(result);
+    
+        } catch (error) {
+            // Log the error and return a custom error response
+            console.error('Error processing request:', error);
+            throw { error: 400, msg: "Unable to add location due to a duplicate" };
+        }
+    };
+
     
 }
 

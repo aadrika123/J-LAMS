@@ -335,6 +335,93 @@ class AssetManagementController {
             })
         }
     };
+
+
+    marketcircle = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.marketcircle(req);
+
+            return res.json({
+                "status": true,
+                "message": "Assets fetched Circle Data Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data
+            })
+           
+            
+        } catch (error) {
+              return res.json({
+                "status": false,
+                "message": "Error occured while fetching Assets",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            })
+        }
+    };
+
+
+
+    locationAdd = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.locationAdd(req);
+            // if (!data?.error) {
+                return res.json({
+                // "status": true,
+                status: 201,
+                "message": "Location Added Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "POST",
+                    version: "1.0",
+                },
+                data: data
+            })
+            // } else {
+            //     return res.json({
+            //     // "status": true,
+            //     status: 400,
+            //     "message": data?.error?.message,
+            //     "meta-data": {
+            //         apiId,
+            //         action: "POST",
+            //         version: "1.0",
+            //     },
+            //     data: data
+            // })
+            // }
+            
+        } catch (error) {
+            return res.json({
+                "status": false,
+                "message": "Error occured while Adding Location",
+                "meta-data": {
+                    apiId,
+                    "type":"DUPLICATE",
+                    action: "POST",
+                    version: "1.0",
+                },
+              })
+        }
+    };
     
 }
 
