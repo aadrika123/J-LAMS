@@ -89,14 +89,11 @@ const Marketmaster = () => {
       }
     }, [ulbID]);
 
-
-    console.log("userDetails?.ulb_id",ulbID)
-  
-
     const COLUMN = [
         { name: "#" },
-        { name: "ASSET NAME" },
-        { name: "ASSET TYPE" },
+        { name: "Location" },
+        { name: "Building Name" },
+        { name: "Address" },
         { name: "ACTIONS" },
         
     ]
@@ -105,7 +102,7 @@ const Marketmaster = () => {
         try {
            
             const res = await axios({
-                url: `${ASSETS.LIST.marketcircle}id=${ulbID}`,
+                url: `${ASSETS.LIST.marketcircle}id=${ulbID}&page=${page}&limit=${itemsPerPage}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -564,7 +561,8 @@ const Marketmaster = () => {
             onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} 
             type="submit" 
             className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" 
-            disabled={isLoadingCSV || count == 0 ? true : false}
+            // disabled={isLoadingCSV || count == 0 ? true : false}
+            disabled
         >
             {isLoadingCSV ? (
                 <>
@@ -630,7 +628,8 @@ const Marketmaster = () => {
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
                                     <td className="px-6 py-4">{item?.location || "---"}</td>
-                                    <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
+                                    <td className="px-6 py-4">{item?.building_name || "---"}</td>
+                                    <td className="px-6 py-4">{item?.address || "---"}</td>
                                     
                                     
                                     <td className="px-6 py-4">

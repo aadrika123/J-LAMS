@@ -25,6 +25,7 @@ type Urls = {
     getcsvdata?:string;
     marketcircle?:number;
     locationadd?: string;
+    locationselect?: string;
   };
 };
 
@@ -44,6 +45,7 @@ export const ASSETS: Urls = {
     getcsvdata: "/asset/getcsvdata?",
     marketcircle: "/asset/marketcircle?",
     locationadd: "/asset/locationadd",
+    locationselect: "asset/locationselect?",
     
   },
 };
