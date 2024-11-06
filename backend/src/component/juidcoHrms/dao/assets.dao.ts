@@ -209,6 +209,41 @@ class AssetsManagementDao {
                     },
                 });
 
+
+
+                const existingLocation = await tx.location.findFirst({
+                    where: { location: location }, 
+                });
+    
+                if (existingLocation) {
+                    // If location exists and either building_name or address is missing, update it
+                    if (!existingLocation.building_name || !existingLocation.address) {
+                        const updatedLocation = await tx.location.update({
+                            where: { id: existingLocation.id },
+                            data: {
+                                building_name: existingLocation.building_name || req.body.building_name || "",
+                                address: existingLocation.address || req.body.address || "",
+                                updated_at: new Date(),
+                            },
+                        });
+                        console.log("Location updated in location table:", updatedLocation);
+                    }
+                } else {
+                    // If location doesn't exist, create a new entry
+                    const newLocation = await tx.location.create({
+                        data: {
+                            location: location || '',
+                            ulb_id: ulb_id,
+                            building_name: req.body.building_name || '',
+                            address: req.body.address || '',
+                            is_active: true, // Assuming is_active should be true for new entries
+                            created_at: new Date(),
+                            updated_at: new Date(),
+                        },
+                    });
+                    console.log("New location saved in location table:", newLocation);
+                }
+
                 return assetReq;
             });
 
@@ -1337,71 +1372,168 @@ class AssetsManagementDao {
 
 
 
-    marketcircle = async (req: Request) => {
-        const id =  Number(req.query.id) || 1;
+    // marketcircle = async (req: Request) => {
+    //     const id =  Number(req.query.id) || 1;
+    //     try {
+    //         const circleGet = await prisma.circle.findMany({
+    //             where: {
+    //                 ulb_id: id,
+    //             },
+    //             orderBy: {
+    //                 created_at: 'desc'
+    //             }
+    //         });
+    //         const circleGets = await prisma.assets_list.findMany({
+    //             where: {
+    //                 ulb_id: id,
+    //             },
+    //             orderBy: {
+    //                 created_at: 'desc'
+    //             }
+    //         });
+    //         console.log("circleGets",circleGets)
+    //         return generateRes({
+    //             data: circleGet,
+    //         });
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+
+    // };
+
+
+    locationselect = async (req: Request) => {
+
+        const id = Number(req.query.id) || 1;  
         try {
-            const circleGet = await prisma.circle.findMany({
+          // Fetch circle data
+          const circleGet = await prisma.location.findMany({
+            where: {
+              ulb_id: id,
+            },
+            orderBy: {
+              created_at: 'desc', 
+            },
+          });
+
+
+          return generateRes({
+            data: circleGet,  
+          });
+      
+        } catch (err) {
+          console.error("Error fetching market circle data:", err);
+          return generateRes({
+            data: [],  // Return empty data on error
+            message: 'Error fetching market circle data',
+          });
+        }
+      };
+      
+
+      marketcircle = async (req: Request) => {
+        const page = Number(req.query.page) || 1; 
+        const limit = Number(req.query.limit) || 5; 
+        const id = Number(req.query.id) || 1;
+        
+        const skip = (page - 1) * limit;
+    
+        try {
+            const circleGet = await prisma.location.findMany({
                 where: {
                     ulb_id: id,
                 },
                 orderBy: {
-                    created_at: 'desc'
+                    created_at: 'desc', 
+                },
+                skip: skip,      
+                take: limit,   
+            });
+    
+
+            const circleGets = await prisma.assets_list.findMany({
+                where: {
+                    ulb_id: id,
+                },
+                select: {
+                    location: true,
+                    id: true,
+                    ulb_id: true,
+                    building_name: true,
+                    address: true
+                },
+                orderBy: {
+                    created_at: 'desc', 
+                },
+                skip: skip,     
+                take: limit,   
+               
+            });
+    
+            let resultData = [];
+
+            for (const item of circleGets) {
+                const matchedAsset = circleGet.find(asset => asset.location === item.location);
+    
+                if (matchedAsset) {
+                    resultData.push(matchedAsset); 
+                } else {
+
+                    resultData.push(item);  
                 }
-            });
+            }
+
             return generateRes({
-                data: circleGet,
+                data: resultData, 
+                page,             
+                limit,            
+                totalPages: resultData.length, 
             });
+    
         } catch (err) {
-            console.log(err);
+            console.error("Error fetching market circle data:", err);
+            return generateRes({
+                data: [],  // Return empty data on error
+                message: 'Error fetching market circle data',
+            });
         }
-
     };
-
+    
 
 
 
     locationAdd = async (req: Request) => {
-        const locationdata = req.body.location;
+        const locationData = req.body.location || '';
         const ids = req.body.id;
-        console.log("req.body",req.body)
-    console.log("datacheck",location, ids)
-
         try {
             const result = await prisma.$transaction(async (tx) => {
-                const existingAsset = await tx.circle.findUnique({
-                    where: { location: locationdata }, 
+                const existingLocation  = await tx.location.findFirst({
+                    where: { location:locationData, }, 
                 });
     
-                console.log('existingAsset', existingAsset);
     
-                if (existingAsset) {
-                    // If the location already exists, throw an error
-                    throw new Error(`${location} already exists`);
+                if (existingLocation ) {
+                    throw new Error(`${locationData} already exists`);
                 }
-    
-                console.log("Proceeding to add new data");
-    
-                // Create a new asset record in the 'circle' table
-                const assetReq = await tx.circle.create({
+
+                const assetReq = await tx.location.create({
                     data: {
                         ulb_id: ids, 
-                        location: locationdata,
+                        location: locationData||'',
                         is_active: true, 
+                        building_name:"",
+                        address:"",   
                         created_at: new Date(), 
                         updated_at: new Date(), 
                     },
                 });
     
-                console.log("assetReq", assetReq); 
-    
                 return assetReq; 
             });
-    
-            // Return the successful response from the transaction
+
             return generateRes(result);
     
         } catch (error) {
-            // Log the error and return a custom error response
             console.error('Error processing request:', error);
             throw { error: 400, msg: "Unable to add location due to a duplicate" };
         }

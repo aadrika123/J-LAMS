@@ -111,6 +111,14 @@ class AssetManagementRoute {
       (req: Request, res: Response, next: NextFunction) =>
         this.assetManagementController.locationAdd(req, res, next, "0113"),
   ); //0113
+
+
+  app
+  .route(`${baseUrl}/asset/locationselect`)
+  .get(
+    (req: Request, res: Response, next: NextFunction) =>
+      this.assetManagementController.locationselect(req, res, next, "0114"),
+  ); //0114
   }
 }
 

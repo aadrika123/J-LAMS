@@ -188,11 +188,13 @@ model market {
   ulb_id       Int
 }
 
-model circle {
+model location {
   id           Int      @id @default(autoincrement())
-  location     String? @unique
+  location     String?   
   ulb_id       Int
-  is_active    Boolean
-  created_at   DateTime? @db.Timestamp  
-  updated_at   DateTime? @db.Timestamp
+  building_name String? // Added building_name field
+  address      String?  // Added address field
+  is_active    Boolean?
+  created_at   DateTime @db.Timestamp
+  updated_at   DateTime @db.Timestamp
 }

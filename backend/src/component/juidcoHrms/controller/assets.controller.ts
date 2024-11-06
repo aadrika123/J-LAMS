@@ -337,6 +337,41 @@ class AssetManagementController {
     };
 
 
+    locationselect = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+
+        try {
+            const data = await this.assetsManagementDao.locationselect(req);
+
+            return res.json({
+                "status": true,
+                "message": "Assets fetched Circle Data Succesfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data
+            })
+           
+            
+        } catch (error) {
+              return res.json({
+                "status": false,
+                "message": "Error occured while fetching Assets",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            })
+        }
+    };
+    
     marketcircle = async (
         req: Request,
         res: Response,
