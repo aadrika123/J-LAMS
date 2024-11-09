@@ -6,49 +6,27 @@
 //  */
 
 "use client"
-
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Customer from "@/assets/icons/cv 1.png";
 import { InnerHeading, SubHeading } from '@/components/Helpers/Heading'
 import Link from 'next/link';
 import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Jhar from "@/assets/icons/jhar.png"
-// import PrimaryButton from '@/components/Helpers/Button';
-import docs from '@/assets/icons/doc.svg'
-import pdf from '@/assets/icons/pdf.svg'
-import notfound from '@/assets/icons/not-found.png'
-// import goBack from '@/utils/helper';
-import autoTable from 'jspdf-autotable'
-// import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast';
-import Papa from 'papaparse';
-
-
-import { jsPDF } from "jspdf";
-import Modal from '@/components/Modal/Modal';
 import AddMarketModal from '@/components/Modal/AddMarketModal/AddMarketModal';
-
-// import { combineSlices } from '@reduxjs/toolkit';
 
 interface ModalContent {
     type: "image" | "pdf";
     src: string;
 }
 
-
-
 const Marketmaster = () => {
-    
-
-    // const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
-    const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -58,20 +36,12 @@ const Marketmaster = () => {
     const [currentAssetId, setCurrentAssetId] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
     const [audit, setAudit]= useState<any>();
-
     const [itemsPerPage, setItemsPerPage] = useState(5);
-
-
     const queryClient = useQueryClient();
     const [ulbID, setUlbID] = useState<number | null >();
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
     const [modalClose, setModalClose] = useState(false);
     const [modalMarketClose, setModalMarketClose] = useState(false);
-    const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });
-
-    const [circleData, setCircleData] = useState(false);
-
-    const isPDF = (url: string) => url.endsWith('.pdf');
 
     useEffect(() => {
       const storedUserDetails = localStorage.getItem("user_details");
@@ -134,24 +104,7 @@ const Marketmaster = () => {
         }
     };
 
-       const fetchAuditData = async () => {
-        try {
-            const res = await axios({
-                url: `${ASSETS.LIST.getAllAudit}`,
-                method: "GET",
-            });
-            setAudit(res?.data)
 
-            return res?.data?.data;
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            return [];
-        }
-    };
-
-    useEffect(() => {
-        fetchAuditData()
-    }, [])
     
 
     const { isLoading, error, data } = useQuery({
@@ -231,63 +184,6 @@ const Marketmaster = () => {
         queryClient.invalidateQueries({ queryKey: ['assets', currentPage] });
     };
 
-    /////////////////////////////// search data /////////////////////////////
-
-    /////////////////// download pdf //////////////////
-
-    // const doc = new jsPDF();
-    // const handleDownload = () => {
-    //     autoTable(doc, { html: '#data-table' })
-    //     doc.save('assets.pdf')
-    // }
-
-    const handleDownload = () => {
-        const doc = new jsPDF();
-
-        const columns = [
-            { header: "#" },
-            { header: "ASSET NAME" },
-            { header: "ASSET TYPE" },
-            { header: "LAND TYPE" },
-            { header: "KHATA NO." },
-            { header: "AREA (sqFt.)" },
-        ]
-
-        const data: any = [];
-        const table = document.getElementById('data-table');
-        const rows = table?.querySelectorAll('tbody tr') || [];
-        rows.forEach(row => {
-            const rowData: any = [];
-            row.querySelectorAll('td').forEach(cell => {
-                const cellData = cell?.textContent?.trim() || '';
-                rowData.push(cellData);
-            });
-            data.push(rowData);
-        });
-
-        autoTable(doc, {
-            head: [columns.map(column => column.header)],
-            body: data,
-        });
-
-        doc.save('assets.pdf');
-    }
-
-
-    /////////////////// download pdf //////////////////
-
-    // const handleClick = () => {
-    //     router.replace('/apply/form')
-    // }
-
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilter(e.target.value);
-    };
-
-    const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilterWard(e.target.value);
-        console.log("filterWard",filterWard)
-    };
 
     const handleItemsPerPageChange = (e:any) => {
         setItemsPerPage(Number(e.target.value));
@@ -302,48 +198,7 @@ const Marketmaster = () => {
         setModalMarketClose(false);
       };
 
-    const handleExportCSV = async (page: number, searchQuery: string, filter: string) => {
-        setIsLoadingCSV(true);
-        try {
-            const res = await axios({
-                url: `${ASSETS.LIST.getcsvdata}page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&status=3`,
-                method: "GET",
-            });
 
-            const dataToMap = res?.data?.data?.data;
-            if (!dataToMap || !Array.isArray(dataToMap)) {
-                throw new Error("No valid data available to export");
-            }
-            const csvData = dataToMap.map((row: any) => [
-                row?.id,
-                row?.type_of_assets,
-                row?.assets_category_type,
-                row?.type_of_land,
-                row?.khata_no,
-                row?.area
-            ]);
-    
-            csvData.unshift(['ID', 'ASSET NAME', 'ASSET TYPE', 'LAND TYPE', 'KHATA NO.', 'AREA(SQFT)']);
-
-            const csv = Papa.unparse(csvData);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-    
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'assets_data.csv');
-            link.style.visibility = 'hidden';
-    
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error:any) {
-            console.error("Error exporting CSV:", error?.message);
-        }
-        finally {
-            setIsLoadingCSV(false);
-        }
-    };
     
     const handleConfirm = () => {
         if (actionType === 'approve') {
@@ -411,17 +266,6 @@ const Marketmaster = () => {
         }
     }
 
-    console.log("audit", audit)
-
- 
-    const handleOpenModal = (url:string) => {
-        console.log(`Opening PDF: ${url}`);
-        setModalContent({
-          type: isPDF(url) ? 'pdf' : 'image',
-          src: url,
-        });
-        setModalClose(true);
-      };
     
       const handleCloseModal = () => {
         setModalClose(false);
@@ -443,43 +287,6 @@ const Marketmaster = () => {
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-5">
                 <div className="flex gap-5 justify-between overflow-x-auto sm:rounded-lg p-5">
-
-                    {/* <div className="max-w-md">
-                        <div className='flex gap-3 mb-9'>
-                            <Image src={Customer} alt="employee" width={40} height={20} />
-                            <SubHeading>Search Filter </SubHeading>
-                        </div>
-
-                        <select onChange={handleFilterChange}
-                            value={filter} className="block p-2.5 mt-3 rounded-md w-[13rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 rounded-e-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500">
-                            <option disabled selected> by Asset Type</option>
-                            <option value="">All</option>
-                            <option value="Immovable">Immovable</option>
-                            <option value="Building">Building</option>
-                            <option value="Hall">Hall</option>
-                            <option value="Vacant Land">Vacant Land</option>
-                            <option value="Others">Others</option> 
-
-                        </select>
-                    </div> */}
-                    
-                    {/* <div className="max-w-md">
-                        <div className='flex gap-3 mb-9'>
-                            <SubHeading>Ward No.</SubHeading>
-                        </div>
-
-                        <select 
-                            onChange={handleFilterWardChange}
-                            className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
-                        >
-                            {Array.from({ length: 55 }, (_, index) => (
-                                <option key={index + 1} value={index + 1}>
-                                    {index + 1}
-                                </option>
-                            ))}
-                        </select>
-
-                    </div> */}
 
                     {role == 'Admin' ?
                         <div className='flex gap-4'>
@@ -553,57 +360,8 @@ const Marketmaster = () => {
                             </button>
                         </div>
 
-                        {/* <button onClick={handleDownload} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700"  disabled={isLoadingCSV || count == 0 ? true : false}>
-                            Export PDF
-                        </button> */}
 
-                        <button 
-            onClick={() => handleExportCSV(currentPage, debouncedSearch, filter)} 
-            type="submit" 
-            className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" 
-            // disabled={isLoadingCSV || count == 0 ? true : false}
-            disabled
-        >
-            {isLoadingCSV ? (
-                <>
-                    <span className="loader"></span>  <svg
-        width="20"
-        height="20"
-        viewBox="0 0 38 38"
-        className="loader"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <defs>
-            <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="gradient">
-                <stop stopColor="#3498db" offset="0%" />
-                <stop stopColor="#9b59b6" offset="100%" />
-            </linearGradient>
-        </defs>
-        <circle
-            stroke="url(#gradient)"
-            strokeWidth="2"
-            fill="none"
-            cx="19"
-            cy="19"
-            r="18"
-            strokeDasharray="90, 150"
-            strokeDashoffset="0"
-            transform="rotate(115 19 19)"
-        >
-            <animate
-                attributeName="stroke-dashoffset"
-                values="0; 90; 0"
-                dur="1.5s"
-                repeatCount="indefinite"
-            />
-        </circle>
-    </svg>
-                    Loading...
-                </>
-            ) : (
-                'Export CSV'
-            )}
-        </button>
+
 
 
         <button onClick={() => handleMarketOpenModal(true)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700"  disabled={isLoadingCSV || count == 0 ? true : false}>
@@ -876,19 +634,12 @@ const Marketmaster = () => {
 
             </div>
 
-            {/* <Modal isOpen={modalClose} onClose={setModalClose} /> */}
-            <Modal 
-        isOpen={modalClose} 
-        onClose={handleCloseModal} 
-        content={modalContent} 
-      />
+          
       {modalMarketClose && 
       
-
          <AddMarketModal 
         isOpen={modalMarketClose} 
         onClose={handleMarketCloseModal} 
-        circleData={circleData}
         ulbID={ulbID}
        
       />

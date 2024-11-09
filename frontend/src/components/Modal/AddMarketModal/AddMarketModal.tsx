@@ -7,11 +7,10 @@ import axios from "@/lib/axiosConfig";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  circleData:any;
   ulbID:any
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose,circleData, ulbID }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
   const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [marketInput, setMarketInput] = useState<string>('');
   const [isMarketValid, setIsMarketValid] = useState<boolean>(true); // Validation state
