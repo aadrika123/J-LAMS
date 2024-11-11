@@ -20,6 +20,7 @@ import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
 import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
 import Jhar from "@/assets/icons/jhar.png"
+import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
 
 export const DashboardMain = () => {
 
@@ -74,7 +75,12 @@ export const DashboardMain = () => {
 
   const [isCommercialChecked, setIsCommercialChecked] = useState(false);
   const [isResidentialChecked, setIsResidentialChecked] = useState(false);
+  const [selectedMarket, setSelectedMarket] = useState<string>('');
+  const [circleData, setCircleData] = useState<any>([]);
 
+  const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMarket(event.target.value);
+  };
 
 
   useEffect(() => {
@@ -83,10 +89,14 @@ export const DashboardMain = () => {
       try {
         const userDetails = JSON.parse(storedUserDetails);
         setUlbID(userDetails.ulb_id || null); 
+       const data = fetchData(userDetails.ulb_id);
+       console.log("data here",data)
       } catch (error) {
         console.error('Error parsing user details:', error);
       }
     }
+
+    
   }, []);
 
   console.log("residentialCount",residentialCount)
@@ -184,6 +194,23 @@ export const DashboardMain = () => {
     }
   };
 
+
+  const fetchData = async (ulbID:number) => {
+    try {
+       
+        const res = await axios({
+            url: `${ASSETS.LIST.locationselect}id=${ulbID}`,
+            method: "GET",
+        });
+        setCircleData(res?.data?.data?.data);
+        return res?.data?.data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        return [];
+    }
+};
+console.log("data 456",circleData)
+
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
 
     try {
@@ -203,6 +230,7 @@ export const DashboardMain = () => {
       values.floorData = transformDataForAPI(data);
 
       values.building_name = buildingName;
+      values.location = selectedMarket;
 
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
@@ -470,8 +498,7 @@ export const DashboardMain = () => {
   }
 
   const handleTypeBox = (e: any, type: string, index: number | null) => {
-    console.log("this is called without calling it ")
-    const count = parseInt(e?.target?.value) || e || 0; // Default to 0 if NaN
+    const count = parseInt(e?.target?.value) || e || 0; 
   
     if (isNaN(count)) return;
   
@@ -486,7 +513,7 @@ export const DashboardMain = () => {
       commercialData = count;
       if (count > 10) {
         toast.error("Max 10 Floors");
-        return; // Stop execution if the count exceeds 10
+        return; 
       }
     }
     console.log("ResidentialData",ResidentialData)
@@ -798,6 +825,8 @@ export const DashboardMain = () => {
   }
 
 
+  console.log("setCommercialCount",commercialCount)
+  console.log("residentialCount",residentialCount)
   
   return (
     <div>
@@ -1038,16 +1067,16 @@ export const DashboardMain = () => {
                 disabled={isCommercialChecked} // Disable if checked
             />
             <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
+                type="commercial"
+                id="commercial"
+                name="commercial"
+                value="commercial"
                 checked={isCommercialChecked}
                 onChange={() => {
                     setIsCommercialChecked(!isCommercialChecked);
                     if (isCommercialChecked) {
                         // Reset count or other logic if necessary
-                        setCommercialCount(0);
+                        setCommercialCount(commercialCount);
                     }
                 }}
             />
@@ -1070,16 +1099,16 @@ export const DashboardMain = () => {
                 disabled={isResidentialChecked} // Disable if checked
             />
             <input
-                type="checkbox"
-                id="vehicle2"
-                name="vehicle2"
-                value="Bike"
+                type="residential"
+                id="residential"
+                name="residential"
+                value="residential"
                 checked={isResidentialChecked}
                 onChange={() => {
                     setIsResidentialChecked(!isResidentialChecked);
                     if (isResidentialChecked) {
                         // Reset count or other logic if necessary
-                        setResidentialCount(0);
+                        setResidentialCount(residentialCount);
                     }
                 }}
             />
@@ -1240,7 +1269,7 @@ export const DashboardMain = () => {
 
                                             return (
                                                 <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
-                                                    <p className="font-bold">Unit {unit.index}</p>
+                                                    <p className="font-bold">Unit {unit.index + 1}</p>
                                                     <p>Type: {unit.type}</p>
                                                     {isBooked && (
                                                         <>
@@ -1609,6 +1638,31 @@ export const DashboardMain = () => {
                       maxLength={50}
                     />
 
+                    <div className={styles.marketSelection}>
+
+
+                      <label htmlFor="location" className={styles.selectLabel}>
+                        Select Location:
+                      </label>
+                      <select
+                        name="location"
+                        id="location"
+                        value={selectedMarket}
+                        onChange={handleMarketChange}
+                        className={styles.selectInput}
+                        required
+                        
+                      >
+
+                        <option value="" disabled>-- Choose a Location --</option>
+                        {circleData?.map((item: any) => (
+                          <option key={item.id} value={item.location} >
+                            {item.location}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -1635,7 +1689,7 @@ export const DashboardMain = () => {
                    />
 
 
-                    <InputBox
+                    {/* <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.location}
@@ -1644,7 +1698,10 @@ export const DashboardMain = () => {
                       name="location"
                       type="text"
                       maxLength={100}
-                    />
+                    /> */}
+
+
+       
                     
 
 

@@ -96,6 +96,29 @@ class AssetManagementRoute {
       (req: Request, res: Response, next: NextFunction) =>
         this.assetManagementController.getcsvdatall(req, res, next, "0111"),
     ); //0102
+
+
+    app
+    .route(`${baseUrl}/asset/marketcircle`)
+    .get(
+      (req: Request, res: Response, next: NextFunction) =>
+        this.assetManagementController.marketcircle(req, res, next, "0112"),
+    ); //0112
+
+    app
+    .route(`${baseUrl}/asset/locationadd`)
+    .post(
+      (req: Request, res: Response, next: NextFunction) =>
+        this.assetManagementController.locationAdd(req, res, next, "0113"),
+  ); //0113
+
+
+  app
+  .route(`${baseUrl}/asset/locationselect`)
+  .get(
+    (req: Request, res: Response, next: NextFunction) =>
+      this.assetManagementController.locationselect(req, res, next, "0114"),
+  ); //0114
   }
 }
 

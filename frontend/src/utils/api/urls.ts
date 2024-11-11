@@ -23,6 +23,9 @@ type Urls = {
     getAllData?: string;
     getAllAudit?:string;
     getcsvdata?:string;
+    marketcircle?:number;
+    locationadd?: string;
+    locationselect?: string;
   };
 };
 
@@ -40,6 +43,9 @@ export const ASSETS: Urls = {
     getAllAudit: "/assets/auditlog-list?limit=10",
     updateMany:"/assets/checker-list?limit=100",
     getcsvdata: "/asset/getcsvdata?",
+    marketcircle: "/asset/marketcircle?",
+    locationadd: "/asset/locationadd",
+    locationselect: "asset/locationselect?",
     
   },
 };
