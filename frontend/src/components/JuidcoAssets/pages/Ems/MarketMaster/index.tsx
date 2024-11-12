@@ -35,7 +35,7 @@ const Marketmaster = () => {
     const [remarks, setRemarks] = useState<any>('')
     const [currentAssetId, setCurrentAssetId] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
-    const [audit, setAudit] = useState<any>();
+    // const [audit, setAudit] = useState<any>();
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const queryClient = useQueryClient();
     const [ulbID, setUlbID] = useState<number | null>();
@@ -302,8 +302,8 @@ const Marketmaster = () => {
                                     <div className="flex">
                                         <div className="ms-3 text-sm font-normal">
                                             <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Assets Log Data</span> <br></br>
-                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({audit?.data?.count || 0})</span></span><br></br>
-                                            <div className="mb-2 text-sm text-slate-800 font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved <span className='text-sm font-semibold text-[#42ca38] dark:text-white'>({audit?.data?.count || 0})</span> for audit changes in assets data. </div>
+                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({ 0})</span></span><br></br>
+                                            <div className="mb-2 text-sm text-slate-800 font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved <span className='text-sm font-semibold text-[#42ca38] dark:text-white'>({0})</span> for audit changes in assets data. </div>
                                             <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center mt-3 text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Logs</Link>
                                         </div>
                                     </div>
