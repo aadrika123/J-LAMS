@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
+
 import React, { useEffect, useState } from 'react';
 import styles from './Modal.module.css';
 import toast from 'react-hot-toast';
@@ -11,10 +14,10 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
-  const [selectedMarket, setSelectedMarket] = useState<string>('');
+  // const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [marketInput, setMarketInput] = useState<string>('');
   const [isMarketValid, setIsMarketValid] = useState<boolean>(true); // Validation state
-  let values = {
+  const values = {
     location: marketInput,  
     id: ulbID              
   };
@@ -37,9 +40,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
     return result;
   };
 
-  const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMarket(event.target.value);
-  };
+  // const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedMarket(event.target.value);
+  // };
 
   const handleMarketInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMarketInput(event.target.value);
@@ -58,7 +61,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
       values.location = marketInput;  
       values.id = ulbID; 
 
-      setSelectedMarket('');
+      // setSelectedMarket('');
       setMarketInput('');
       fetchLocationAdd()
 

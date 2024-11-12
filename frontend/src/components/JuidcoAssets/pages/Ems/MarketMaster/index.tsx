@@ -8,7 +8,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { InnerHeading, SubHeading } from '@/components/Helpers/Heading'
+import { InnerHeading } from '@/components/Helpers/Heading'
 import Link from 'next/link';
 import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
@@ -17,16 +17,16 @@ import Jhar from "@/assets/icons/jhar.png"
 import toast, { Toaster } from 'react-hot-toast';
 import AddMarketModal from '@/components/Modal/AddMarketModal/AddMarketModal';
 
-interface ModalContent {
-    type: "image" | "pdf";
-    src: string;
-}
+// interface ModalContent {
+//     type: "image" | "pdf";
+//     src: string;
+// }
 
 const Marketmaster = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
-    const [filter, setFilter] = useState('');
+    // const [filter, setFilter] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -35,28 +35,28 @@ const Marketmaster = () => {
     const [remarks, setRemarks] = useState<any>('')
     const [currentAssetId, setCurrentAssetId] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
-    const [audit, setAudit]= useState<any>();
+    const [audit, setAudit] = useState<any>();
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const queryClient = useQueryClient();
-    const [ulbID, setUlbID] = useState<number | null >();
-    const [isLoadingCSV, setIsLoadingCSV] = useState(false);
-    const [modalClose, setModalClose] = useState(false);
+    const [ulbID, setUlbID] = useState<number | null>();
+    // const [isLoadingCSV, setIsLoadingCSV] = useState(false);
+    // const [modalClose, setModalClose] = useState(false);
     const [modalMarketClose, setModalMarketClose] = useState(false);
 
     useEffect(() => {
-      const storedUserDetails = localStorage.getItem("user_details");
-      if (storedUserDetails) {
-        try {
-          const userDetails = JSON.parse(storedUserDetails);
-        
-          if(userDetails?.ulb_id !== undefined){
-            setUlbID(userDetails.ulb_id || null); 
-          }
-         
-        } catch (error) {
-          console.error('Error parsing user details:', error);
+        const storedUserDetails = localStorage.getItem("user_details");
+        if (storedUserDetails) {
+            try {
+                const userDetails = JSON.parse(storedUserDetails);
+
+                if (userDetails?.ulb_id !== undefined) {
+                    setUlbID(userDetails.ulb_id || null);
+                }
+
+            } catch (error) {
+                console.error('Error parsing user details:', error);
+            }
         }
-      }
     }, [ulbID]);
 
     const COLUMN = [
@@ -65,12 +65,12 @@ const Marketmaster = () => {
         { name: "Building Name" },
         { name: "Address" },
         { name: "ACTIONS" },
-        
+
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number) => {
+    const fetchData = async (page: number, searchQuery: string, itemsPerPage: number, ulbID: number) => {
         try {
-           
+
             const res = await axios({
                 url: `${ASSETS.LIST.marketcircle}id=${ulbID}&page=${page}&limit=${itemsPerPage}`,
                 method: "GET",
@@ -105,18 +105,18 @@ const Marketmaster = () => {
     };
 
 
-    
+
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter,itemsPerPage,ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID as number) ,
-        enabled: !!ulbID ,
+        queryKey: ['assets', currentPage, debouncedSearch, itemsPerPage, ulbID],
+        queryFn: () => fetchData(currentPage, debouncedSearch, itemsPerPage, ulbID as number),
+        enabled: !!ulbID,
         staleTime: 1000,
     });
 
-    
 
-    
+
+
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
@@ -151,10 +151,10 @@ const Marketmaster = () => {
 
     /////////////////////////////// delete & update data /////////////////////////////
 
-    const handleDelete = async (id: number) => {
-        setDeleteId(id);
-        setShowModal(true);
-    };
+    // const handleDelete = async (id: number) => {
+    //     setDeleteId(id);
+    //     setShowModal(true);
+    // };
 
     const confirmDelete = async () => {
         if (deleteId !== null) {
@@ -185,21 +185,21 @@ const Marketmaster = () => {
     };
 
 
-    const handleItemsPerPageChange = (e:any) => {
+    const handleItemsPerPageChange = (e: any) => {
         setItemsPerPage(Number(e.target.value));
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
 
-    const handleMarketOpenModal=(val:boolean)=>{
+    const handleMarketOpenModal = (val: boolean) => {
         setModalMarketClose(val)
     }
 
     const handleMarketCloseModal = () => {
         setModalMarketClose(false);
-      };
+    };
 
 
-    
+
     const handleConfirm = () => {
         if (actionType === 'approve') {
             appApprover(currentAssetId);
@@ -266,10 +266,10 @@ const Marketmaster = () => {
         }
     }
 
-    
-      const handleCloseModal = () => {
-        setModalClose(false);
-      };
+
+    //   const handleCloseModal = () => {
+    //     setModalClose(false);
+    //   };
 
     return (
         <div>
@@ -364,11 +364,11 @@ const Marketmaster = () => {
 
 
 
-        <button onClick={() => handleMarketOpenModal(true)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700"  disabled={isLoadingCSV || count == 0 ? true : false}>
-                           Add Location
-        </button>
+                        <button onClick={() => handleMarketOpenModal(true)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" disabled={count == 0 ? true : false}>
+                            Add Location
+                        </button>
 
-                       
+
                     </div>
                 </div>
 
@@ -388,8 +388,8 @@ const Marketmaster = () => {
                                     <td className="px-6 py-4">{item?.location || "---"}</td>
                                     <td className="px-6 py-4">{item?.building_name || "---"}</td>
                                     <td className="px-6 py-4">{item?.address || "---"}</td>
-                                    
-                                    
+
+
                                     <td className="px-6 py-4">
                                         <div className='flex'>
                                             {role === 'Admin' ? null : (
@@ -399,39 +399,39 @@ const Marketmaster = () => {
                                                     //     className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
                                                     // >
 
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="23"
-                                                            height="20"
-                                                            viewBox="0 0 23 20"
-                                                            fill="none"
-                                                        >
-                                                            <g clipPath="url(#clip0_1440_7941)">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="23"
+                                                        height="20"
+                                                        viewBox="0 0 23 20"
+                                                        fill="none"
+                                                    >
+                                                        <g clipPath="url(#clip0_1440_7941)">
+                                                            <rect
+                                                                x="1.63591"
+                                                                y="0.63591"
+                                                                width="18.7282"
+                                                                height="18.7282"
+                                                                rx="4.36409"
+                                                                stroke="#726E6E"
+                                                                strokeWidth="1.27182"
+                                                            />
+                                                            <path
+                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                                fill="black"
+                                                                fillOpacity="0.41"
+                                                            />
+                                                        </g>
+                                                        <defs>
+                                                            <clipPath id="clip0_1440_7941">
                                                                 <rect
-                                                                    x="1.63591"
-                                                                    y="0.63591"
-                                                                    width="18.7282"
-                                                                    height="18.7282"
-                                                                    rx="4.36409"
-                                                                    stroke="#726E6E"
-                                                                    strokeWidth="1.27182"
+                                                                    width="22.7692"
+                                                                    height="19.7333"
+                                                                    fill="white"
                                                                 />
-                                                                <path
-                                                                    d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                                                                    fill="black"
-                                                                    fillOpacity="0.41"
-                                                                />
-                                                            </g>
-                                                            <defs>
-                                                                <clipPath id="clip0_1440_7941">
-                                                                    <rect
-                                                                        width="22.7692"
-                                                                        height="19.7333"
-                                                                        fill="white"
-                                                                    />
-                                                                </clipPath>
-                                                            </defs>
-                                                        </svg>
+                                                            </clipPath>
+                                                        </defs>
+                                                    </svg>
 
                                                     // </Link>
                                                 ) : (
@@ -439,76 +439,76 @@ const Marketmaster = () => {
                                                     //     href={`/apply/approve-application/${item?.id}?status=clicked`}
                                                     //     className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
                                                     // >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="23"
-                                                            height="20"
-                                                            viewBox="0 0 23 20"
-                                                            fill="none"
-                                                        >
-                                                            <g clipPath="url(#clip0_1440_7941)">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="23"
+                                                        height="20"
+                                                        viewBox="0 0 23 20"
+                                                        fill="none"
+                                                    >
+                                                        <g clipPath="url(#clip0_1440_7941)">
+                                                            <rect
+                                                                x="1.63591"
+                                                                y="0.63591"
+                                                                width="18.7282"
+                                                                height="18.7282"
+                                                                rx="4.36409"
+                                                                stroke="#726E6E"
+                                                                strokeWidth="1.27182"
+                                                            />
+                                                            <path
+                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                                fill="black"
+                                                                fillOpacity="0.41"
+                                                            />
+                                                        </g>
+                                                        <defs>
+                                                            <clipPath id="clip0_1440_7941">
                                                                 <rect
-                                                                    x="1.63591"
-                                                                    y="0.63591"
-                                                                    width="18.7282"
-                                                                    height="18.7282"
-                                                                    rx="4.36409"
-                                                                    stroke="#726E6E"
-                                                                    strokeWidth="1.27182"
+                                                                    width="22.7692"
+                                                                    height="19.7333"
+                                                                    fill="white"
                                                                 />
-                                                                <path
-                                                                    d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                                                                    fill="black"
-                                                                    fillOpacity="0.41"
-                                                                />
-                                                            </g>
-                                                            <defs>
-                                                                <clipPath id="clip0_1440_7941">
-                                                                    <rect
-                                                                        width="22.7692"
-                                                                        height="19.7333"
-                                                                        fill="white"
-                                                                    />
-                                                                </clipPath>
-                                                            </defs>
-                                                        </svg>
-                                                   // </Link>
+                                                            </clipPath>
+                                                        </defs>
+                                                    </svg>
+                                                    // </Link>
                                                 )
                                             )}
 
                                             {/* <Link   href={`/apply/approve-application/${item?.id}`}  className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"> */}
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="21"
-                                                    height="20"
-                                                    viewBox="0 0 21 20"
-                                                    fill="none"
-                                                >
-                                                    <rect
-                                                        x="0.578644"
-                                                        y="0.578644"
-                                                        width="19.8427"
-                                                        height="18.8427"
-                                                        rx="4.42136"
-                                                        stroke="#726E6E"
-                                                        strokeWidth="1.15729"
-                                                    />
-                                                    <path
-                                                        d="M10 9.1C10.3617 9.1 10.7085 9.2475 10.9642 9.51005C11.22 9.7726 11.3636 10.1287 11.3636 10.5C11.3636 10.8713 11.22 11.2274 10.9642 11.4899C10.7085 11.7525 10.3617 11.9 10 11.9C9.63834 11.9 9.29149 11.7525 9.03576 11.4899C8.78003 11.2274 8.63636 10.8713 8.63636 10.5C8.63636 10.1287 8.78003 9.7726 9.03576 9.51005C9.29149 9.2475 9.63834 9.1 10 9.1ZM10 7C12.2727 7 14.2136 8.45133 15 10.5C14.2136 12.5487 12.2727 14 10 14C7.72727 14 5.78636 12.5487 5 10.5C5.78636 8.45133 7.72727 7 10 7ZM5.99091 10.5C6.3583 11.2701 6.92878 11.919 7.63749 12.3729C8.34621 12.8267 9.16473 13.0673 10 13.0673C10.8353 13.0673 11.6538 12.8267 12.3625 12.3729C13.0712 11.919 13.6417 11.2701 14.0091 10.5C13.6417 9.72986 13.0712 9.08098 12.3625 8.62715C11.6538 8.17331 10.8353 7.93272 10 7.93272C9.16473 7.93272 8.34621 8.17331 7.63749 8.62715C6.92878 9.08098 6.3583 9.72986 5.99091 10.5Z"
-                                                        fill="black"
-                                                        fillOpacity="0.41"
-                                                    />
-                                                </svg>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="21"
+                                                height="20"
+                                                viewBox="0 0 21 20"
+                                                fill="none"
+                                            >
+                                                <rect
+                                                    x="0.578644"
+                                                    y="0.578644"
+                                                    width="19.8427"
+                                                    height="18.8427"
+                                                    rx="4.42136"
+                                                    stroke="#726E6E"
+                                                    strokeWidth="1.15729"
+                                                />
+                                                <path
+                                                    d="M10 9.1C10.3617 9.1 10.7085 9.2475 10.9642 9.51005C11.22 9.7726 11.3636 10.1287 11.3636 10.5C11.3636 10.8713 11.22 11.2274 10.9642 11.4899C10.7085 11.7525 10.3617 11.9 10 11.9C9.63834 11.9 9.29149 11.7525 9.03576 11.4899C8.78003 11.2274 8.63636 10.8713 8.63636 10.5C8.63636 10.1287 8.78003 9.7726 9.03576 9.51005C9.29149 9.2475 9.63834 9.1 10 9.1ZM10 7C12.2727 7 14.2136 8.45133 15 10.5C14.2136 12.5487 12.2727 14 10 14C7.72727 14 5.78636 12.5487 5 10.5C5.78636 8.45133 7.72727 7 10 7ZM5.99091 10.5C6.3583 11.2701 6.92878 11.919 7.63749 12.3729C8.34621 12.8267 9.16473 13.0673 10 13.0673C10.8353 13.0673 11.6538 12.8267 12.3625 12.3729C13.0712 11.919 13.6417 11.2701 14.0091 10.5C13.6417 9.72986 13.0712 9.08098 12.3625 8.62715C11.6538 8.17331 10.8353 7.93272 10 7.93272C9.16473 7.93272 8.34621 8.17331 7.63749 8.62715C6.92878 9.08098 6.3583 9.72986 5.99091 10.5Z"
+                                                    fill="black"
+                                                    fillOpacity="0.41"
+                                                />
+                                            </svg>
                                             {/* </Link> */}
 
 
                                             {role == 'Admin' ? null : (
                                                 <>
                                                     {/* <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed" disabled> */}
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                            <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
-                                                            <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
-                                                        </svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                        <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
+                                                        <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
+                                                    </svg>
                                                     {/* </button> */}
 
                                                     {showModal && (
@@ -526,8 +526,8 @@ const Marketmaster = () => {
                                             )}
                                         </div>
                                     </td>
-                                   
-                                    
+
+
 
                                     {role == 'Admin' ? (
                                         <td>
@@ -580,16 +580,16 @@ const Marketmaster = () => {
 
                 <nav className='mt-4'>
                     <div>Page {data?.page} of {data?.totalPages}</div>
-                <select
-                    onChange={handleItemsPerPageChange}
-                    value={itemsPerPage}
-                    className="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                </select>
+                    <select
+                        onChange={handleItemsPerPageChange}
+                        value={itemsPerPage}
+                        className="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                    </select>
                     <ul className="flex items-center -space-x-px h-8 text-sm justify-end">
                         <li>
                             <button
@@ -634,16 +634,16 @@ const Marketmaster = () => {
 
             </div>
 
-          
-      {modalMarketClose && 
-      
-         <AddMarketModal 
-        isOpen={modalMarketClose} 
-        onClose={handleMarketCloseModal} 
-        ulbID={ulbID}
-       
-      />
-    }
+
+            {modalMarketClose &&
+
+                <AddMarketModal
+                    isOpen={modalMarketClose}
+                    onClose={handleMarketCloseModal}
+                    ulbID={ulbID}
+
+                />
+            }
         </div>
     )
 }
