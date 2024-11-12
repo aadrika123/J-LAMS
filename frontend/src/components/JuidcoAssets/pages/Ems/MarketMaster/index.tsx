@@ -195,7 +195,13 @@ const Marketmaster = () => {
     }
 
     const handleMarketCloseModal = () => {
+        queryClient.invalidateQueries({ queryKey: ['assets'] });
         setModalMarketClose(false);
+    };
+
+    const handleModalSuccess = () => {
+        queryClient.invalidateQueries({ queryKey: ['assets'] });
+        setModalMarketClose(false); // Close modal
     };
 
 
@@ -641,6 +647,7 @@ const Marketmaster = () => {
                     isOpen={modalMarketClose}
                     onClose={handleMarketCloseModal}
                     ulbID={ulbID}
+                 
 
                 />
             }
