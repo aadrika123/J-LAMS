@@ -2,7 +2,8 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import styles from './Modal.module.css';
+// import styles from './AddMarket.css';
+import './AddMarket.css';
 import toast from 'react-hot-toast';
 import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
@@ -10,7 +11,7 @@ import axios from "@/lib/axiosConfig";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ulbID:any
+  ulbID: any
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
@@ -18,8 +19,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
   const [marketInput, setMarketInput] = useState<string>('');
   const [isMarketValid, setIsMarketValid] = useState<boolean>(true); // Validation state
   const values = {
-    location: marketInput,  
-    id: ulbID              
+    location: marketInput,
+    id: ulbID
   };
 
   useEffect(() => {
@@ -51,15 +52,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
   const handleSubmit = () => {
     if (
       // !selectedMarket ||
-       !marketInput) {
+      !marketInput) {
       setIsMarketValid(false);
     } else {
       setIsMarketValid(true);
       toast.success('Market added successfully!',)
-      console.log('Form Submitted with:', {marketInput ,ulbID});
+      console.log('Form Submitted with:', { marketInput, ulbID });
 
-      values.location = marketInput;  
-      values.id = ulbID; 
+      values.location = marketInput;
+      values.id = ulbID;
 
       // setSelectedMarket('');
       setMarketInput('');
@@ -72,35 +73,35 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
 
   const fetchLocationAdd = async () => {
     try {
-        const res = await axios({
-            url: `${ASSETS.LIST.locationadd}`,
-            method: "POST",
-            data: values,
-        });
+      const res = await axios({
+        url: `${ASSETS.LIST.locationadd}`,
+        method: "POST",
+        data: values,
+      });
 
-        if (res?.data?.status === true) {
-            toast.success("Location Added Successfully");
-            // window.location.reload()
-            return res?.data?.data;
+      if (res?.data?.status === true) {
+        toast.success("Location Added Successfully");
+        // window.location.reload()
+        return res?.data?.data;
 
-        } else {
-            toast.error("Failed to save location");
-        }
+      } else {
+        toast.error("Failed to save location");
+      }
     } catch (error) {
-        console.error("Error fetching data:", error);
-        return [];
+      console.error("Error fetching data:", error);
+      return [];
     }
-};
+  };
 
   return (
-    <div className={styles.modalOverlay} onClick={handleClose}>
+    <div className={"modalOverlay"} onClick={handleClose}>
       <div
         id="modal-content"
-        className={styles.modalContent}
+        className={"modalContent"}
         onClick={(e) => e.stopPropagation()}
         tabIndex={0}
       >
-        <button onClick={handleClose} className={styles.closeButton}>X</button>
+        <button onClick={handleClose} className={"closeButton"}>X</button>
         <h2 className='text-bold'>Location Master</h2>
 
         {/* <div className={styles.marketSelection}>
@@ -123,7 +124,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
           </select>
         </div> */}
 
-        <div className={styles.marketInput}>
+        <div className={"marketInput"}>
           <label htmlFor="marketInput">Location Name:</label>
           <input
             type="text"
@@ -133,14 +134,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
             placeholder="Enter Location"
             required
           />
-          {!isMarketValid && <span className={styles.error}>Both fields are required!</span>}
+          {!isMarketValid && <span className={"error"}>Both fields are required!</span>}
         </div>
 
-        <div className={styles.submitButtonContainer}>
+        <div className={"submitButtonContainer"}>
           <button
             onClick={handleSubmit}
-            className={styles.submitButton}
-            disabled={ !marketInput}
+            className={"submitButton"}
+            disabled={!marketInput}
           >
             Submit
           </button>
