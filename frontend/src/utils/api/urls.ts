@@ -23,7 +23,7 @@ type Urls = {
     getAllData?: string;
     getAllAudit?:string;
     getcsvdata?:string;
-    marketcircle?:number;
+    marketcircle?:string;
     locationadd?: string;
     locationselect?: string;
   };
