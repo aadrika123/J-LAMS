@@ -199,10 +199,7 @@ const Marketmaster = () => {
         setModalMarketClose(false);
     };
 
-    const handleModalSuccess = () => {
-        queryClient.invalidateQueries({ queryKey: ['assets'] });
-        setModalMarketClose(false); // Close modal
-    };
+
 
 
 
