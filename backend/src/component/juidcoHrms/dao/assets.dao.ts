@@ -127,7 +127,7 @@ class AssetsManagementDao {
                     },
                 });
 
-                const numericMatch = lastAsset?.id?.match(/(\d{3})$/);
+                const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
                 const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
             
                 const newIncrementId = lastId + 1;

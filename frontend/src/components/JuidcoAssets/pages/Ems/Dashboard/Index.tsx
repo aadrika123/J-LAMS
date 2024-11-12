@@ -20,7 +20,8 @@ import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
 import { ASSETS } from '@/utils/api/urls';
 import axios from "@/lib/axiosConfig";
 import Jhar from "@/assets/icons/jhar.png"
-import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
+// import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
+import '../../../../Modal/AddMarketModal/AddMarket.css'
 
 export const DashboardMain = () => {
 
@@ -34,14 +35,14 @@ export const DashboardMain = () => {
     property_name: string;
     type_of_plot: string;
   }
-  
+
   interface FloorData {
     floor: number;
     plotCount: number;
-    units: Record<string, Unit[]>; 
+    units: Record<string, Unit[]>;
   }
 
-  type NavigationStackType = React.ReactNode[][]; 
+  type NavigationStackType = React.ReactNode[][];
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,24 +89,24 @@ export const DashboardMain = () => {
     if (storedUserDetails) {
       try {
         const userDetails = JSON.parse(storedUserDetails);
-        setUlbID(userDetails.ulb_id || null); 
-       const data = fetchData(userDetails.ulb_id);
-       console.log("data here",data)
+        setUlbID(userDetails.ulb_id || null);
+        const data = fetchData(userDetails.ulb_id);
+        console.log("data here", data)
       } catch (error) {
         console.error('Error parsing user details:', error);
       }
     }
 
-    
+
   }, []);
 
-  console.log("residentialCount",residentialCount)
-  console.log("commercialCount",commercialCount)
+  console.log("residentialCount", residentialCount)
+  console.log("commercialCount", commercialCount)
 
 
   useEffect(() => {
-    const numericFloorCount = parseInt(floorCount) || 0; 
-    setPlotNos(Array(numericFloorCount).fill("")); 
+    const numericFloorCount = parseInt(floorCount) || 0;
+    setPlotNos(Array(numericFloorCount).fill(""));
   }, [floorCount]);
 
   const initialValues = {
@@ -130,9 +131,9 @@ export const DashboardMain = () => {
     role: "Municipal",
     building_approval_plan: "",
     no_of_floors: parseInt(floorCount),
-    building_name:buildingName,
-    ulb_id:ulbID,
-    location:"",
+    building_name: buildingName,
+    ulb_id: ulbID,
+    location: "",
   }
 
   const employeeValidationSchema = Yup.object().shape({
@@ -195,21 +196,21 @@ export const DashboardMain = () => {
   };
 
 
-  const fetchData = async (ulbID:number) => {
+  const fetchData = async (ulbID: number) => {
     try {
-       
-        const res = await axios({
-            url: `${ASSETS.LIST.locationselect}id=${ulbID}`,
-            method: "GET",
-        });
-        setCircleData(res?.data?.data?.data);
-        return res?.data?.data;
+
+      const res = await axios({
+        url: `${ASSETS.LIST.locationselect}id=${ulbID}`,
+        method: "GET",
+      });
+      setCircleData(res?.data?.data?.data);
+      return res?.data?.data;
     } catch (error) {
-        console.error("Error fetching data:", error);
-        return [];
+      console.error("Error fetching data:", error);
+      return [];
     }
-};
-console.log("data 456",circleData)
+  };
+  console.log("data 456", circleData)
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
 
@@ -361,51 +362,51 @@ console.log("data 456",circleData)
     window.location.replace("/lams/apply/approve-application");
   }
 
-  const handleSave = (value:boolean) => {
+  const handleSave = (value: boolean) => {
 
-    if(buildingName?.length === 0 && floorCount?.length === 0 ){
+    if (buildingName?.length === 0 && floorCount?.length === 0) {
       toast.error("Building Name & Floor Cannot be Empty")
       return false;
-    }else if(buildingName?.length ==0){
+    } else if (buildingName?.length == 0) {
       toast.error("Building Name Cannot be Empty")
       return false;
-    }else if(floorCount?.length ==0){
+    } else if (floorCount?.length == 0) {
       toast.error("Floor Cannot be Empty")
       return false;
     }
-    
+
 
     const numericFloorCount = Number(floorCount);
 
 
     if (isNaN(numericFloorCount) || numericFloorCount < 0) {
-        console.error("Invalid floor count");
-        return;
+      console.error("Invalid floor count");
+      return;
     }
 
     const boxes = Array.from({ length: numericFloorCount }, () => (
       <></> // Return an empty fragment
-  ));
+    ));
 
     // Only proceed if floorCount is greater than 0
     if (numericFloorCount > 0) {
-        setFloorDisable(true);
-        setInputBoxes(boxes);
-        // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+      setFloorDisable(true);
+      setInputBoxes(boxes);
+      // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
 
-        setNavigationStack((prevStack) => [...prevStack, boxes] as any);
-        if(value){
-                  handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
+      setNavigationStack((prevStack) => [...prevStack, boxes] as any);
+      if (value) {
+        handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
         handleTypeBox({ target: { value: numericFloorCount } }, 'Commercial', 0);
-        }
+      }
 
     }
 
-};
+  };
 
 
   const handleFloor = (index: any) => {
-    setSelectedFloor(index); 
+    setSelectedFloor(index);
     if (!data[index]) {
       setData((prevData: any) => {
         const updatedData = Array.isArray(prevData) ? [...prevData] : [];
@@ -478,64 +479,64 @@ console.log("data 456",circleData)
     setCurrentType(type);
     const typeBox = (
       <>
-      
+
 
       </>
-      
+
     );
 
     setInputBoxes([typeBox]);
     setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
   };
 
-  const handleCommercial=(val:any)=>{
+  const handleCommercial = (val: any) => {
     setCommercialCount(parseInt(val) || 0);
   }
 
-  
-  const handleresidential=(val:any)=>{
-    setResidentialCount(parseInt(val) || 0); 
+
+  const handleresidential = (val: any) => {
+    setResidentialCount(parseInt(val) || 0);
   }
 
   const handleTypeBox = (e: any, type: string, index: number | null) => {
-    const count = parseInt(e?.target?.value) || e || 0; 
-  
+    const count = parseInt(e?.target?.value) || e || 0;
+
     if (isNaN(count)) return;
-  
+
     setCount(count);
-  
+
     let ResidentialData = 0;
     let commercialData = 0;
-  
+
     if (type === 'Residential') {
       ResidentialData = count;
     } else if (type === 'Commercial') {
       commercialData = count;
       if (count > 10) {
         toast.error("Max 10 Floors");
-        return; 
+        return;
       }
     }
-    console.log("ResidentialData",ResidentialData)
-    console.log("commercialData",commercialData)
-  
+    console.log("ResidentialData", ResidentialData)
+    console.log("commercialData", commercialData)
+
     // Update the data based on the type and index
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
       if (index !== null && index >= 0 && index < updatedData.length) {
-      const floorObj = updatedData[index];
-      if (floorObj) {
-        floorObj.units[type] = new Array(count).fill({}).map((_, unitIndex) => ({
-          index: unitIndex + 1,
-          type,
-        }));
+        const floorObj = updatedData[index];
+        if (floorObj) {
+          floorObj.units[type] = new Array(count).fill({}).map((_, unitIndex) => ({
+            index: unitIndex + 1,
+            type,
+          }));
+        }
+      } else {
+        console.error("Invalid index:", index);
       }
-    } else {
-      console.error("Invalid index:", index);
-  }
       return updatedData;
     });
-  
+
     const newBoxes = Array.from({ length: count }, (_, boxIndex) => (
       <div key={`box-${index}-${boxIndex}`} className='flex flex-column'>
         <br />
@@ -545,7 +546,7 @@ console.log("data 456",circleData)
             readOnly
             className={`border p-2 ml-2 justify-center items-center w-[3rem] text-slate-600 cursor-pointer rounded-md bg-[#d6fce7]`}
             placeholder={`${boxIndex + 1}`}
-            onClick={() => handleInnerFloor(index, 'Commercial', boxIndex)} 
+            onClick={() => handleInnerFloor(index, 'Commercial', boxIndex)}
           />
         )}
         {type === 'Residential' && (
@@ -560,23 +561,23 @@ console.log("data 456",circleData)
         <br />
       </div>
     ));
-  
+
     // Update the input boxes based on the type
     setInputBoxes((prevInputBoxes: any) => {
       const typeBoxIndex = prevInputBoxes?.findIndex(
         (box: any) => box.key === `type-${type}`
       );
-  
+
       if (typeBoxIndex !== -1) {
         return [
           ...prevInputBoxes.slice(0, typeBoxIndex + 1),
           ...newBoxes,
         ];
       }
-  
+
       return [...prevInputBoxes, ...newBoxes];
     });
-  
+
     // Update the navigation stack
     setNavigationStack((prevStack) => {
       const newStack = [...prevStack];
@@ -584,121 +585,121 @@ console.log("data 456",circleData)
       return newStack;
     });
   };
-  
+
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
     const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
-    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex );
+    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex);
     const unitData = floorData?.units[type]?.[unitIndex] || {};
 
     const innerBoxes = (
       <>
-      
 
-      <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex +1 }</span></h4></div>
-      <div key={`${floorIndex}-${type}-${unitIndex}`}>
-       
-        <input
-          type="text"
-          className="border p-2 m-2"
-          placeholder="Length in meter"
-          defaultValue={unitData.length || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
-          maxLength={10}
-          onKeyPress={(e: any) => {
-            if (!(e.key >= "0" && e.key <= "9")) {
-              e.preventDefault();
-            }
-          }}
-        />
-        <input
-          type="text"
-          className="border p-2 m-2"
-          placeholder="Breadth in meter"
-          defaultValue={unitData.breadth || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
-          maxLength={10}
-          onKeyPress={(e: any) => {
-            if (!(e.key >= "0" && e.key <= "9")) {
-              e.preventDefault();
-            }
-          }}
-        />
-        <input
-          type="text"
-          className="border p-2 m-2"
-          placeholder="Height in meter"
-          defaultValue={unitData.height || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
-          maxLength={10}
-          onKeyPress={(e: any) => {
-            if (!(e.key >= "0" && e.key <= "9")) {
-              e.preventDefault();
-            }
-          }}
-        />
-        <input
-          type="text"
-          className="border p-2 m-2"
-          placeholder="Name"
-          defaultValue={unitData.name || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
-          maxLength={30}
-          onKeyPress={(e: any) => {
-            if (
-              !(
-                (e.key >= "a" || e.key >= "z") ||
-                (e.key <= "A" || e.key <= "Z") ||
-                e.key === " "
-              )
-            ) {
-              e.preventDefault();
-            }
-          }}
-        />
-        <input
-          type="text"
-          className="border p-2 m-2"
-          placeholder="Property Name"
-          defaultValue={unitData.property_name || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
-          maxLength={10}
-          onKeyPress={(e: any) => {
-            if (
-              !(
-                (e.key >= "a" || e.key >= "z") ||
-                (e.key <= "A" || e.key <= "Z") ||
-                (e.key <= "0" || e.key <= "9") ||
-                e.key === " "
-              )
-            ) {
-              e.preventDefault();
-            }
-          }}
-        />
 
-        <select className="border p-2 m-2"
-          value={unitData.type_of_plot}
-          defaultValue={unitData.type_of_plot || ""}
-          onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
-          <option>Choose the below options</option>
-          <option value="Enclosed">Enclosed</option>
-          <option value="Non-Enclosed">Non-Enclosed</option>
-        </select>
+        <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex + 1}</span></h4></div>
+        <div key={`${floorIndex}-${type}-${unitIndex}`}>
 
-        <br></br>
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => {
-              handleSave(true);
-              setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Length in meter"
+            defaultValue={unitData.length || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
+            maxLength={10}
+            onKeyPress={(e: any) => {
+              if (!(e.key >= "0" && e.key <= "9")) {
+                e.preventDefault();
+              }
             }}
-            className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-          >
-            Save & Move to Floor Part
-          </button>
+          />
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Breadth in meter"
+            defaultValue={unitData.breadth || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
+            maxLength={10}
+            onKeyPress={(e: any) => {
+              if (!(e.key >= "0" && e.key <= "9")) {
+                e.preventDefault();
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Height in meter"
+            defaultValue={unitData.height || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
+            maxLength={10}
+            onKeyPress={(e: any) => {
+              if (!(e.key >= "0" && e.key <= "9")) {
+                e.preventDefault();
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Name"
+            defaultValue={unitData.name || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
+            maxLength={30}
+            onKeyPress={(e: any) => {
+              if (
+                !(
+                  (e.key >= "a" || e.key >= "z") ||
+                  (e.key <= "A" || e.key <= "Z") ||
+                  e.key === " "
+                )
+              ) {
+                e.preventDefault();
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Property Name"
+            defaultValue={unitData.property_name || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
+            maxLength={10}
+            onKeyPress={(e: any) => {
+              if (
+                !(
+                  (e.key >= "a" || e.key >= "z") ||
+                  (e.key <= "A" || e.key <= "Z") ||
+                  (e.key <= "0" || e.key <= "9") ||
+                  e.key === " "
+                )
+              ) {
+                e.preventDefault();
+              }
+            }}
+          />
+
+          <select className="border p-2 m-2"
+            value={unitData.type_of_plot}
+            defaultValue={unitData.type_of_plot || ""}
+            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
+            <option>Choose the below options</option>
+            <option value="Enclosed">Enclosed</option>
+            <option value="Non-Enclosed">Non-Enclosed</option>
+          </select>
+
+          <br></br>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => {
+                handleSave(true);
+                setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+              }}
+              className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+            >
+              Save & Move to Floor Part
+            </button>
+          </div>
         </div>
-      </div>
       </>
     );
 
@@ -736,7 +737,7 @@ console.log("data 456",circleData)
   //       if (storedData) {
   //         setSessionData(JSON.parse(storedData));
   //       }
-        
+
   //       setUnitCompletion((prevCompletion) => ({
   //         ...prevCompletion,
   //         [`${unitIndex }`]: allFieldsFilled,
@@ -750,46 +751,46 @@ console.log("data 456",circleData)
 
   const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
     const value = e.target.value;
-  
+
     setData((prevData: any) => {
       // Get existing data from sessionStorage
       const storedData = sessionStorage.getItem('unitData');
       const initialData = storedData ? JSON.parse(storedData) : [];
-  
+
       // Create a copy of the initial data
       const updatedData = Array.isArray(prevData) ? [...prevData] : [...initialData];
-  
+
       // Find or create floor object
       let floorObj = updatedData.find((floor) => floor?.floor === floorIndex);
       if (!floorObj) {
         floorObj = { floor: floorIndex, units: {}, plotCount: 0 };
         updatedData.push(floorObj); // Use push instead of setting at an index
       }
-  
+
       // Ensure the units object for the specific type exists
       if (!floorObj.units[type]) {
         floorObj.units[type] = [];
       }
-  
+
       // Check if unit already exists for the specified unitIndex
-      let unit = floorObj.units[type].find((u:any) => u.index === unitIndex);
+      let unit = floorObj.units[type].find((u: any) => u.index === unitIndex);
       if (!unit) {
         // If not, create a new unit
         unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
         floorObj.units[type].push(unit);
       }
-  
+
       // Update the field value for the specific unit
       unit[field] = value;
-  
+
       // Save updated data to sessionStorage
       sessionStorage.setItem('unitData', JSON.stringify(updatedData));
-  
+
       // Return the updated data for the state
       return updatedData;
     });
   };
-  
+
 
   const transformDataForAPI = (data: any) => {
     return data
@@ -820,14 +821,14 @@ console.log("data 456",circleData)
     setInputBoxes('')
   }
 
-  const handleCloseDataModal =()=>{
+  const handleCloseDataModal = () => {
     setIsModalVisibleData(false)
   }
 
 
-  console.log("setCommercialCount",commercialCount)
-  console.log("residentialCount",residentialCount)
-  
+  console.log("setCommercialCount", commercialCount)
+  console.log("residentialCount", residentialCount)
+
   return (
     <div>
       <div className="flex items-center justify-between border-b-2 pb-7 mb-10">
@@ -903,11 +904,11 @@ console.log("data 456",circleData)
               }
             }, [values.type_of_assets]);
 
-            const handleDataModal =()=>{
+            const handleDataModal = () => {
               setIsModalVisibleData(!isModalVisibleData)
             }
-            
-            
+
+
             return (
               <>
                 <form onSubmit={handleSubmit} className="relative">
@@ -992,7 +993,7 @@ console.log("data 456",circleData)
 
 
 
-                            <button onClick={()=>{handleSave(false)}} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
+                            <button onClick={() => { handleSave(false) }} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
 
                             {floorDisable ? (
                               <div className='flex flex-row'>
@@ -1047,72 +1048,72 @@ console.log("data 456",circleData)
                               </div>
                             )}
 
-{plotNo >0 && 
-  <div>
-            <input
-                key={`type-Commercial`}
-                type="text"
-                className="border p-2 m-2"
-                placeholder={`Number of Commercial units`}
-                onChange={(e) => {
-                    handleCommercial(parseInt(e.target.value));
-                    handleTypeBox(e, 'Commercial', null);
-                }}
-                maxLength={2}
-                onKeyPress={(e) => {
-                    if (!(e.key >= "0" && e.key <= "9")) {
-                        e.preventDefault();
-                    }
-                }}
-                disabled={isCommercialChecked} // Disable if checked
-            />
-            <input
-                type="commercial"
-                id="commercial"
-                name="commercial"
-                value="commercial"
-                checked={isCommercialChecked}
-                onChange={() => {
-                    setIsCommercialChecked(!isCommercialChecked);
-                    if (isCommercialChecked) {
-                        // Reset count or other logic if necessary
-                        setCommercialCount(commercialCount);
-                    }
-                }}
-            />
+                            {plotNo > 0 &&
+                              <div>
+                                <input
+                                  key={`type-Commercial`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Commercial units`}
+                                  onChange={(e) => {
+                                    handleCommercial(parseInt(e.target.value));
+                                    handleTypeBox(e, 'Commercial', null);
+                                  }}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                  disabled={isCommercialChecked} // Disable if checked
+                                />
+                                <input
+                                  type="commercial"
+                                  id="commercial"
+                                  name="commercial"
+                                  value="commercial"
+                                  checked={isCommercialChecked}
+                                  onChange={() => {
+                                    setIsCommercialChecked(!isCommercialChecked);
+                                    if (isCommercialChecked) {
+                                      // Reset count or other logic if necessary
+                                      setCommercialCount(commercialCount);
+                                    }
+                                  }}
+                                />
 
-            <input
-                key={`type-Residential`}
-                type="text"
-                className="border p-2 m-2"
-                placeholder={`Number of Residential units`}
-                onChange={(e) => {
-                    handleresidential(parseInt(e.target.value));
-                    handleTypeBox(e, 'Residential', null);
-                }}
-                maxLength={2}
-                onKeyPress={(e) => {
-                    if (!(e.key >= "0" && e.key <= "9")) {
-                        e.preventDefault();
-                    }
-                }}
-                disabled={isResidentialChecked} // Disable if checked
-            />
-            <input
-                type="residential"
-                id="residential"
-                name="residential"
-                value="residential"
-                checked={isResidentialChecked}
-                onChange={() => {
-                    setIsResidentialChecked(!isResidentialChecked);
-                    if (isResidentialChecked) {
-                        // Reset count or other logic if necessary
-                        setResidentialCount(residentialCount);
-                    }
-                }}
-            />
-        </div>}
+                                <input
+                                  key={`type-Residential`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Residential units`}
+                                  onChange={(e) => {
+                                    handleresidential(parseInt(e.target.value));
+                                    handleTypeBox(e, 'Residential', null);
+                                  }}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                  disabled={isResidentialChecked} // Disable if checked
+                                />
+                                <input
+                                  type="residential"
+                                  id="residential"
+                                  name="residential"
+                                  value="residential"
+                                  checked={isResidentialChecked}
+                                  onChange={() => {
+                                    setIsResidentialChecked(!isResidentialChecked);
+                                    if (isResidentialChecked) {
+                                      // Reset count or other logic if necessary
+                                      setResidentialCount(residentialCount);
+                                    }
+                                  }}
+                                />
+                              </div>}
 
 
 
@@ -1164,25 +1165,25 @@ console.log("data 456",circleData)
                                           </div>
                                         ))
                                       ) : (
-                        <p>No units available.</p>
+                                        <p>No units available.</p>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <p className="text-center">No data available.</p>
+                            )}
+
+                          </div>
+                        </div>
+                      </div>
                     )}
-                </div>
-            );
-        })}
-    </div>
-) : (
-    <p className="text-center">No data available.</p>
-)}
-
-      </div>
-    </div>
-  </div>
-)}
 
 
 
-{/* Data modal */}
-{/* {isModalVisibleData && (
+                    {/* Data modal */}
+                    {/* {isModalVisibleData && (
   <div className="fixed inset-0 flex items-center justify-center">
     <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
     <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] z-20">
@@ -1230,129 +1231,129 @@ console.log("data 456",circleData)
 )} */}
 
 
-{/* Data Modal */}
-{isModalVisibleData && (
-  <div className="fixed inset-0 flex items-center justify-center">
-    {/* Background Overlay for Blur Effect */}
-    <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
+                    {/* Data Modal */}
+                    {isModalVisibleData && (
+                      <div className="fixed inset-0 flex items-center justify-center">
+                        {/* Background Overlay for Blur Effect */}
+                        <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm z-10"></div>
 
-    {/* Modal Content */}
-    <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] z-20 max-h-[80vh] overflow-auto">
-      <div className='mb-[3rem]'>
-        <button onClick={handleCloseDataModal} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
-      </div>
+                        {/* Modal Content */}
+                        <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] z-20 max-h-[80vh] overflow-auto">
+                          <div className='mb-[3rem]'>
+                            <button onClick={handleCloseDataModal} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
+                          </div>
 
-      {sessionData.length > 0 ? (
-    <div className="p-4">
-        <h2 className="text-lg font-bold mb-4">Building Status Overview (with units)</h2>
+                          {sessionData.length > 0 ? (
+                            <div className="p-4">
+                              <h2 className="text-lg font-bold mb-4">Building Status Overview (with units)</h2>
 
-        <div className="grid grid-cols-3 gap-4">
-            {sessionData.map((floorData, floorIndex) => {
-                if (!floorData) return null; // Skip null entries
-                
-                // Determine the display label for the floor
-                const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
+                              <div className="grid grid-cols-3 gap-4">
+                                {sessionData.map((floorData, floorIndex) => {
+                                  if (!floorData) return null; // Skip null entries
 
-                return (
-                    <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
-                        <h3 className="text-md font-semibold mb-2">{floorLabel}</h3>
-                        <p className="mb-2">Plot Count: {floorData.plotCount}</p>
+                                  // Determine the display label for the floor
+                                  const floorLabel = floorIndex === 0 ? "Basement" : `Floor ${floorIndex - 1}`;
 
-                        <div className="flex flex-wrap">
-                            {floorData.units && Object.entries(floorData.units).map(([unitType, units]) => (
-                                <div key={unitType} className="mb-4">
-                                    <h4 className="font-semibold">{unitType} Units:</h4>
-                                    {units.length > 0 ? (
-                                        units.map((unit, unitIndex) => {
-                                            const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
-                                            const statusColor = isBooked ? 'bg-yellow-200' : 'bg-green-200'; // Red for booked, green for vacant
+                                  return (
+                                    <div key={floorIndex} className="mb-4 border p-4 rounded-lg shadow-md">
+                                      <h3 className="text-md font-semibold mb-2">{floorLabel}</h3>
+                                      <p className="mb-2">Plot Count: {floorData.plotCount}</p>
 
-                                            return (
-                                                <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
+                                      <div className="flex flex-wrap">
+                                        {floorData.units && Object.entries(floorData.units).map(([unitType, units]) => (
+                                          <div key={unitType} className="mb-4">
+                                            <h4 className="font-semibold">{unitType} Units:</h4>
+                                            {units.length > 0 ? (
+                                              units.map((unit, unitIndex) => {
+                                                const isBooked = unit.length && unit.breadth && unit.height; // Check for detailed properties
+                                                const statusColor = isBooked ? 'bg-yellow-200' : 'bg-green-200'; // Red for booked, green for vacant
+
+                                                return (
+                                                  <div key={unitIndex} className={`m-2 p-2 border rounded ${statusColor} text-center`}>
                                                     <p className="font-bold">Unit {unit.index + 1}</p>
                                                     <p>Type: {unit.type}</p>
                                                     {isBooked && (
-                                                        <>
-                                                            <p>Length: {unit.length}</p>
-                                                            <p>Breadth: {unit.breadth}</p>
-                                                            <p>Height: {unit.height}</p>
-                                                            <p>Name: {unit.name}</p>
-                                                            {unit.property_name && <p>Property Name: {unit.property_name}</p>}
-                                                        </>
+                                                      <>
+                                                        <p>Length: {unit.length}</p>
+                                                        <p>Breadth: {unit.breadth}</p>
+                                                        <p>Height: {unit.height}</p>
+                                                        <p>Name: {unit.name}</p>
+                                                        {unit.property_name && <p>Property Name: {unit.property_name}</p>}
+                                                      </>
                                                     )}
                                                     {!isBooked && <p>Status: Vacant</p>}
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className={`m-2 p-2 border rounded bg-green-200 text-center`}>
-                                            <p className="font-bold">No Units Available</p>
-                                            <p>Status: Vacant</p>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                                  </div>
+                                                );
+                                              })
+                                            ) : (
+                                              <div className={`m-2 p-2 border rounded bg-green-200 text-center`}>
+                                                <p className="font-bold">No Units Available</p>
+                                                <p>Status: Vacant</p>
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-center">No data available.</p>
+                          )}
+
                         </div>
-                    </div>
-                );
-            })}
-        </div>
-    </div>
-) : (
-    <p className="text-center">No data available.</p>
-)}
-
-    </div>
-  </div>
-)}
+                      </div>
+                    )}
 
 
 
 
 
 
-<SelectForNoApi
-  onChange={handleChange}
-  onBlur={handleBlur}
-  value={values.asset_sub_category_name}
-  error={errors.asset_sub_category_name}
-  touched={touched.asset_sub_category_name}
-  label="Asset Sub-Category Name"
-  name="asset_sub_category_name"
-  placeholder={"Choose Asset Sub Category Name"}
-  options={[
-    {
-      id: 1,
-      name: "Hospitals",
-    },
-    {
-      id: 2,
-      name: "Library",
-    },
-    {
-      id: 3,
-      name: "Parking",
-    },
-    {
-      id: 4,
-      name: "Enclosed/Non-Enclosed",
-    },
-    ...(values.type_of_assets === "Building" ? [] : [
-      {
-        id: 5,
-        name: "Vacant Land",
-      },
-    ]),
-    {
-      id: 6,
-      name: "Gym",
-    },
-    {
-      id: 7,
-      name: "Market",
-    },
-  ]}
-/>
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.asset_sub_category_name}
+                      error={errors.asset_sub_category_name}
+                      touched={touched.asset_sub_category_name}
+                      label="Asset Sub-Category Name"
+                      name="asset_sub_category_name"
+                      placeholder={"Choose Asset Sub Category Name"}
+                      options={[
+                        {
+                          id: 1,
+                          name: "Hospitals",
+                        },
+                        {
+                          id: 2,
+                          name: "Library",
+                        },
+                        {
+                          id: 3,
+                          name: "Parking",
+                        },
+                        {
+                          id: 4,
+                          name: "Enclosed/Non-Enclosed",
+                        },
+                        ...(values.type_of_assets === "Building" ? [] : [
+                          {
+                            id: 5,
+                            name: "Vacant Land",
+                          },
+                        ]),
+                        {
+                          id: 6,
+                          name: "Gym",
+                        },
+                        {
+                          id: 7,
+                          name: "Market",
+                        },
+                      ]}
+                    />
 
                     <SelectForNoApi
                       onChange={handleChange}
@@ -1421,7 +1422,7 @@ console.log("data 456",circleData)
                       <input
                         type='file'
                         name='ownership_doc'
-                         accept="image/*,.pdf"
+                        accept="image/*,.pdf"
                         className="mb-4 p-1 border border-slate-400 w-full rounded"
                         onChange={handleFile2Change}
                       />
@@ -1638,10 +1639,11 @@ console.log("data 456",circleData)
                       maxLength={50}
                     />
 
-                    <div className={styles.marketSelection}>
+                    {/* <div className={styles.marketSelection}> */}
+                    <div className="marketSelection">
 
 
-                      <label htmlFor="location" className={styles.selectLabel}>
+                      <label htmlFor="location" className={'selectLabel'}>
                         Select Location:
                       </label>
                       <select
@@ -1649,9 +1651,9 @@ console.log("data 456",circleData)
                         id="location"
                         value={selectedMarket}
                         onChange={handleMarketChange}
-                        className={styles.selectInput}
+                        className={'selectInput'}
                         required
-                        
+
                       >
 
                         <option value="" disabled>-- Choose a Location --</option>
@@ -1674,19 +1676,19 @@ console.log("data 456",circleData)
                       maxLength={20}
                     />
 
-                <SelectForNoApi
-                 onChange={handleChange}
-                 onBlur={handleBlur}
-                 // value={values.mode_of_acquisition}
-                  label="Ward no."
-                   name="ward_no"
-                   value={values.ward_no}
-                  placeholder={"Ward no."}
-                  options={Array.from({ length: 55 }, (_, index) => ({
-                  id: index + 1,
-                   name: `${index + 1}`, 
-                     }))}
-                   />
+                    <SelectForNoApi
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      // value={values.mode_of_acquisition}
+                      label="Ward no."
+                      name="ward_no"
+                      value={values.ward_no}
+                      placeholder={"Ward no."}
+                      options={Array.from({ length: 55 }, (_, index) => ({
+                        id: index + 1,
+                        name: `${index + 1}`,
+                      }))}
+                    />
 
 
                     {/* <InputBox
@@ -1701,8 +1703,8 @@ console.log("data 456",circleData)
                     /> */}
 
 
-       
-                    
+
+
 
 
                   </div>
@@ -1723,10 +1725,10 @@ console.log("data 456",circleData)
                   </div>
                 </form>
               </>
-                 
+
             )
           }}
-       
+
         </Formik>
       </div>
     </div>
