@@ -81,7 +81,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
             return res?.data?.data;
 
         } else {
-            toast.error("Failed to save location");
+            // toast.error("Failed to save location");
         }
     } catch (error) {
         console.error("Error fetching data:", error);
