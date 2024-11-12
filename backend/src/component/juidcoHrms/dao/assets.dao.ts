@@ -1431,14 +1431,84 @@ class AssetsManagementDao {
       };
       
 
-      marketcircle = async (req: Request) => {
+    //   marketcircle = async (req: Request) => {
+    //     const page = Number(req.query.page) || 1; 
+    //     const limit = Number(req.query.limit) || 5; 
+    //     const id = Number(req.query.id) || 1;
+        
+    //     const skip = (page - 1) * limit;
+    
+    //     try {
+    //         const circleGet = await prisma.location.findMany({
+    //             where: {
+    //                 ulb_id: id,
+    //             },
+    //             orderBy: {
+    //                 created_at: 'desc', 
+    //             },
+    //             skip: skip,      
+    //             take: limit,   
+    //         });
+    
+
+    //         const circleGets = await prisma.assets_list.findMany({
+    //             where: {
+    //                 ulb_id: id,
+    //             },
+    //             select: {
+    //                 location: true,
+    //                 id: true,
+    //                 ulb_id: true,
+    //                 building_name: true,
+    //                 address: true
+    //             },
+    //             orderBy: {
+    //                 created_at: 'desc', 
+    //             },
+    //             skip: skip,     
+    //             take: limit,   
+               
+    //         });
+
+    //         console.log("circleGet",circleGet)
+    //         console.log("circleGets",circleGets)
+    
+    //         let resultData = [];
+
+    //         for (const item of circleGets) {
+    //             const matchedAsset = circleGet.find(asset => asset.location === item.location);
+    
+    //             if (matchedAsset) {
+    //                 resultData.push(matchedAsset); 
+    //             } else {
+
+    //                 resultData.push(item);  
+    //             }
+    //         }
+
+    //         return generateRes({
+    //             data: resultData, 
+    //             page,             
+    //             limit,            
+    //             totalPages: resultData.length, 
+    //         });
+    
+    //     } catch (err) {
+    //         console.error("Error fetching market circle data:", err);
+    //         return generateRes({
+    //             data: [],  // Return empty data on error
+    //             message: 'Error fetching market circle data',
+    //         });
+    //     }
+    // };
+    
+    marketcircle = async (req: Request) => {
         const page = Number(req.query.page) || 1; 
         const limit = Number(req.query.limit) || 5; 
         const id = Number(req.query.id) || 1;
-        
         const skip = (page - 1) * limit;
-    
         try {
+            let resultData = [];
             const circleGet = await prisma.location.findMany({
                 where: {
                     ulb_id: id,
@@ -1450,7 +1520,6 @@ class AssetsManagementDao {
                 take: limit,   
             });
     
-
             const circleGets = await prisma.assets_list.findMany({
                 where: {
                     ulb_id: id,
@@ -1467,33 +1536,32 @@ class AssetsManagementDao {
                 },
                 skip: skip,     
                 take: limit,   
-               
             });
     
-            let resultData = [];
-
-            for (const item of circleGets) {
-                const matchedAsset = circleGet.find(asset => asset.location === item.location);
-    
+            for (const asset of circleGet) {
+                const matchedAsset = circleGets.find(item => item.location === asset.location);
                 if (matchedAsset) {
-                    resultData.push(matchedAsset); 
+                    resultData.push({
+                        ...asset, 
+                        building_name: matchedAsset.building_name || null,
+                        address: matchedAsset.address || null              
+                    });
                 } else {
-
-                    resultData.push(item);  
+                    resultData.push(asset);
                 }
             }
-
+    
             return generateRes({
                 data: resultData, 
                 page,             
                 limit,            
-                totalPages: resultData.length, 
+                totalPages: Math.ceil(resultData.length / limit), 
             });
     
         } catch (err) {
             console.error("Error fetching market circle data:", err);
             return generateRes({
-                data: [],  // Return empty data on error
+                data: [],  
                 message: 'Error fetching market circle data',
             });
         }
