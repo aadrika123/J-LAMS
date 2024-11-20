@@ -430,7 +430,7 @@ const Approved = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application
+                        Approval Application 
                     </InnerHeading>
                 </div>
             </div>

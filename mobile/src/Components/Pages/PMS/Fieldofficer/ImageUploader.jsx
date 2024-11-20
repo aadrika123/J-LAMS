@@ -331,7 +331,7 @@ const ImageUploader = () => {
           On-Hold
         </button>
 
-        <button
+        {/* <button
           className="bg-[#4338CA] hover:bg-white hover:text-[#4338CA] hover:border-b-2 hover:border-[#4338CA] px-7 py-2 text-white font-semibold rounded shadow-lg border border-[#4338ca] focus:outline-none"
           onClick={() =>
             handleOpenModal(
@@ -342,7 +342,7 @@ const ImageUploader = () => {
           }
         >
           Reject
-        </button>
+        </button> */}
 
         <button
           className="bg-[#4338CA] hover:bg-white hover:text-[#4338CA] hover:border-b-2 hover:border-[#4338CA] px-7 py-2 text-white font-semibold rounded shadow-lg border border-[#4338ca] focus:outline-none"
