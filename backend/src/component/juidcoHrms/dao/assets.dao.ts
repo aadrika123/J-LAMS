@@ -463,7 +463,9 @@ class AssetsManagementDao {
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
         const filter = req.query.filter as string || '';
-        const id =  Number(req.query.id) || 1;
+        console.log(req.body.auth);
+        const {ulb_id} = req.body.auth ||2;
+        // const id =  Number(req.query.id) || 1;
 
         const status = Number(req.query.status)
         const land = req.query.land as string || ''
@@ -523,7 +525,7 @@ class AssetsManagementDao {
                                 }
                             ]
                             : undefined,
-                        ulb_id: id,
+                        ulb_id: ulb_id,
                         AND: [
                             filter ? {
                                 OR: [
@@ -621,7 +623,7 @@ class AssetsManagementDao {
                             }
                         ]
                         : undefined,
-                    // ulb_id: id,
+                    ulb_id: ulb_id,
                     AND: [
                         filter ? {
                             OR: [
