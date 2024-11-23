@@ -467,6 +467,7 @@ class AssetsManagementDao {
 
         const status = Number(req.query.status)
         const land = req.query.land as string || ''
+        console.log("data",req.body.auth)
 
         const skip = (page - 1) * limit;
         const status1Items = await prisma.assets_list.count({
