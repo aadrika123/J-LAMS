@@ -22,6 +22,7 @@ import axios from "@/lib/axiosConfig";
 import Jhar from "@/assets/icons/jhar.png"
 // import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
 import '../../../../Modal/AddMarketModal/AddMarket.css'
+import './Modal.css'
 
 export const DashboardMain = () => {
 
@@ -53,6 +54,7 @@ export const DashboardMain = () => {
   const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
   const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
+  // const [isModalVisibleSuccessData, setIsModalVisibleSuccessData] = useState<any>(false);
   const [data, setData] = useState<any>([]);
   const [currentType, setCurrentType] = useState<any>(null);
   const [plotNo, setPlotNo] = useState<any>(0);
@@ -211,6 +213,9 @@ export const DashboardMain = () => {
     }
   };
   console.log("data 456", circleData)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [succeessId, setSucceessId] = useState();
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
 
@@ -238,10 +243,16 @@ export const DashboardMain = () => {
         method: "POST",
         data: values,
       });
+      console.log("resres",res)
+      
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
-        window.location.replace("/lams/apply/approve-application");
+        setIsModalOpen(true);
+        console.log("resres",res?.data?.data?.id)
+        setSucceessId(res?.data?.data?.id);
+
+       
       } else if (res?.data?.type === "DUPLICATE") {
         toast.error("Duplicate asset data found. Please check and try again.");
       }
@@ -254,6 +265,12 @@ export const DashboardMain = () => {
     }
   };
 
+
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  console.log("datat data data data",isModalOpen)
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
@@ -825,6 +842,12 @@ export const DashboardMain = () => {
     setIsModalVisibleData(false)
   }
 
+
+  const handleCloseSuccessModal = () => {
+    // setIsModalVisibleSuccessData(false);
+    setIsModalOpen(false);
+    window.location.replace("/lams/apply/approve-application");
+  }
 
   console.log("setCommercialCount", commercialCount)
   console.log("residentialCount", residentialCount)
@@ -1730,7 +1753,77 @@ export const DashboardMain = () => {
           }}
 
         </Formik>
+
+
+        
       </div>
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Congratulations!</h2>
+            <p>Your asset was successfully added.</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
+
+
+{isModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center z-20">
+    {/* Background Overlay for Blur Effect */}
+    <div className="absolute inset-0 bg-black opacity-40 backdrop-blur-md z-10"></div>
+
+    {/* Modal Content */}
+    <div className="bg-white p-8 rounded-2xl shadow-xl w-[22rem] max-h-[80vh] overflow-auto z-20">
+
+      {/* Circle Icon and Text */}
+      <div className="flex flex-col items-center justify-center text-center space-y-6">
+
+        <div className="mb-6">
+          {/* Circle Tick Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mb-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M16.707 4.293a1 1 0 011.414 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L7 13.586l9-9z" clipRule="evenodd" />
+          </svg>
+        </div>
+
+        {/* Success Message */}
+        {succeessId ? (
+          <div className="text-center space-y-3">
+            <div className="font-semibold text-2xl text-green-600 mb-3">Congratulation!! Asset Added Successfully </div>
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <p className="text-gray-700 text-lg font-bold">Number: <span className="font-semibold">{succeessId}</span></p>
+              
+              {/* Copy Icon Button */}
+              <button 
+                onClick={() => navigator.clipboard.writeText(succeessId)} 
+                className="flex items-center justify-center bg-gray-600 text-white p-3 rounded-md shadow-md hover:bg-white hover:text-black border-2 border-black transition-all duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 10v10a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1zM6 14H5V5h9v1a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2z"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className="text-center text-gray-500 text-lg">No data available.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Close Modal Button */}
+      <div className="flex justify-center mt-6">
+        <button 
+          onClick={handleCloseSuccessModal} 
+          className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-all duration-200">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
     </div>
   )
 }
