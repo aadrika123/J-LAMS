@@ -1510,7 +1510,7 @@ export const DashboardMain = () => {
                       value={values.area}
                       error={errors.area}
                       touched={touched.area}
-                      label="Area"
+                      label="Area in sqft."
                       name="area"
                       type="text"
                       placeholder={"in sqft."}
