@@ -81,6 +81,11 @@ export const DashboardMain = () => {
   const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [circleData, setCircleData] = useState<any>([]);
 
+  const [commercialUnits, setCommercialUnits] = useState([]); // Array to hold commercial units data
+  const [residentialUnits, setResidentialUnits] = useState([])
+
+  const [selectedUnit, setSelectedUnit] = useState(null); // Track selected unit details for edit
+
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMarket(event.target.value);
   };
@@ -292,9 +297,9 @@ export const DashboardMain = () => {
     );
   }
 
-  const generateBoxes = (count:any) => {
-    return Array.from({ length: count }, (_, index) => index + 1);
-  };
+  // const generateBoxes = (count:any) => {
+  //   return Array.from({ length: count }, (_, index) => index + 1);
+  // };
 
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
@@ -547,6 +552,43 @@ export const DashboardMain = () => {
       return newStack;
     });
   };
+
+
+
+
+
+  // Generate boxes for the given count
+  const generateBoxes = (count) => {
+    return Array.from({ length: count }, (_, index) => index + 1);
+  };
+
+  // Handle click on unit number to show input fields
+  const handleUnitClick = (unitType, unitIndex) => {
+    setSelectedUnit({ type: unitType, index: unitIndex });
+  };
+
+  // Handle input change for unit details
+  const handleUnitDetailsChange = (e, field) => {
+    const value = e.target.value;
+    if (selectedUnit) {
+      if (selectedUnit.type === "Commercial") {
+        const updatedUnits = [...commercialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setCommercialUnits(updatedUnits);
+      } else if (selectedUnit.type === "Residential") {
+        const updatedUnits = [...residentialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setResidentialUnits(updatedUnits);
+      }
+    }
+  };
+
 
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
@@ -1082,29 +1124,103 @@ export const DashboardMain = () => {
                               </div>}
 
 
-                            <div className="count-display">
-                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
-                                Commercial Data:
-                              </h4>
-                              <div className="boxes">
-                                {generateBoxes(commercialCount).map((num) => (
-                                  <span key={num} className="box">
-                                    {num}
-                                  </span>
-                                ))}
-                              </div>
+                              <div className="count-display">
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Commercial Data:</h4>
+        <div className="boxes">
+          {generateBoxes(commercialCount).map((num) => (
+            <span
+              key={num}
+              className="box"
+              onClick={() => handleUnitClick("Commercial", num - 1)} // Handle click on commercial unit
+            >
+              {num}
+            </span>
+          ))}
+        </div>
 
-                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
-                                Residential Data:
-                              </h4>
-                              <div className="boxes">
-                                {generateBoxes(residentialCount).map((num) => (
-                                  <span key={num} className="box">
-                                    {num}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Residential Data:</h4>
+        <div className="boxes">
+          {generateBoxes(residentialCount).map((num) => (
+            <span
+              key={num}
+              className="box"
+              onClick={() => handleUnitClick("Residential", num - 1)} // Handle click on residential unit
+            >
+              {num}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Show Input Fields When a Unit is Clicked */}
+      {selectedUnit && (
+        <div>
+          <h4>{selectedUnit.type} Unit {selectedUnit.index + 1} Details:</h4>
+
+          {/* Length Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Length in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.length || "" : residentialUnits[selectedUnit.index]?.length || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "length")}
+          />
+
+          {/* Breadth Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Breadth in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.breadth || "" : residentialUnits[selectedUnit.index]?.breadth || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "breadth")}
+          />
+
+          {/* Height Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Height in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.height || "" : residentialUnits[selectedUnit.index]?.height || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "height")}
+          />
+
+          {/* Name Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Unit Name"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.name || "" : residentialUnits[selectedUnit.index]?.name || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "name")}
+          />
+
+          {/* Property Name Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Property Name"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.property_name || "" : residentialUnits[selectedUnit.index]?.property_name || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "property_name")}
+          />
+
+          {/* Save Button */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleSave}
+              className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+            >
+              Save & Move to Next Step
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Display Saved Data */}
+      <div>
+        <h4>Commercial Units:</h4>
+        <pre>{JSON.stringify(commercialUnits, null, 2)}</pre>
+        <h4>Residential Units:</h4>
+        <pre>{JSON.stringify(residentialUnits, null, 2)}</pre>
+      </div>
 
 
                             commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
