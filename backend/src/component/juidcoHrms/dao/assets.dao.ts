@@ -146,7 +146,7 @@ class AssetsManagementDao {
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-    
+                console.log("Generated formattedId: existingAsset", existingAsset);
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
