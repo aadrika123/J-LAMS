@@ -114,10 +114,21 @@ class AssetsManagementDao {
             ulb_id,
             location
         } = req.body;
-
+    
         try {
+            // Check if floorData is an array and each floor has details as an object containing 'create'
+            if (!Array.isArray(floorData)) {
+                throw new Error('floorData must be an array');
+            }
+    
+            // Ensure each floor has a 'details.create' array
+            floorData.forEach((floor, index) => {
+                if (!floor.details || !Array.isArray(floor.details.create)) {
+                    throw new Error(`floor.details.create must be an array for floor ${index + 1}`);
+                }
+            });
+    
             const result = await prisma.$transaction(async (tx) => {
-
                 const lastAsset = await tx.assets_list.findFirst({
                     orderBy: {
                         created_at: 'desc',
@@ -126,31 +137,32 @@ class AssetsManagementDao {
                         id: true,
                     },
                 });
-
+    
                 const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
-                const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
-            
+                const lastId = numericMatch ? Number(numericMatch[0]) : 0;
+    
                 const newIncrementId = lastId + 1;
-                const formattedIds = newIncrementId.toString().padStart(3, '0'); 
-   
+                const formattedIds = newIncrementId.toString().padStart(3, '0');
+    
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
-                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
-
-                const formattedId = validUlbId && validAssetType 
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : '';
+    
+                const formattedId = validUlbId && validAssetType
                     ? `${validUlbId}${validAssetType}${formattedIds}`
-                    : 'invalid-id'; 
-            
+                    : 'invalid-id';
+    
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-            
+    
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
- 
+    
+                // Map the floorData and ensure details are correctly created
                 const assetReq = await tx.assets_list.create({
                     data: {
-                        id:formattedId,
+                        id: formattedId,
                         type_of_assets,
                         asset_sub_category_name,
                         assets_category_type,
@@ -158,8 +170,8 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name:building_name, 
-                        ulb_id:ulb_id,
+                        building_name,
+                        ulb_id,
                         depreciation_method,
                         location,
                         apreciation_method,
@@ -181,7 +193,7 @@ class AssetsManagementDao {
                                 plotCount: floor.plotCount,
                                 type: floor.type,
                                 details: {
-                                    create: floor.details.map((detail: any) => ({
+                                    create: floor.details.create.map((detail: any) => ({
                                         index: detail.index,
                                         type: detail.type,
                                         length: detail.length,
@@ -196,23 +208,21 @@ class AssetsManagementDao {
                         }
                     }
                 });
-
+    
                 await tx.asset_fieldOfficer_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-
+    
                 await tx.asset_checker_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-
-
-
+    
                 const existingLocation = await tx.location.findFirst({
-                    where: { location: location }, 
+                    where: { location: location },
                 });
     
                 if (existingLocation) {
@@ -243,17 +253,18 @@ class AssetsManagementDao {
                     });
                     console.log("New location saved in location table:", newLocation);
                 }
-
+    
                 return assetReq;
             });
-
+    
             return generateRes(result);
-
-        } catch (error) {
+    
+        } catch (error:any) {
             console.error('Error processing request:', error);
-            throw { error: 400, msg: "duplicate" }
+            throw { error: 400, msg: error.message || "duplicate" };
         }
     };
+    
 
     // post = async (req: Request) => {
     //     const {
