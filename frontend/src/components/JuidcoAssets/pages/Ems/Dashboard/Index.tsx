@@ -23,6 +23,7 @@ import Jhar from "@/assets/icons/jhar.png"
 // import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
 import '../../../../Modal/AddMarketModal/AddMarket.css'
 import './Modal.css'
+import './Building.css'
 
 export const DashboardMain = () => {
 
@@ -51,7 +52,6 @@ export const DashboardMain = () => {
   const [file2, setFile2] = useState<File | null>(null);
   const [floorCount, setFloorCount] = useState('');
   const [buildingName, setBuildingName] = useState('');
-  const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
   const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
   // const [isModalVisibleSuccessData, setIsModalVisibleSuccessData] = useState<any>(false);
@@ -81,6 +81,11 @@ export const DashboardMain = () => {
   const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [circleData, setCircleData] = useState<any>([]);
 
+  const [commercialUnits, setCommercialUnits] = useState([]); // Array to hold commercial units data
+  const [residentialUnits, setResidentialUnits] = useState([])
+
+  const [selectedUnit, setSelectedUnit] = useState(null); // Track selected unit details for edit
+
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMarket(event.target.value);
   };
@@ -101,9 +106,6 @@ export const DashboardMain = () => {
 
 
   }, []);
-
-  console.log("residentialCount", residentialCount)
-  console.log("commercialCount", commercialCount)
 
 
   useEffect(() => {
@@ -221,6 +223,21 @@ export const DashboardMain = () => {
 
     try {
 
+      const mergedUnits = [
+        ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
+        ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
+      ];
+      
+      // Function to check if a unit is fully filled (all necessary fields are available)
+      const isUnitFilled = (unit) => {
+        return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+      };
+      
+      // Filter the merged units to include only filled units
+      const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+      
+      console.log("Filled Units:", filledUnits);
+
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
@@ -233,7 +250,8 @@ export const DashboardMain = () => {
 
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors
-      values.floorData = transformDataForAPI(data);
+      // values.floorData = transformDataForAPI(data);
+      values.floorData = filledUnits;
 
       values.building_name = buildingName;
       values.location = selectedMarket;
@@ -294,6 +312,10 @@ export const DashboardMain = () => {
       </div>
     );
   }
+
+  // const generateBoxes = (count:any) => {
+  //   return Array.from({ length: count }, (_, index) => index + 1);
+  // };
 
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
@@ -408,9 +430,6 @@ export const DashboardMain = () => {
     // Only proceed if floorCount is greater than 0
     if (numericFloorCount > 0) {
       setFloorDisable(true);
-      setInputBoxes(boxes);
-      // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
-
       setNavigationStack((prevStack) => [...prevStack, boxes] as any);
       if (value) {
         handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
@@ -433,42 +452,8 @@ export const DashboardMain = () => {
         return updatedData;
       });
     }
-
-    const popup = (
-      // <div key={`popup-${index}`}>
-      //   <input
-      //     key={index}
-      //     type="text"
-      //     className="border p-2 m-2"
-      //     placeholder={`No of shop/flat on the floor ${index + 1}`}
-      //     onChange={(e) => handlePlotCountChange(e, index)}
-      //     maxLength={3}
-      //     onKeyPress={(e: any) => {
-      //       if (!(e.key >= "0" && e.key <= "9")) {
-      //         e.preventDefault();
-      //       }
-      //     }}
-      //   />
-
-      //   <br />
-      //   <button
-      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
-      //     onClick={() => handleTypeSelect("Commercial", index)}
-      //   >
-      //     Commercial
-      //   </button>
-      //   <button
-      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
-      //     onClick={() => handleTypeSelect("Residential", index)}
-      //   >
-      //     Residential
-      //   </button>
-      // </div>
-      <></>
-    );
-
-    setInputBoxes([popup]);
-    setNavigationStack((prevStack) => [...prevStack, [popup]] as any);
+  
+    setNavigationStack((prevStack) => [...prevStack,] as any);
   };
 
   const handlePlotCountChange = (e: any, index: any) => {
@@ -501,8 +486,6 @@ export const DashboardMain = () => {
       </>
 
     );
-
-    setInputBoxes([typeBox]);
     setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
   };
 
@@ -579,29 +562,49 @@ export const DashboardMain = () => {
       </div>
     ));
 
-    // Update the input boxes based on the type
-    setInputBoxes((prevInputBoxes: any) => {
-      const typeBoxIndex = prevInputBoxes?.findIndex(
-        (box: any) => box.key === `type-${type}`
-      );
-
-      if (typeBoxIndex !== -1) {
-        return [
-          ...prevInputBoxes.slice(0, typeBoxIndex + 1),
-          ...newBoxes,
-        ];
-      }
-
-      return [...prevInputBoxes, ...newBoxes];
-    });
-
-    // Update the navigation stack
     setNavigationStack((prevStack) => {
       const newStack = [...prevStack];
       newStack[newStack.length - 1] = [newBoxes];
       return newStack;
     });
   };
+
+
+
+
+
+  // Generate boxes for the given count
+  const generateBoxes = (count) => {
+    return Array.from({ length: count }, (_, index) => index + 1);
+  };
+
+  // Handle click on unit number to show input fields
+  const handleUnitClick = (unitType, unitIndex) => {
+    setSelectedUnit({ type: unitType, index: unitIndex });
+  };
+
+  // Handle input change for unit details
+  const handleUnitDetailsChange = (e, field) => {
+    const value = e.target.value;
+    if (selectedUnit) {
+      if (selectedUnit.type === "Commercial") {
+        const updatedUnits = [...commercialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setCommercialUnits(updatedUnits);
+      } else if (selectedUnit.type === "Residential") {
+        const updatedUnits = [...residentialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setResidentialUnits(updatedUnits);
+      }
+    }
+  };
+
 
 
   const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
@@ -720,7 +723,6 @@ export const DashboardMain = () => {
       </>
     );
 
-    setInputBoxes([innerBoxes]);
     setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
   };
 
@@ -826,7 +828,6 @@ export const DashboardMain = () => {
     setNavigationStack((prevStack) => {
       if (prevStack.length > 1) {
         const newStack = prevStack.slice(0, -1);
-        setInputBoxes(newStack[newStack.length - 1]);
         return newStack;
       }
       return prevStack;
@@ -835,7 +836,6 @@ export const DashboardMain = () => {
 
   const handleClose = () => {
     setIsModalVisible(false)
-    setInputBoxes('')
   }
 
   const handleCloseDataModal = () => {
@@ -1090,6 +1090,7 @@ export const DashboardMain = () => {
                                   }}
                                   disabled={isCommercialChecked} // Disable if checked
                                 />
+                                {commercialCount}
                                 <input
                                   type="commercial"
                                   id="commercial"
@@ -1139,17 +1140,181 @@ export const DashboardMain = () => {
                               </div>}
 
 
+                              <div className="count-display">
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Commercial Data:</h4>
+        <div className="boxes">
+          {generateBoxes(commercialCount).map((num) => (
+            <span
+              key={num}
+              className="box"
+              onClick={() => handleUnitClick("Commercial", num - 1)} // Handle click on commercial unit
+            >
+              {num}
+            </span>
+          ))}
+        </div>
+
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Residential Data:</h4>
+        <div className="boxes">
+          {generateBoxes(residentialCount).map((num) => (
+            <span
+              key={num}
+              className="box"
+              onClick={() => handleUnitClick("Residential", num - 1)} // Handle click on residential unit
+            >
+              {num}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Show Input Fields When a Unit is Clicked */}
+      {selectedUnit && (
+        <div>
+          <h4>{selectedUnit.type} Unit {selectedUnit.index + 1} Details:</h4>
+
+          {/* Length Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Length in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.length || "" : residentialUnits[selectedUnit.index]?.length || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "length")}
+          />
+
+          {/* Breadth Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Breadth in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.breadth || "" : residentialUnits[selectedUnit.index]?.breadth || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "breadth")}
+          />
+
+          {/* Height Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Height in meters"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.height || "" : residentialUnits[selectedUnit.index]?.height || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "height")}
+          />
+
+          {/* Name Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Unit Name"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.name || "" : residentialUnits[selectedUnit.index]?.name || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "name")}
+          />
+
+          {/* Property Name Input */}
+          <input
+            type="text"
+            className="border p-2 m-2"
+            placeholder="Property Name"
+            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.property_name || "" : residentialUnits[selectedUnit.index]?.property_name || ""}
+            onChange={(e) => handleUnitDetailsChange(e, "property_name")}
+          />
+
+          {/* Save Button */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleSave}
+              className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+            >
+              Save & Move to Next Step
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Display Saved Data */}
+<div className="container mx-auto p-4">
+  {/* Commercial Units Section */}
+  <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
+  {commercialUnits?.length > 0 ? (
+    <div className="space-y-4">
+      {/* Displaying Commercial Units */}
+      <div className="grid grid-cols-4 gap-4">
+        {commercialUnits.map((unit, index) => {
+          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+          
+          return (
+            <div 
+              key={index} 
+              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
+            >
+              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+              <div className="space-y-2">
+                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+              </div>
+              {/* If incomplete data, show an empty block (yellow) */}
+              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ) : (
+    <p>No Commercial units saved yet.</p>
+  )}
+
+  {/* Residential Units Section */}
+  <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
+  {residentialUnits?.length > 0 ? (
+    <div className="space-y-4">
+      {/* Displaying Residential Units */}
+      <div className="grid grid-cols-4 gap-4">
+        {residentialUnits.map((unit, index) => {
+          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+          
+          return (
+            <div 
+              key={index} 
+              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
+            >
+              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+              <div className="space-y-2">
+                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+              </div>
+              {/* If incomplete data, show an empty block (yellow) */}
+              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ) : (
+    <p>No Residential units saved yet.</p>
+  )}
+</div>
 
 
 
 
-                            <div className="flex flex-col">
+
+                            commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
+
+
+
+
+                            {/* <div className="flex flex-col">
                               {inputBoxes.length > 0 ? (
                                 <div className="h-[12rem] overflow-x-auto">
                                   {inputBoxes}
                                 </div>
                               ) : null}
-                            </div>
+                            </div> */}
 
                             <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
@@ -1510,7 +1675,7 @@ export const DashboardMain = () => {
                       value={values.area}
                       error={errors.area}
                       touched={touched.area}
-                      label="Area"
+                      label="Area in sqft."
                       name="area"
                       type="text"
                       placeholder={"in sqft."}
