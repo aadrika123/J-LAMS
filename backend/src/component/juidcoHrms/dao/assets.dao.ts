@@ -256,7 +256,7 @@ class AssetsManagementDao {
     
             return generateRes(result);
     
-        } catch (error) {
+        } catch (error:any) {
             console.error('Error processing request:', error);
             console.error('Error processing request:', error.message);
             throw { error: 400, msg: "duplicate" };
