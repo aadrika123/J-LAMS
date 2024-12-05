@@ -108,19 +108,16 @@ class AssetsManagementDao {
             from_whom_acquired,
             mode_of_acquisition,
             role,
-            floorData = [],  // Default to empty array if not provided
+            floorData,
             no_of_floors,
             building_name,
             ulb_id,
             location
         } = req.body;
-        console.log("req.body",req.body)
 
-        console.log("req.body floorData",floorData)
-    
         try {
             const result = await prisma.$transaction(async (tx) => {
-    
+
                 const lastAsset = await tx.assets_list.findFirst({
                     orderBy: {
                         created_at: 'desc',
@@ -129,107 +126,97 @@ class AssetsManagementDao {
                         id: true,
                     },
                 });
-    console.log("lastAsset",lastAsset)
-                const lastId = lastAsset ? String(lastAsset.id).match(/(\d{3})$/) : null;
-                console.log("lastId",lastId)
-                const lastNumericId = lastId ? Number(lastId[0]) : 0;
-                console.log("lastNumericId",lastNumericId)
-                const newIncrementId = lastNumericId + 1;
-                const formattedIds = newIncrementId.toString().padStart(3, '0');
-                console.log("formattedIds",formattedIds)
+
+                const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
+                const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
+            
+                const newIncrementId = lastId + 1;
+                const formattedIds = newIncrementId.toString().padStart(3, '0'); 
+   
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
-                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : '';
-                const formattedId = validUlbId && validAssetType
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
+
+                const formattedId = validUlbId && validAssetType 
                     ? `${validUlbId}${validAssetType}${formattedIds}`
                     : 'invalid-id'; 
-    
-                console.log("Generated formattedId:", formattedId);
-    
+            
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-                console.log("Generated formattedId: existingAsset", existingAsset);
-                if (!existingAsset == null) {
+            
+                if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
-    
+ 
                 const assetReq = await tx.assets_list.create({
                     data: {
-                        id: formattedId,
+                        id:formattedId,
                         type_of_assets,
                         asset_sub_category_name,
                         assets_category_type,
                         khata_no,
                         plot_no,
                         ward_no,
-                        address: address || null,  // Handle potential null or empty values
-                        building_name: building_name,
-                        ulb_id: ulb_id,
-                        depreciation_method: depreciation_method || null, // Ensure undefined values are handled
-                        location: location,
-                        apreciation_method: apreciation_method || null,
-                        ownership_doc: ownership_doc || null,
-                        blue_print: blue_print || null,
-                        type_of_land: type_of_land,
-                        area: area,
-                        order_no: order_no || null,
-                        order_date: order_date || null,
-                        acquisition: acquisition || null,
-                        from_whom_acquired: from_whom_acquired || null,
-                        mode_of_acquisition: mode_of_acquisition || null,
-                        role: role,
-                        no_of_floors: no_of_floors,
+                        address,
+                        building_name:building_name, 
+                        ulb_id:ulb_id,
+                        depreciation_method,
+                        location,
+                        apreciation_method,
+                        ownership_doc,
+                        blue_print,
+                        type_of_land,
+                        area,
+                        order_no,
+                        order_date,
+                        acquisition,
+                        from_whom_acquired,
+                        mode_of_acquisition,
+                        role,
+                        no_of_floors,
                         status: 0,
                         floorData: {
-                            create: Array.isArray(floorData) && floorData.length > 0
-                                ? floorData.map((floor: any) => ({
-                                      floor: floor.floor || null, // Handle missing floor value
-                                      plotCount: floor.plotCount || 0, // Provide default value for plotCount
-                                      type: floor.type || 'Unknown', // Default value for type if missing
-                                      assetsListId: formattedId, // Use the formattedId for the foreign key
-                                      details: {
-                                          create: Array.isArray(floor.details) && floor.details.length > 0
-                                              ? floor.details.map((detail: any) => ({
-                                                    index: detail.index || null, // Handle missing index
-                                                    type: detail.type || 'Unknown', // Default type
-                                                    length: detail.length || null, // Handle missing length
-                                                    breadth: detail.breadth || null, // Handle missing breadth
-                                                    height: detail.height || null, // Handle missing height
-                                                    name: detail.name || 'Unknown', // Default name if missing
-                                                    property_name: detail.property_name || 'Unknown', // Handle missing property_name
-                                                    type_of_plot: detail.type_of_plot || 'Unknown' // Default type_of_plot
-                                              }))
-                                              : []
-                                      }
-                                  }))
-                                : []
+                            create: floorData.map((floor: any) => ({
+                                floor: floor.floor,
+                                plotCount: floor.plotCount,
+                                type: floor.type,
+                                details: {
+                                    create: floor.details.map((detail: any) => ({
+                                        index: detail.index,
+                                        type: detail.type,
+                                        length: detail.length,
+                                        breadth: detail.breadth,
+                                        height: detail.height,
+                                        name: detail.name,
+                                        property_name: detail.property_name,
+                                        type_of_plot: detail.type_of_plot
+                                    }))
+                                }
+                            }))
                         }
                     }
                 });
-                
-                
-    
-                console.log("assetReqassetReq",assetReq)
+
                 await tx.asset_fieldOfficer_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-    
+
                 await tx.asset_checker_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
-                });  
-                 console.log("assetReqassetReq lin2 217")
-    
-                const existingLocation = await tx.location.findFirst({
-                    where: { location: location },
                 });
-                console.log("assetReqassetReq lin2 222 existingLocation",existingLocation)
+
+
+
+                const existingLocation = await tx.location.findFirst({
+                    where: { location: location }, 
+                });
     
                 if (existingLocation) {
-                    console.log("255")
+                    // If location exists and either building_name or address is missing, update it
                     if (!existingLocation.building_name || !existingLocation.address) {
                         const updatedLocation = await tx.location.update({
                             where: { id: existingLocation.id },
@@ -242,35 +229,31 @@ class AssetsManagementDao {
                         console.log("Location updated in location table:", updatedLocation);
                     }
                 } else {
-                    console.log("assetReqassetReq lin2 222 existingLocation")
+                    // If location doesn't exist, create a new entry
                     const newLocation = await tx.location.create({
                         data: {
                             location: location || '',
                             ulb_id: ulb_id,
                             building_name: req.body.building_name || '',
                             address: req.body.address || '',
-                            is_active: true,
+                            is_active: true, // Assuming is_active should be true for new entries
                             created_at: new Date(),
                             updated_at: new Date(),
                         },
                     });
                     console.log("New location saved in location table:", newLocation);
                 }
-    
+
                 return assetReq;
             });
-            console.log("result",result)
-    
+
             return generateRes(result);
-    
-        } catch (error:any) {
+
+        } catch (error) {
             console.error('Error processing request:', error);
-            console.error('Error processing request:', error.message);
-            throw { error: 400, msg: "duplicate" };
+            throw { error: 400, msg: "duplicate" }
         }
     };
-    
-    
 
     // post = async (req: Request) => {
     //     const {
