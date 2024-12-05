@@ -183,26 +183,21 @@ class AssetsManagementDao {
                         // Ensure floorData is valid and an array
                         floorData: {
                             create: Array.isArray(floorData) ? floorData.map((floor: any) => ({
-                                floor: floor.floor,
-                                plotCount: floor.plotCount,
+                                floor: floor.floor, // If you want to store the floor field from the payload
+                                plotCount: floor.plotCount, // If you want to store plotCount from the payload (it's not in the payload, so you may want to leave this out or add default values)
                                 type: floor.type,
-                                assetsListId: formattedId,
-                                details: {
-                                    create: floor.details.map((detail: any) => ({
-                                        index: detail.index,
-                                        type: detail.type,
-                                        length: detail.length,
-                                        breadth: detail.breadth,
-                                        height: detail.height,
-                                        name: detail.name,
-                                        property_name: detail.property_name,
-                                        type_of_plot: detail.type_of_plot
-                                    }))
-                                }
+                                assetsListId: formattedId, // Reference to the assets list
+                                // Directly map other properties from the floorData object
+                                length: floor.length,
+                                breadth: floor.breadth,
+                                height: floor.height,
+                                name: floor.name,
+                                property_name: floor.property_name,
                             })) : []
                         }
                     }
                 });
+                
     
                 console.log("assetReqassetReq",assetReq)
                 await tx.asset_fieldOfficer_req.create({
