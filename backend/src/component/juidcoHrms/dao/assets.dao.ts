@@ -147,7 +147,7 @@ class AssetsManagementDao {
                     where: { id: formattedId },
                 });
                 console.log("Generated formattedId: existingAsset", existingAsset);
-                if (existingAsset) {
+                if (!existingAsset == null) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
     
