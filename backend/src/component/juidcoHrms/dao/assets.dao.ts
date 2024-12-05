@@ -108,16 +108,16 @@ class AssetsManagementDao {
             from_whom_acquired,
             mode_of_acquisition,
             role,
-            floorData,
+            floorData,  // This is the merged array of floors
             no_of_floors,
             building_name,
             ulb_id,
             location
         } = req.body;
-
+    
         try {
             const result = await prisma.$transaction(async (tx) => {
-
+    
                 const lastAsset = await tx.assets_list.findFirst({
                     orderBy: {
                         created_at: 'desc',
@@ -126,31 +126,31 @@ class AssetsManagementDao {
                         id: true,
                     },
                 });
-
+    
                 const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
                 const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
-            
+    
                 const newIncrementId = lastId + 1;
                 const formattedIds = newIncrementId.toString().padStart(3, '0'); 
-   
+    
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
                 const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
-
+    
                 const formattedId = validUlbId && validAssetType 
                     ? `${validUlbId}${validAssetType}${formattedIds}`
                     : 'invalid-id'; 
-            
+    
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-            
+    
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
- 
+    
                 const assetReq = await tx.assets_list.create({
                     data: {
-                        id:formattedId,
+                        id: formattedId,
                         type_of_assets,
                         asset_sub_category_name,
                         assets_category_type,
@@ -158,8 +158,8 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name:building_name, 
-                        ulb_id:ulb_id,
+                        building_name: building_name, 
+                        ulb_id: ulb_id,
                         depreciation_method,
                         location,
                         apreciation_method,
@@ -180,6 +180,7 @@ class AssetsManagementDao {
                                 floor: floor.floor,
                                 plotCount: floor.plotCount,
                                 type: floor.type,
+                                assetsListId: formattedId, // Reference the asset ID here
                                 details: {
                                     create: floor.details.map((detail: any) => ({
                                         index: detail.index,
@@ -196,27 +197,24 @@ class AssetsManagementDao {
                         }
                     }
                 });
-
+    
                 await tx.asset_fieldOfficer_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-
+    
                 await tx.asset_checker_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-
-
-
+    
                 const existingLocation = await tx.location.findFirst({
                     where: { location: location }, 
                 });
     
                 if (existingLocation) {
-                    // If location exists and either building_name or address is missing, update it
                     if (!existingLocation.building_name || !existingLocation.address) {
                         const updatedLocation = await tx.location.update({
                             where: { id: existingLocation.id },
@@ -229,31 +227,31 @@ class AssetsManagementDao {
                         console.log("Location updated in location table:", updatedLocation);
                     }
                 } else {
-                    // If location doesn't exist, create a new entry
                     const newLocation = await tx.location.create({
                         data: {
                             location: location || '',
                             ulb_id: ulb_id,
                             building_name: req.body.building_name || '',
                             address: req.body.address || '',
-                            is_active: true, // Assuming is_active should be true for new entries
+                            is_active: true,
                             created_at: new Date(),
                             updated_at: new Date(),
                         },
                     });
                     console.log("New location saved in location table:", newLocation);
                 }
-
+    
                 return assetReq;
             });
-
+    
             return generateRes(result);
-
+    
         } catch (error) {
             console.error('Error processing request:', error);
-            throw { error: 400, msg: "duplicate" }
+            throw { error: 400, msg: "duplicate" };
         }
     };
+    
 
     // post = async (req: Request) => {
     //     const {
