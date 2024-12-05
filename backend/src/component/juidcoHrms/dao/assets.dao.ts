@@ -108,12 +108,13 @@ class AssetsManagementDao {
             from_whom_acquired,
             mode_of_acquisition,
             role,
-            floorData,  // This is the merged array of floors
+            floorData = [],  // Default to empty array if not provided
             no_of_floors,
             building_name,
             ulb_id,
             location
         } = req.body;
+        console.log("req.body",req.body)
     
         try {
             const result = await prisma.$transaction(async (tx) => {
@@ -126,19 +127,21 @@ class AssetsManagementDao {
                         id: true,
                     },
                 });
-    
-                const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
-                const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
-    
-                const newIncrementId = lastId + 1;
-                const formattedIds = newIncrementId.toString().padStart(3, '0'); 
-    
+    console.log("lastAsset",lastAsset)
+                const lastId = lastAsset ? String(lastAsset.id).match(/(\d{3})$/) : null;
+                console.log("lastId",lastId)
+                const lastNumericId = lastId ? Number(lastId[0]) : 0;
+                console.log("lastNumericId",lastNumericId)
+                const newIncrementId = lastNumericId + 1;
+                const formattedIds = newIncrementId.toString().padStart(3, '0');
+                console.log("formattedIds",formattedIds)
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
-                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
-    
-                const formattedId = validUlbId && validAssetType 
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : '';
+                const formattedId = validUlbId && validAssetType
                     ? `${validUlbId}${validAssetType}${formattedIds}`
                     : 'invalid-id'; 
+    
+                console.log("Generated formattedId:", formattedId);
     
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
@@ -158,7 +161,7 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name: building_name, 
+                        building_name: building_name,
                         ulb_id: ulb_id,
                         depreciation_method,
                         location,
@@ -175,12 +178,13 @@ class AssetsManagementDao {
                         role,
                         no_of_floors,
                         status: 0,
+                        // Ensure floorData is valid and an array
                         floorData: {
-                            create: floorData.map((floor: any) => ({
+                            create: Array.isArray(floorData) ? floorData.map((floor: any) => ({
                                 floor: floor.floor,
                                 plotCount: floor.plotCount,
                                 type: floor.type,
-                                assetsListId: formattedId, // Reference the asset ID here
+                                assetsListId: formattedId,
                                 details: {
                                     create: floor.details.map((detail: any) => ({
                                         index: detail.index,
@@ -193,11 +197,12 @@ class AssetsManagementDao {
                                         type_of_plot: detail.type_of_plot
                                     }))
                                 }
-                            }))
+                            })) : []
                         }
                     }
                 });
     
+                console.log("assetReqassetReq",assetReq)
                 await tx.asset_fieldOfficer_req.create({
                     data: {
                         assetId: assetReq?.id,
@@ -208,13 +213,16 @@ class AssetsManagementDao {
                     data: {
                         assetId: assetReq?.id,
                     },
-                });
+                });  
+                 console.log("assetReqassetReq lin2 217")
     
                 const existingLocation = await tx.location.findFirst({
-                    where: { location: location }, 
+                    where: { location: location },
                 });
+                console.log("assetReqassetReq lin2 222 existingLocation",existingLocation)
     
                 if (existingLocation) {
+                    console.log("255")
                     if (!existingLocation.building_name || !existingLocation.address) {
                         const updatedLocation = await tx.location.update({
                             where: { id: existingLocation.id },
@@ -227,6 +235,7 @@ class AssetsManagementDao {
                         console.log("Location updated in location table:", updatedLocation);
                     }
                 } else {
+                    console.log("assetReqassetReq lin2 222 existingLocation")
                     const newLocation = await tx.location.create({
                         data: {
                             location: location || '',
@@ -243,14 +252,17 @@ class AssetsManagementDao {
     
                 return assetReq;
             });
+            console.log("result",result)
     
             return generateRes(result);
     
         } catch (error) {
             console.error('Error processing request:', error);
+            console.error('Error processing request:', error.message);
             throw { error: 400, msg: "duplicate" };
         }
     };
+    
     
 
     // post = async (req: Request) => {
