@@ -162,41 +162,51 @@ class AssetsManagementDao {
                         khata_no,
                         plot_no,
                         ward_no,
-                        address,
+                        address: address || null,  // Handle potential null or empty values
                         building_name: building_name,
                         ulb_id: ulb_id,
-                        depreciation_method,
-                        location,
-                        apreciation_method,
-                        ownership_doc,
-                        blue_print,
-                        type_of_land,
-                        area,
-                        order_no,
-                        order_date,
-                        acquisition,
-                        from_whom_acquired,
-                        mode_of_acquisition,
-                        role,
-                        no_of_floors,
+                        depreciation_method: depreciation_method || null, // Ensure undefined values are handled
+                        location: location,
+                        apreciation_method: apreciation_method || null,
+                        ownership_doc: ownership_doc || null,
+                        blue_print: blue_print || null,
+                        type_of_land: type_of_land,
+                        area: area,
+                        order_no: order_no || null,
+                        order_date: order_date || null,
+                        acquisition: acquisition || null,
+                        from_whom_acquired: from_whom_acquired || null,
+                        mode_of_acquisition: mode_of_acquisition || null,
+                        role: role,
+                        no_of_floors: no_of_floors,
                         status: 0,
-                        // Ensure floorData is valid and an array
                         floorData: {
-                            create: Array.isArray(floorData) ? floorData.map((floor: any) => ({
-                                floor: floor.floor, // If you want to store the floor field from the payload
-                                plotCount: floor.plotCount, // If you want to store plotCount from the payload (it's not in the payload, so you may want to leave this out or add default values)
-                                type: floor.type,
-                                assetsListId: formattedId, // Reference to the assets list
-                                // Directly map other properties from the floorData object
-                                length: floor.length,
-                                breadth: floor.breadth,
-                                height: floor.height,
-                                name: floor.name,
-                                property_name: floor.property_name,
-                            })) : []
+                            create: Array.isArray(floorData) && floorData.length > 0
+                                ? floorData.map((floor: any) => ({
+                                      floor: floor.floor || null, // Handle missing floor value
+                                      plotCount: floor.plotCount || 0, // Provide default value for plotCount
+                                      type: floor.type || 'Unknown', // Default value for type if missing
+                                      assetsListId: formattedId, // Use the formattedId for the foreign key
+                                      details: {
+                                          create: Array.isArray(floor.details) && floor.details.length > 0
+                                              ? floor.details.map((detail: any) => ({
+                                                    index: detail.index || null, // Handle missing index
+                                                    type: detail.type || 'Unknown', // Default type
+                                                    length: detail.length || null, // Handle missing length
+                                                    breadth: detail.breadth || null, // Handle missing breadth
+                                                    height: detail.height || null, // Handle missing height
+                                                    name: detail.name || 'Unknown', // Default name if missing
+                                                    property_name: detail.property_name || 'Unknown', // Handle missing property_name
+                                                    type_of_plot: detail.type_of_plot || 'Unknown' // Default type_of_plot
+                                              }))
+                                              : []
+                                      }
+                                  }))
+                                : []
                         }
                     }
                 });
+                
                 
     
                 console.log("assetReqassetReq",assetReq)
