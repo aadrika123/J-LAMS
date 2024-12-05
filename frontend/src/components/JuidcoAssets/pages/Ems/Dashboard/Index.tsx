@@ -23,6 +23,7 @@ import Jhar from "@/assets/icons/jhar.png"
 // import styles from '@/components/Modal/AddMarketModal/Modal.module.css'
 import '../../../../Modal/AddMarketModal/AddMarket.css'
 import './Modal.css'
+import './Building.css'
 
 export const DashboardMain = () => {
 
@@ -51,7 +52,6 @@ export const DashboardMain = () => {
   const [file2, setFile2] = useState<File | null>(null);
   const [floorCount, setFloorCount] = useState('');
   const [buildingName, setBuildingName] = useState('');
-  const [inputBoxes, setInputBoxes] = useState<any>([]);
   const [isModalVisible, setIsModalVisible] = useState<any>(true);
   const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
   // const [isModalVisibleSuccessData, setIsModalVisibleSuccessData] = useState<any>(false);
@@ -101,9 +101,6 @@ export const DashboardMain = () => {
 
 
   }, []);
-
-  console.log("residentialCount", residentialCount)
-  console.log("commercialCount", commercialCount)
 
 
   useEffect(() => {
@@ -295,6 +292,10 @@ export const DashboardMain = () => {
     );
   }
 
+  const generateBoxes = (count:any) => {
+    return Array.from({ length: count }, (_, index) => index + 1);
+  };
+
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
     const file = fileInput.files?.[0] ?? null;
@@ -408,9 +409,6 @@ export const DashboardMain = () => {
     // Only proceed if floorCount is greater than 0
     if (numericFloorCount > 0) {
       setFloorDisable(true);
-      setInputBoxes(boxes);
-      // setNavigationStack((prevStack) => [...prevStack, boxes] as any);
-
       setNavigationStack((prevStack) => [...prevStack, boxes] as any);
       if (value) {
         handleTypeBox({ target: { value: numericFloorCount } }, 'Residential', 0);
@@ -433,42 +431,8 @@ export const DashboardMain = () => {
         return updatedData;
       });
     }
-
-    const popup = (
-      // <div key={`popup-${index}`}>
-      //   <input
-      //     key={index}
-      //     type="text"
-      //     className="border p-2 m-2"
-      //     placeholder={`No of shop/flat on the floor ${index + 1}`}
-      //     onChange={(e) => handlePlotCountChange(e, index)}
-      //     maxLength={3}
-      //     onKeyPress={(e: any) => {
-      //       if (!(e.key >= "0" && e.key <= "9")) {
-      //         e.preventDefault();
-      //       }
-      //     }}
-      //   />
-
-      //   <br />
-      //   <button
-      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl"
-      //     onClick={() => handleTypeSelect("Commercial", index)}
-      //   >
-      //     Commercial
-      //   </button>
-      //   <button
-      //     className="bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl"
-      //     onClick={() => handleTypeSelect("Residential", index)}
-      //   >
-      //     Residential
-      //   </button>
-      // </div>
-      <></>
-    );
-
-    setInputBoxes([popup]);
-    setNavigationStack((prevStack) => [...prevStack, [popup]] as any);
+  
+    setNavigationStack((prevStack) => [...prevStack,] as any);
   };
 
   const handlePlotCountChange = (e: any, index: any) => {
@@ -501,8 +465,6 @@ export const DashboardMain = () => {
       </>
 
     );
-
-    setInputBoxes([typeBox]);
     setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
   };
 
@@ -579,23 +541,6 @@ export const DashboardMain = () => {
       </div>
     ));
 
-    // Update the input boxes based on the type
-    setInputBoxes((prevInputBoxes: any) => {
-      const typeBoxIndex = prevInputBoxes?.findIndex(
-        (box: any) => box.key === `type-${type}`
-      );
-
-      if (typeBoxIndex !== -1) {
-        return [
-          ...prevInputBoxes.slice(0, typeBoxIndex + 1),
-          ...newBoxes,
-        ];
-      }
-
-      return [...prevInputBoxes, ...newBoxes];
-    });
-
-    // Update the navigation stack
     setNavigationStack((prevStack) => {
       const newStack = [...prevStack];
       newStack[newStack.length - 1] = [newBoxes];
@@ -720,7 +665,6 @@ export const DashboardMain = () => {
       </>
     );
 
-    setInputBoxes([innerBoxes]);
     setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
   };
 
@@ -826,7 +770,6 @@ export const DashboardMain = () => {
     setNavigationStack((prevStack) => {
       if (prevStack.length > 1) {
         const newStack = prevStack.slice(0, -1);
-        setInputBoxes(newStack[newStack.length - 1]);
         return newStack;
       }
       return prevStack;
@@ -835,7 +778,6 @@ export const DashboardMain = () => {
 
   const handleClose = () => {
     setIsModalVisible(false)
-    setInputBoxes('')
   }
 
   const handleCloseDataModal = () => {
@@ -1090,6 +1032,7 @@ export const DashboardMain = () => {
                                   }}
                                   disabled={isCommercialChecked} // Disable if checked
                                 />
+                                {commercialCount}
                                 <input
                                   type="commercial"
                                   id="commercial"
@@ -1139,17 +1082,43 @@ export const DashboardMain = () => {
                               </div>}
 
 
+                              <div className="count-display">
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
+          Commercial Data:
+        </h4>
+        <div className="boxes">
+          {generateBoxes(commercialCount).map((num) => (
+            <span key={num} className="box">
+              {num}
+            </span>
+          ))}
+        </div>
+
+        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
+          Residential Data:
+        </h4>
+        <div className="boxes">
+          {generateBoxes(residentialCount).map((num) => (
+            <span key={num} className="box">
+              {num}
+            </span>
+          ))}
+        </div>
+      </div>
+
+
+                             commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
 
 
 
 
-                            <div className="flex flex-col">
+                            {/* <div className="flex flex-col">
                               {inputBoxes.length > 0 ? (
                                 <div className="h-[12rem] overflow-x-auto">
                                   {inputBoxes}
                                 </div>
                               ) : null}
-                            </div>
+                            </div> */}
 
                             <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
