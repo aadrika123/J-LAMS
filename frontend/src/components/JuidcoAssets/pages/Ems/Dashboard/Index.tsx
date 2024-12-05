@@ -220,61 +220,81 @@ export const DashboardMain = () => {
   const [succeessId, setSucceessId] = useState();
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
-
     try {
-
+      // Merging commercial and residential units
       const mergedUnits = [
         ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
         ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
       ];
-      
+  
       // Function to check if a unit is fully filled (all necessary fields are available)
       const isUnitFilled = (unit) => {
         return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
       };
-      
+  
       // Filter the merged units to include only filled units
       const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
-      
+  
       console.log("Filled Units:", filledUnits);
-
+  
+      // Handle file uploads for blue_print and ownership_doc
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
       }
-
+  
       const fileUploadData2 = await handleUpload2();
       if (fileUploadData2) {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
-
+  
+      // Set other fields from initialValues
       values.role = initialValues.role;
-      values.no_of_floors = initialValues.no_of_floors
-      // values.floorData = transformDataForAPI(data);
-      values.floorData = filledUnits;
-
+      values.no_of_floors = initialValues.no_of_floors;
+  
+      // Ensure values for floorData follow the correct format for the backend
+      values.floorData = filledUnits.map((unit) => ({
+        floor: unit.name, // Assuming 'name' is being used as floor identifier
+        plotCount: unit.plotCount, // Assuming plotCount is available in each unit
+        type: unit.type,
+        details: {
+          create: [
+            {
+              index: 1, // Assuming index 1 for the first entry; adjust as needed
+              type: unit.type,
+              length: unit.length,
+              breadth: unit.breadth,
+              height: unit.height,
+              name: unit.name,
+              property_name: unit.property_name,
+              type_of_plot: "Residential" // or "Commercial" based on the unit type
+            }
+          ]
+        }
+      }));
+  
+      // Setting additional values
       values.building_name = buildingName;
       values.location = selectedMarket;
-
+  
+      // Make the API call to create the asset
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
         method: "POST",
         data: values,
       });
-      console.log("resres",res)
-      
+  
+      console.log("Response:", res);
+  
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
         setIsModalOpen(true);
-        console.log("resres",res?.data?.data?.id)
+        console.log("Asset ID:", res?.data?.data?.id);
         setSucceessId(res?.data?.data?.id);
-
-       
       } else if (res?.data?.type === "DUPLICATE") {
         toast.error("Duplicate asset data found. Please check and try again.");
-      }
-      else {
+      } else {
         toast.error("Failed to add assets");
       }
     } catch (error) {
@@ -282,6 +302,7 @@ export const DashboardMain = () => {
       console.error('Error submitting data:', error);
     }
   };
+  
 
 
 
@@ -1090,21 +1111,7 @@ export const DashboardMain = () => {
                                   }}
                                   disabled={isCommercialChecked} // Disable if checked
                                 />
-                                {commercialCount}
-                                <input
-                                  type="commercial"
-                                  id="commercial"
-                                  name="commercial"
-                                  value="commercial"
-                                  checked={isCommercialChecked}
-                                  onChange={() => {
-                                    setIsCommercialChecked(!isCommercialChecked);
-                                    if (isCommercialChecked) {
-                                      // Reset count or other logic if necessary
-                                      setCommercialCount(commercialCount);
-                                    }
-                                  }}
-                                />
+                              <label htmlFor="">Commercial</label>
 
                                 <input
                                   key={`type-Residential`}
@@ -1123,20 +1130,7 @@ export const DashboardMain = () => {
                                   }}
                                   disabled={isResidentialChecked} // Disable if checked
                                 />
-                                <input
-                                  type="residential"
-                                  id="residential"
-                                  name="residential"
-                                  value="residential"
-                                  checked={isResidentialChecked}
-                                  onChange={() => {
-                                    setIsResidentialChecked(!isResidentialChecked);
-                                    if (isResidentialChecked) {
-                                      // Reset count or other logic if necessary
-                                      setResidentialCount(residentialCount);
-                                    }
-                                  }}
-                                />
+                               <label htmlFor="">Residential</label>
                               </div>}
 
 
