@@ -1082,32 +1082,32 @@ export const DashboardMain = () => {
                               </div>}
 
 
-                              <div className="count-display">
-        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
-          Commercial Data:
-        </h4>
-        <div className="boxes">
-          {generateBoxes(commercialCount).map((num) => (
-            <span key={num} className="box">
-              {num}
-            </span>
-          ))}
-        </div>
+                            <div className="count-display">
+                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
+                                Commercial Data:
+                              </h4>
+                              <div className="boxes">
+                                {generateBoxes(commercialCount).map((num) => (
+                                  <span key={num} className="box">
+                                    {num}
+                                  </span>
+                                ))}
+                              </div>
 
-        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
-          Residential Data:
-        </h4>
-        <div className="boxes">
-          {generateBoxes(residentialCount).map((num) => (
-            <span key={num} className="box">
-              {num}
-            </span>
-          ))}
-        </div>
-      </div>
+                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">
+                                Residential Data:
+                              </h4>
+                              <div className="boxes">
+                                {generateBoxes(residentialCount).map((num) => (
+                                  <span key={num} className="box">
+                                    {num}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
 
 
-                             commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
+                            commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
 
 
 
