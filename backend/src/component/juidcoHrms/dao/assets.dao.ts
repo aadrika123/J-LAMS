@@ -115,6 +115,8 @@ class AssetsManagementDao {
             location
         } = req.body;
         console.log("req.body",req.body)
+
+        console.log("req.body floorData",floorData)
     
         try {
             const result = await prisma.$transaction(async (tx) => {
