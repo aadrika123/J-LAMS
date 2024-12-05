@@ -223,6 +223,21 @@ export const DashboardMain = () => {
 
     try {
 
+      const mergedUnits = [
+        ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
+        ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
+      ];
+      
+      // Function to check if a unit is fully filled (all necessary fields are available)
+      const isUnitFilled = (unit) => {
+        return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+      };
+      
+      // Filter the merged units to include only filled units
+      const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+      
+      console.log("Filled Units:", filledUnits);
+
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
@@ -235,7 +250,8 @@ export const DashboardMain = () => {
 
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors
-      values.floorData = transformDataForAPI(data);
+      // values.floorData = transformDataForAPI(data);
+      values.floorData = filledUnits;
 
       values.building_name = buildingName;
       values.location = selectedMarket;
@@ -1215,12 +1231,76 @@ export const DashboardMain = () => {
       )}
 
       {/* Display Saved Data */}
-      <div>
-        <h4>Commercial Units:</h4>
-        <pre>{JSON.stringify(commercialUnits, null, 2)}</pre>
-        <h4>Residential Units:</h4>
-        <pre>{JSON.stringify(residentialUnits, null, 2)}</pre>
+<div className="container mx-auto p-4">
+  {/* Commercial Units Section */}
+  <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
+  {commercialUnits?.length > 0 ? (
+    <div className="space-y-4">
+      {/* Displaying Commercial Units */}
+      <div className="grid grid-cols-4 gap-4">
+        {commercialUnits.map((unit, index) => {
+          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+          
+          return (
+            <div 
+              key={index} 
+              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
+            >
+              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+              <div className="space-y-2">
+                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+              </div>
+              {/* If incomplete data, show an empty block (yellow) */}
+              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+            </div>
+          );
+        })}
       </div>
+    </div>
+  ) : (
+    <p>No Commercial units saved yet.</p>
+  )}
+
+  {/* Residential Units Section */}
+  <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
+  {residentialUnits?.length > 0 ? (
+    <div className="space-y-4">
+      {/* Displaying Residential Units */}
+      <div className="grid grid-cols-4 gap-4">
+        {residentialUnits.map((unit, index) => {
+          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+          
+          return (
+            <div 
+              key={index} 
+              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
+            >
+              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+              <div className="space-y-2">
+                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+              </div>
+              {/* If incomplete data, show an empty block (yellow) */}
+              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ) : (
+    <p>No Residential units saved yet.</p>
+  )}
+</div>
+
+
+
 
 
                             commercial data :- {commercialCount}   ResidentialCount data:- {residentialCount}
