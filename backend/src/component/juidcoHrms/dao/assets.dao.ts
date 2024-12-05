@@ -114,6 +114,7 @@ class AssetsManagementDao {
             ulb_id,
             location
         } = req.body;
+        console.log("req.body",req.body)
 
         try {
             const result = await prisma.$transaction(async (tx) => {
@@ -127,9 +128,11 @@ class AssetsManagementDao {
                     },
                 });
 
+                console.log("result",lastAsset);
+
                 const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
                 const lastId = numericMatch ? Number(numericMatch[0]) : 0; 
-            
+            console.log("numericMatch",numericMatch);
                 const newIncrementId = lastId + 1;
                 const formattedIds = newIncrementId.toString().padStart(3, '0'); 
    
@@ -139,11 +142,12 @@ class AssetsManagementDao {
                 const formattedId = validUlbId && validAssetType 
                     ? `${validUlbId}${validAssetType}${formattedIds}`
                     : 'invalid-id'; 
-            
+                    console.log("formattedId",formattedId);
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-            
+                console.log("existingAsset",existingAsset);
+                console.log("floorDatafloorData",floorData)
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
@@ -246,6 +250,7 @@ class AssetsManagementDao {
 
                 return assetReq;
             });
+            console.log("result",result)
 
             return generateRes(result);
 
