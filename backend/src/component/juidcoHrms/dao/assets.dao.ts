@@ -148,6 +148,7 @@ class AssetsManagementDao {
                 });
                 console.log("existingAsset",existingAsset);
                 console.log("floorDatafloorData",floorData)
+                console.log("floorDatafloorData details",floorData?.details)
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
