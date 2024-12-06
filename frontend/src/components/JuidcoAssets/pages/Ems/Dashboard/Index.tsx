@@ -97,7 +97,7 @@ export const DashboardMain = () => {
       try {
         const userDetails = JSON.parse(storedUserDetails);
         setUlbID(userDetails.ulb_id || null);
-        const data = fetchData(userDetails.ulb_id);
+         fetchData(userDetails.ulb_id);
       } catch (error) {
         console.error('Error parsing user details:', error);
       }
@@ -221,52 +221,63 @@ export const DashboardMain = () => {
         ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
         ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
       ];
-
-      const isUnitFilled = (unit:any) => {
+  
+      const isUnitFilled = (unit: any) => {
         return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
       };
+  
       const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
       }
+  
       const fileUploadData2 = await handleUpload2();
       if (fileUploadData2) {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
+  
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors;
+
       values.floorData = filledUnits.map((unit) => {
-        const details:any = [];
-        Object.keys(unit).forEach((key) => {
-          if (key !== 'type' && key !== 'name' && key !== 'plotCount') {
-            details.push({
-              index: details.length + 1,  
-              type: unit.type,
-              length: unit.length,
-              breadth: unit.breadth,
-              height: unit.height,
-              name: unit.name,
-              property_name: unit.property_name,
-              type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
-            });
-          }
-        });
-  
+        const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
+        const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
+        const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
+
+        const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
+      
+        const details = [{
+          index: 1,  
+          type: unit.type,
+          length: length,
+          breadth: breadth,
+          height: height,  
+          name: unit.name,
+          property_name: unit.property_name,
+          type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
+        }];
+      
         return {
           floor: unit.name, 
-          plotCount: unit.plotCount, 
-          type: unit.type,
-          details:  details 
+          plotCount: plotCount, 
+          type: unit.type, 
+          details: details,  
         };
       });
+
+      console.log("Mapped floorData:", values.floorData);
+  
       values.building_name = buildingName;
       values.location = selectedMarket;
+
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
-        method: "POST",
+        method: "POST", 
         data: values,
       });
+  
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
@@ -278,11 +289,16 @@ export const DashboardMain = () => {
       } else {
         toast.error("Failed to add assets");
       }
+  
     } catch (error) {
       toast.error("Failed to add Assets");
       console.error('Error submitting data:', error);
     }
   };
+  
+  
+  
+  
   
   
 
@@ -479,17 +495,17 @@ export const DashboardMain = () => {
     });
   };
 
-  const handleTypeSelect = (type: any) => {
-    setCurrentType(type);
-    const typeBox = (
-      <>
+  // const handleTypeSelect = (type: any) => {
+  //   setCurrentType(type);
+  //   const typeBox = (
+  //     <>
 
 
-      </>
+  //     </>
 
-    );
-    setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
-  };
+  //   );
+  //   setNavigationStack((prevStack) => [...prevStack, [typeBox]] as any);
+  // };
 
   const handleCommercial = (val: any) => {
     setCommercialCount(parseInt(val) || 0);
@@ -507,8 +523,8 @@ export const DashboardMain = () => {
 
     setCount(count);
 
-    let ResidentialData = 0;
-    let commercialData = 0;
+    let ResidentialData:number = 0;
+    let commercialData:number = 0;
 
     if (type === 'Residential') {
       ResidentialData = count;
@@ -810,18 +826,18 @@ export const DashboardMain = () => {
   };
 
 
-  const transformDataForAPI = (data: any) => {
-    return data
-      .filter((item: any) => item)
-      .flatMap((floor: any) =>
-        Object.entries(floor.units).map(([type, units]: any) => ({
-          floor: floor.floor,
-          plotCount: floor.plotCount,
-          type,
-          details: units.filter((unit: any) => unit),
-        }))
-      );
-  };
+  // const transformDataForAPI = (data: any) => {
+  //   return data
+  //     .filter((item: any) => item)
+  //     .flatMap((floor: any) =>
+  //       Object.entries(floor.units).map(([type, units]: any) => ({
+  //         floor: floor.floor,
+  //         plotCount: floor.plotCount,
+  //         type,
+  //         details: units.filter((unit: any) => unit),
+  //       }))
+  //     );
+  // };
 
   const handleBackss = () => {
     setNavigationStack((prevStack) => {
@@ -924,9 +940,9 @@ export const DashboardMain = () => {
               }
             }, [values.type_of_assets]);
 
-            const handleDataModal = () => {
-              setIsModalVisibleData(!isModalVisibleData)
-            }
+            // const handleDataModal = () => {
+            //   setIsModalVisibleData(!isModalVisibleData)
+            // }
 
 
             return (
@@ -978,7 +994,7 @@ export const DashboardMain = () => {
                           <div className='mb-[3rem]'>
                             <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
                             <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
-                            <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button>
+                            {/* <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button> */}
                           </div>
 
                           <div>
@@ -1052,19 +1068,19 @@ export const DashboardMain = () => {
                                   }}
                                 />
 
-                                <button
+                                {/* <button
                                   className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
                                   onClick={() => handleTypeSelect("Commercial")}
                                 >
                                   Commercial
-                                </button>
+                                </button> */}
 
-                                <button
+                                {/* <button
                                   className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
                                   onClick={() => handleTypeSelect("Residential")}
                                 >
                                   Residential
-                                </button>
+                                </button> */}
                               </div>
                             )}
 
@@ -1291,7 +1307,7 @@ export const DashboardMain = () => {
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
                             {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
 
-                            {sessionData.length > 0 ? (
+                            {/* {sessionData.length > 0 ? (
                               <div className="p-4 max-h-[40vh] overflow-y-auto">
                                 {sessionData.map((floorData, floorIndex) => {
                                   if (!floorData) return null; // Skip null entries
@@ -1331,7 +1347,7 @@ export const DashboardMain = () => {
                               </div>
                             ) : (
                               <p className="text-center">No data available.</p>
-                            )}
+                            )} */}
 
                           </div>
                         </div>
