@@ -25,18 +25,35 @@ import '../../../../Modal/AddMarketModal/AddMarket.css'
 import './Modal.css'
 import './Building.css'
 
+
+
+
 export const DashboardMain = () => {
 
+  // interface Unit {
+  //   index: number;
+  //   type: string;
+  //   length: number;
+  //   breadth: number;
+  //   height: number;
+  //   name: string;
+  //   property_name: string;
+  //   type_of_plot: string;
+  // }
+
+  
   interface Unit {
     index: number;
-    type: string;
-    length: number;
-    breadth: number;
-    height: number;
-    name: string;
-    property_name: string;
-    type_of_plot: string;
+    type: 'Commercial' | 'Residential';
+    length?: number;
+    breadth?: number;
+    height?: number;
+    name?: string;
+    property_name?: string;
+    [key: string]: any;  
   }
+
+  
 
   interface FloorData {
     floor: number;
@@ -56,9 +73,9 @@ export const DashboardMain = () => {
   const [isModalVisibleData, setIsModalVisibleData] = useState<any>(false);
   // const [isModalVisibleSuccessData, setIsModalVisibleSuccessData] = useState<any>(false);
   const [data, setData] = useState<any>([]);
-  const [currentType, setCurrentType] = useState<any>(null);
+  // const [currentType, setCurrentType] = useState<any>(null);
   const [plotNo, setPlotNo] = useState<any>(0);
-  const [count, setCount] = useState<any>(0);
+  // const [count, setCount] = useState<any>(0);
   const [, setNavigationStack] = useState<NavigationStackType>([]);
   // const [unitCompletion, setUnitCompletion] = useState<{ [key: string]: boolean }>({});
   const [sessionData, setSessionData] = useState<FloorData[]>([]);
@@ -76,19 +93,22 @@ export const DashboardMain = () => {
   const [residentialCount, setResidentialCount] = useState<any>(0);
 
 
-  const [isCommercialChecked, setIsCommercialChecked] = useState(false);
-  const [isResidentialChecked, setIsResidentialChecked] = useState(false);
+  // const [isCommercialChecked, setIsCommercialChecked] = useState(false);
+  // const [isResidentialChecked, setIsResidentialChecked] = useState(false);
   const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [circleData, setCircleData] = useState<any>([]);
 
-  const [commercialUnits, setCommercialUnits] = useState([]); // Array to hold commercial units data
-  const [residentialUnits, setResidentialUnits] = useState([])
+  const [commercialUnits, setCommercialUnits] = useState<Unit[]>([]); // Array to hold commercial units data
+  const [residentialUnits, setResidentialUnits] = useState<Unit[]>([])
 
-  const [selectedUnit, setSelectedUnit] = useState(null); // Track selected unit details for edit
+  const [selectedUnit, setSelectedUnit] = useState<any>(null); // Track selected unit details for edit
 
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMarket(event.target.value);
   };
+
+
+
 
 
   useEffect(() => {
@@ -217,9 +237,10 @@ export const DashboardMain = () => {
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
     try {
+      // 
       const mergedUnits = [
-        ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
-        ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
+        ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
+        ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
       ];
   
       const isUnitFilled = (unit: any) => {
@@ -521,14 +542,16 @@ export const DashboardMain = () => {
 
     if (isNaN(count)) return;
 
-    setCount(count);
+    // setCount(count);
 
     let ResidentialData:number = 0;
     let commercialData:number = 0;
 
     if (type === 'Residential') {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ResidentialData = count;
     } else if (type === 'Commercial') {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       commercialData = count;
       if (count > 10) {
         toast.error("Max 10 Floors");
@@ -589,34 +612,34 @@ export const DashboardMain = () => {
 
 
   // Generate boxes for the given count
-  const generateBoxes = (count) => {
+  const generateBoxes = (count: any) => {
     return Array.from({ length: count }, (_, index) => index + 1);
   };
 
   // Handle click on unit number to show input fields
-  const handleUnitClick = (unitType, unitIndex) => {
+  const handleUnitClick = (unitType: string, unitIndex: number) => {
     setSelectedUnit({ type: unitType, index: unitIndex });
   };
 
   // Handle input change for unit details
-  const handleUnitDetailsChange = (e, field) => {
+  const handleUnitDetailsChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const value = e.target.value;
     if (selectedUnit) {
-      if (selectedUnit.type === "Commercial") {
-        const updatedUnits = [...commercialUnits];
-        updatedUnits[selectedUnit.index] = {
-          ...updatedUnits[selectedUnit.index],
-          [field]: value,
-        };
-        setCommercialUnits(updatedUnits);
-      } else if (selectedUnit.type === "Residential") {
-        const updatedUnits = [...residentialUnits];
-        updatedUnits[selectedUnit.index] = {
-          ...updatedUnits[selectedUnit.index],
-          [field]: value,
-        };
-        setResidentialUnits(updatedUnits);
-      }
+        if (selectedUnit.type === "Commercial") {
+      const updatedUnits = [...commercialUnits];
+      updatedUnits[selectedUnit.index] = {
+        ...updatedUnits[selectedUnit.index],
+        [field]: value,
+      };
+      setCommercialUnits(updatedUnits);
+    } else if (selectedUnit.type === "Residential") {
+      const updatedUnits = [...residentialUnits];
+      updatedUnits[selectedUnit.index] = {
+        ...updatedUnits[selectedUnit.index],
+        [field]: value,
+      };
+      setResidentialUnits(updatedUnits);
+    }
     }
   };
 
@@ -1101,7 +1124,7 @@ export const DashboardMain = () => {
                                       e.preventDefault();
                                     }
                                   }}
-                                  disabled={isCommercialChecked} // Disable if checked
+                                  // disabled={isCommercialChecked} // Disable if checked
                                 />
                               <label htmlFor="">Commercial</label>
 
@@ -1120,7 +1143,7 @@ export const DashboardMain = () => {
                                       e.preventDefault();
                                     }
                                   }}
-                                  disabled={isResidentialChecked} // Disable if checked
+                                  // disabled={isResidentialChecked} // Disable if checked
                                 />
                                <label htmlFor="">Residential</label>
                               </div>}
@@ -1207,7 +1230,7 @@ export const DashboardMain = () => {
           {/* Save Button */}
           <div className="flex justify-center mt-4">
             <button
-              onClick={handleSave}
+              onClick={()=>handleSave(true)}
               className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
             >
               Save & Move to Next Step
@@ -1305,7 +1328,7 @@ export const DashboardMain = () => {
                             <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
-                            {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>}
+                            {/* {currentType && <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Number of {currentType} units: <span className="font-normal">{count || 0}</span></h4>} */}
 
                             {/* {sessionData.length > 0 ? (
                               <div className="p-4 max-h-[40vh] overflow-y-auto">
