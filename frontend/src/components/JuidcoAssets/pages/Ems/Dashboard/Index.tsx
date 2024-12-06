@@ -98,7 +98,6 @@ export const DashboardMain = () => {
         const userDetails = JSON.parse(storedUserDetails);
         setUlbID(userDetails.ulb_id || null);
         const data = fetchData(userDetails.ulb_id);
-        console.log("data here", data)
       } catch (error) {
         console.error('Error parsing user details:', error);
       }
@@ -157,7 +156,6 @@ export const DashboardMain = () => {
       data.append('file', file1);
       try {
         const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-        console.log("Response:", response);
 
         if (response.status === 200) {
           return {
@@ -181,7 +179,6 @@ export const DashboardMain = () => {
       data.append('file', file2);
       try {
         const response = await axios.post(`${ASSETS.LIST.validate}`, data);
-        console.log("Response:", response);
 
         if (response.status === 200) {
           return {
@@ -214,78 +211,62 @@ export const DashboardMain = () => {
       return [];
     }
   };
-  console.log("data 456", circleData)
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [succeessId, setSucceessId] = useState();
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
     try {
-      // Merging commercial and residential units
       const mergedUnits = [
         ...commercialUnits.map(unit => ({ ...unit, type: 'Commercial' })),
         ...residentialUnits.map(unit => ({ ...unit, type: 'Residential' }))
       ];
-  
-      // Function to check if a unit is fully filled (all necessary fields are available)
-      const isUnitFilled = (unit) => {
+
+      const isUnitFilled = (unit:any) => {
         return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
       };
-  
-      // Filter the merged units to include only filled units
       const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
-  
-      console.log("Filled Units:", filledUnits);
-  
-      // Handle file uploads for blue_print and ownership_doc
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
       }
-  
       const fileUploadData2 = await handleUpload2();
       if (fileUploadData2) {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
-  
-      // Set other fields from initialValues
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors;
-  
-      // Ensure values for floorData follow the correct format for the backend
-      values.floorData = filledUnits.map((unit) => ({
-        floor: unit.name, // Assuming 'name' is being used as floor identifier
-        plotCount: unit.plotCount, // Assuming plotCount is available in each unit
-        type: unit.type,
-        details: {
-          create: [
-            {
-              index: 1, // Assuming index 1 for the first entry; adjust as needed
+      values.floorData = filledUnits.map((unit) => {
+        const details:any = [];
+        Object.keys(unit).forEach((key) => {
+          if (key !== 'type' && key !== 'name' && key !== 'plotCount') {
+            details.push({
+              index: details.length + 1,  
               type: unit.type,
               length: unit.length,
               breadth: unit.breadth,
               height: unit.height,
               name: unit.name,
               property_name: unit.property_name,
-              type_of_plot: "Residential" // or "Commercial" based on the unit type
-            }
-          ]
-        }
-      }));
+              type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
+            });
+          }
+        });
   
-      // Setting additional values
+        return {
+          floor: unit.name, 
+          plotCount: unit.plotCount, 
+          type: unit.type,
+          details:  details 
+        };
+      });
       values.building_name = buildingName;
       values.location = selectedMarket;
-  
-      // Make the API call to create the asset
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
         method: "POST",
         data: values,
       });
-  
-      console.log("Response:", res);
-  
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
@@ -303,13 +284,13 @@ export const DashboardMain = () => {
     }
   };
   
+  
 
 
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  console.log("datat data data data",isModalOpen)
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
@@ -538,10 +519,7 @@ export const DashboardMain = () => {
         return;
       }
     }
-    console.log("ResidentialData", ResidentialData)
-    console.log("commercialData", commercialData)
 
-    // Update the data based on the type and index
     setData((prevData: any) => {
       const updatedData = Array.isArray(prevData) ? [...prevData] : [];
       if (index !== null && index >= 0 && index < updatedData.length) {
@@ -870,8 +848,6 @@ export const DashboardMain = () => {
     window.location.replace("/lams/apply/approve-application");
   }
 
-  console.log("setCommercialCount", commercialCount)
-  console.log("residentialCount", residentialCount)
 
   return (
     <div>
