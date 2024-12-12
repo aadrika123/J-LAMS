@@ -21,6 +21,7 @@ const ViewByIdList = () => {
   const { id } = useParams();
  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
+  const API_BASE_URL = import.meta.env.VITE_REACT_URL;
 
   const openModal = (content) => {
     setModalContent(content);
@@ -37,7 +38,7 @@ const ViewByIdList = () => {
     const fetchData = async () => {
       try {
         const res = await axios({
-          url: `https://aadrikainfomedia.com/auth/api/lams/v1/asset/get-single/?id=${id}`,
+          url: `${API_BASE_URL}/api/lams/v1/asset/get-single/?id=${id}`,
           method: 'GET',
           headers: {
             Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`

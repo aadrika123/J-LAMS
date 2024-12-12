@@ -12,6 +12,8 @@ const ImageUploader = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRejectModalOpen, setisRejectModalOpen] = useState(false);
   const [isOnHoldModalOpen, setisOnHoldModalOpen] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_REACT_URL;
+  const DMS =  import.meta.env.DMS_UPLOAD;
 
   const [modalMessage, setModalMessage] = useState("");
   // const [modalSideMessage, setModalSideMessage] = useState(null);
@@ -28,23 +30,24 @@ const ImageUploader = () => {
       return;
     }
 
-    const acceptedFileTypes = ["image/png", "image/jpeg"];
+    const acceptedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
     const validFiles = selectedFiles.filter(file =>
-      acceptedFileTypes.includes(file.type) && file.size / 1024 < 2048
+      acceptedFileTypes.includes(file.type) && file.size / 1024 < 5120
     );
 
     if (validFiles.length !== selectedFiles.length) {
       alert("Some files are invalid or too large. Only PNG or JPEG files under 2MB are allowed.");
     }
 
-    setFiles(prevFiles => {
+    setFiles((prevFiles) => {
       const newFiles = [...prevFiles, ...validFiles];
-      if (newFiles.length === 1) {
-        // Fetch location when the first file is added
-        handleGetLocation();
-      }
       return newFiles;
     });
+  
+    // Always fetch location whenever a new file is added
+    if (selectedFiles.length > 0) {
+      handleGetLocation();
+    }
     fileInput.value = "";
   };
 
@@ -106,7 +109,7 @@ const ImageUploader = () => {
         };
 
         const response = await axios.post(
-          `https://aadrikainfomedia.com/auth/api/lams/v1/asset/update-single/?id=${id}`,
+          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}`,
           data,
           {
             headers: {
@@ -136,47 +139,47 @@ const ImageUploader = () => {
 
 
 
-  const handleReject = async () => {
+  // const handleReject = async () => {
 
-    try {
-      const fileUrls = await handleUpload();
-      if (fileUrls) {
-        const data = {
-          long: String(longitude) ?? null,
-          lat: String(latitude) ?? null,
-          remarks: remarks, // Use the state value for remarks
-          image_one: fileUrls[0] ?? null,
-          image_two: fileUrls[1] ?? null,
-          image_three: fileUrls[2] ?? null,
-          image_four: fileUrls[3] ?? null,
-          image_five: fileUrls[4] ?? null,
-          status: -2,
-        };
+  //   try {
+  //     const fileUrls = await handleUpload();
+  //     if (fileUrls) {
+  //       const data = {
+  //         long: String(longitude) ?? null,
+  //         lat: String(latitude) ?? null,
+  //         remarks: remarks, // Use the state value for remarks
+  //         image_one: fileUrls[0] ?? null,
+  //         image_two: fileUrls[1] ?? null,
+  //         image_three: fileUrls[2] ?? null,
+  //         image_four: fileUrls[3] ?? null,
+  //         image_five: fileUrls[4] ?? null,
+  //         status: -2,
+  //       };
 
-        const response = await axios.post(
-          `https://aadrikainfomedia.com/auth/api/lams/v1/asset/update-single/?id=${id}`,
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
-            },
-          }
-        );
+  //       const response = await axios.post(
+  //         `https://aadrikainfomedia.com/auth/api/lams/v1/asset/update-single/?id=${id}`,
+  //         data,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
+  //           },
+  //         }
+  //       );
 
-        if (response.status === 200) {
-          setisRejectModalOpen(false);
-          setRemarks("");
-          toast.success("Files uploaded and data updated successfully");
-        } else {
-          toast.error("Failed to update data");
-        }
-      }
-    } catch (error) {
-      console.error("Error submitting data:", error);
-      toast.error("Error submitting data");
-    }
-  };
+  //       if (response.status === 200) {
+  //         setisRejectModalOpen(false);
+  //         setRemarks("");
+  //         toast.success("Files uploaded and data updated successfully");
+  //       } else {
+  //         toast.error("Failed to update data");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //     toast.error("Error submitting data");
+  //   }
+  // };
 
 
   const handleOnHold = async () => {
@@ -197,7 +200,7 @@ const ImageUploader = () => {
         };
 
         const response = await axios.post(
-          `https://aadrikainfomedia.com/auth/api/lams/v1/asset/update-single/?id=${id}`,
+          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}`,
           data,
           {
             headers: {
@@ -267,66 +270,86 @@ const ImageUploader = () => {
 
   return (
     <div className="container mx-auto">
-      {locationError && <p className="text-red-500">{locationError}</p>}
+  {locationError && <p className="text-red-500">{locationError}</p>}
 
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleFileChange}
-        className="mb-4 p-2 border border-gray-300 rounded w-full"
-        disabled={files.length >= 5} // Disable if 5 or more files
-      />
+  {/* File upload input */}
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={handleFileChange}
+    className="mb-4 p-2 border border-gray-300 rounded w-full"
+    disabled={files.length >= 5} // Disable if 5 or more files
+  />
 
-      {files.length > 0 && (
-        <div className="relative border border-gray-300 p-4 bg-white rounded shadow-sm">
-          {files.map((file, index) => (
-            <div key={index} className="relative mb-2">
-              <img
-                src={URL.createObjectURL(file)}
-                alt={`Uploaded ${index}`}
-                className="w-full h-48 object-cover mb-2 rounded"
+  {/* Camera button */}
+  <button
+    onClick={() => document.getElementById("cameraInput").click()}
+    className="mb-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-700 focus:outline-none"
+  >
+    Open Camera
+  </button>
+
+  {/* Hidden input for capturing images from the camera */}
+  <input
+    type="file"
+    accept="image/*"
+    capture="environment" // Opens the camera
+    id="cameraInput"
+    style={{ display: "none" }}
+    onChange={handleFileChange} // Reuse the same handler to manage captured images
+  />
+
+  {files.length > 0 && (
+    <div className="relative border border-gray-300 p-4 bg-white rounded shadow-sm">
+      {files.map((file, index) => (
+        <div key={index} className="relative mb-2">
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`Uploaded ${index}`}
+            className="w-full h-48 object-cover mb-2 rounded"
+          />
+          <button
+            onClick={() => handleRemoveImage(index)}
+            className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
               />
-              <button
-                onClick={() => handleRemoveImage(index)}
-                className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          ))}
-          <div>
-            <p className="mt-2">
-              Latitude: {latitude !== null ? latitude : "Not available"}
-            </p>
-            <p>Longitude: {longitude !== null ? longitude : "Not available"}</p>
-          </div>
+            </svg>
+          </button>
         </div>
-      )}
+      ))}
+      <div>
+        <p className="mt-2">
+          Latitude: {latitude !== null ? latitude : "Not available"}
+        </p>
+        <p>Longitude: {longitude !== null ? longitude : "Not available"}</p>
+      </div>
+    </div>
+  )}
 
       <div className="flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0 pt-9">
         <button
           className="bg-[#4338CA] hover:bg-white hover:text-[#4338CA] hover:border-b-2 hover:border-[#4338CA] px-7 py-2 text-white font-semibold rounded shadow-lg border border-[#4338ca] focus:outline-none"
-          onClick={() =>
+          onClick={() => {
+            handleOnHold(); // Call the handleOnHold function
             handleOpenModal(
               "Are you sure you want to put this on hold?",
               "This action can be reverted.",
               setisOnHoldModalOpen(true)
-            )
-          }
+            );
+          }}
         >
           On-Hold
         </button>
@@ -347,11 +370,12 @@ const ImageUploader = () => {
         <button
           className="bg-[#4338CA] hover:bg-white hover:text-[#4338CA] hover:border-b-2 hover:border-[#4338CA] px-7 py-2 text-white font-semibold rounded shadow-lg border border-[#4338ca] focus:outline-none"
           onClick={() => {
+            handleApprove(); // Call the handleApprove function
             handleOpenModal(
               "Are you sure you want to approve this?",
               "This action is irreversible.",
               setIsModalOpen(true)
-            )
+            );
           }}
         >
           Approve
