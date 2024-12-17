@@ -8,10 +8,10 @@ import NotificationSidebar from '../../NotificationSidebar'
 import axios from "@/lib/axiosConfig";
 // import { calcLength } from "framer-motion";
 
-// interface UserDetails {
-//   user_type: string;
-//   // Add other properties here if necessary
-// }
+interface UserDetails {
+  user_type: string;
+  // Add other properties here if necessary
+}
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
   className: string;
@@ -22,7 +22,7 @@ const Header: React.FC<SideBarProps> = (props) => {
 
   const [ulbId, setUlbId] = useState<string>("");
   const [ulbName, setUlbName] = useState<string>("");
-  // const [userStorage, setUserStorage] = useState<string>("");
+  const [userStorage, setUserStorage] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -33,6 +33,7 @@ const Header: React.FC<SideBarProps> = (props) => {
       }
     }
   }, [ulbId]);
+  console.log("to prevent lintin error", userStorage);
 
   useEffect(() => {
     const fetchData = async (ulbId: any) => {
@@ -76,16 +77,16 @@ const Header: React.FC<SideBarProps> = (props) => {
     }
   }
 
-  // useEffect(() => {
-  //   const userdata = localStorage.getItem('user_details');
+  useEffect(() => {
+    const userdata = localStorage.getItem('user_details');
 
-  //   if (userdata) {
-  //     const parsedData: UserDetails = JSON.parse(userdata); // Parse the data into the UserDetails type
-  //     // setUserStorage(parsedData.user_type);
-  //   } else {
-  //     console.log('No user data found');
-  //   }
-  // }, []);
+    if (userdata) {
+      const parsedData: UserDetails = JSON.parse(userdata); // Parse the data into the UserDetails type
+      setUserStorage(parsedData.user_type);
+    } else {
+      console.log('No user data found');
+    }
+  }, []);
 
 
   return (

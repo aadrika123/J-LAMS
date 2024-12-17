@@ -37,7 +37,7 @@ const NotificationSidebar: React.FC = () => {
     const fetchNotifications = async () => {
       try {
         // Retrieve the access token from localStorage
-        const token = "44078|rWlvvjD03ayfUsTjSwifI7izjMUoTb0X1cy2aqQ26c7da260";
+        const token = localStorage.getItem("accesstoken");
         // console.log("tttttttttttttttt", token)
 
         const response = await axios.get(`${ASSETS.LIST.notifications}`, {
