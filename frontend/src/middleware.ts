@@ -20,9 +20,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/lams/auth/login", request.url));
   }
 
-  const paths = data.find(
-    (i: any) => i.user_type.toLowerCase() === user?.user_type?.toLowerCase()
-  )?.paths;
+  // const paths = data.find(
+  //   (i: any) => i.user_type.toLowerCase() === user?.user_type?.toLowerCase()
+  // )?.paths;
 
   // const u = paths?.find((i:any) => request.url.includes(i));
 
