@@ -24,7 +24,7 @@ export function middleware(request: NextRequest) {
     (i: any) => i.user_type.toLowerCase() === user?.user_type?.toLowerCase()
   )?.paths;
 
-  const u = paths?.find((i:any) => request.url.includes(i));
+  // const u = paths?.find((i:any) => request.url.includes(i));
 
   // if (!u) {
   //   return NextResponse.redirect(new URL("/lams/404", request.url));
