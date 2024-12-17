@@ -8,10 +8,10 @@ import NotificationSidebar from '../../NotificationSidebar'
 import axios from "@/lib/axiosConfig";
 // import { calcLength } from "framer-motion";
 
-interface UserDetails {
-  user_type: string;
-  // Add other properties here if necessary
-}
+// interface UserDetails {
+//   user_type: string;
+//   // Add other properties here if necessary
+// }
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
   className: string;
