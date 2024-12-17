@@ -31,6 +31,7 @@ const COLUMN = [
   { name: "ASSET TYPE" },
   { name: "LAND TYPE" },
   { name: "KHATA NO." },
+  { name: "WARD NO." },
   { name: "AREA (sqFt.)" },
   { name: "DOCUMENTS" },
   { name: "ACTIONS" },
@@ -195,12 +196,13 @@ const FieldOfficer = () => {
                   <td className="px-4 py-3">{item?.assets_category_type}</td>
                   <td className="px-4 py-3">{item?.type_of_land}</td>
                   <td className="px-4 py-3">{item?.khata_no}</td>
+                  <td className="px-4 py-3">{item?.ward_no}</td>
                   <td className="px-4 py-3">{item?.area}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" onClick={() => alert("To see documents, go to the view page")}>
                     {item?.blue_print?.length && item?.ownership_doc?.length ? (
                       <div className="flex gap-3">
-                        <Image src={docs} alt="docs" />{" "}
-                        <Image src={pdf} alt={pdf} />
+                        <Image src={docs} alt="docs" />
+                        <Image src={pdf} alt="pdf" />
                       </div>
                     ) : (
                       <div className="ml-3">

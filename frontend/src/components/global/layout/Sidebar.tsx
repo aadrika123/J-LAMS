@@ -31,23 +31,23 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
   // };
 
   useEffect(() => {
-      if (typeof window !== "undefined") {
-          const data = localStorage.getItem("user_details");
-          const user_details = JSON.parse(data as string);       
-              if (user_details?.user_type !== "Employee") {
-                  setSidebarLink(sidebarLinks);
-              } else {
-                  if (user_details.id !== 72) {
-                      let updatedSubModules: any
-                      sidebarLinks.modules[0].subModules = updatedSubModules
-                      setSidebarLink(sidebarLinks);
-                  } else {
-                      setSidebarLink(sidebarLinks);
-                  }
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("user_details");
+      const user_details = JSON.parse(data as string);
+      if (user_details?.user_type !== "Employee") {
+        setSidebarLink(sidebarLinks);
+      } else {
+        if (user_details.id !== 72) {
+          let updatedSubModules: any
+          sidebarLinks.modules[0].subModules = updatedSubModules
+          setSidebarLink(sidebarLinks);
+        } else {
+          setSidebarLink(sidebarLinks);
+        }
 
-              // }
-          }
+        // }
       }
+    }
   }, []);
 
   useEffect(() => {
@@ -84,44 +84,62 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
           </div>
 
-                   <Link href="/apply/approve-application" className="text-xl text-white">
+          <Link href="/apply/approve-application" className="text-xl text-white">
 
-                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
-                    <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white"/>
-                  <InnerHeading  className="text-xl text-white">Home</InnerHeading>
-                    </div>
-                    </Link>
-
-
-                    <Link href="/hold/fieldofficer" className="text-xl text-white">
-
-                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
-                    <Image src={FieldOfficerHoldIcon} alt="finance" width={30} height={30} className="text-white"/>
-                  <InnerHeading  className="text-xl text-white">Hold by Field Officer</InnerHeading>
-                    </div>
-                    </Link>
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Home</InnerHeading>
+            </div>
+          </Link>
 
 
+          <Link href="/hold/fieldofficer" className="text-xl text-white">
 
-                    <Link href="/hold/admin" className="text-xl text-white">
-
-                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
-                    <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white"/>
-                  <InnerHeading  className="text-xl text-white">Hold by Admin </InnerHeading>
-                    </div>
-                    </Link>
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={FieldOfficerHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Hold by Field Officer</InnerHeading>
+            </div>
 
 
-                    <Link href="/hold/marketmaster" className="text-xl text-white">
+          </Link>
 
-<div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
-  <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white"/>
-<InnerHeading  className="text-xl text-white">Market Master </InnerHeading>
-  </div>
-  </Link>
 
-                    
-{/* 
+
+
+
+
+          <Link href="/assets/assets-approved" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Admin Approved Assets</InnerHeading>
+            </div>
+          </Link>
+
+
+
+
+
+
+          <Link href="/hold/admin" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Hold by Admin </InnerHeading>
+            </div>
+          </Link>
+
+
+          <Link href="/hold/marketmaster" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Market Master </InnerHeading>
+            </div>
+          </Link>
+
+
+          {/* 
           <div>
             {sidebarLink?.modules?.map(() => {
               return (

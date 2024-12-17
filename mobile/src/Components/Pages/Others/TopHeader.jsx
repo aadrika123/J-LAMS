@@ -98,6 +98,16 @@ const TopHeader = (props) => {
               <BiLogOutCircle />
             </button>
           </span>
+          <span className="sm:visible flex items-center">
+            <Tooltip anchorId="logout" className="z-50" />
+            <button
+              id="notification"
+              data-tooltip-content="Notification"
+              className=" bg-[#4338CA] text-white rounded-md p-1"
+            >
+              <NotificationSidebar />
+            </button>
+          </span>
           <Tooltip anchorId="notification_icon" className="z-50" />
 
           {/* <NotificationSidebar /> */}

@@ -39,6 +39,7 @@ const Login = () => {
   const handleLogin = async (values: LoginInitialData) => {
     try {
       activateWorkingAnimation();
+  
       const res = await axios({
         url: `${process.env.backend}/api/login`,
         method: "POST",
@@ -47,31 +48,34 @@ const Login = () => {
           password: values.password,
         },
       });
-
+  
+      console.log(res);
+  
       const data = res.data.data;
-      localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
-      Cookies.set("emp_id", data?.userDetails?.emp_id);
-
+  
       if (data) {
+        // Store user details and token in localStorage and cookies
+        localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+        Cookies.set("emp_id", data?.userDetails?.emp_id);
         Cookies.set("accesstoken", data?.token);
-
+  
+        // Store token in localStorage
+        localStorage.setItem("accesstoken", data?.token); // Add this line
+  
+        // Dispatch login and redirect user based on user type
         if (typeof window !== "undefined") {
           const storedData = localStorage.getItem("user_details");
-          const data = storedData && JSON.parse(storedData);
-          if (data?.user_type === "Municipal") {
-            dispatch(login(data)), "a";
-            if (typeof window !== "undefined")
-              window.location.replace("/lams/apply/approve-application");
-          }
-          else if (data?.user_type === "Admin") {
-            dispatch(login(data)), "a";
-            if (typeof window !== "undefined")
-              window.location.replace("/lams/apply/approve-application");
-          }
-          else {
-            dispatch(login(data));
-            if (typeof window !== "undefined")
-              window.location.replace("/hrms/ems/dashboard");
+          const userData = storedData && JSON.parse(storedData);
+  
+          if (userData?.user_type === "Municipal") {
+            dispatch(login(userData));
+            window.location.replace("/lams/apply/approve-application");
+          } else if (userData?.user_type === "Admin") {
+            dispatch(login(userData));
+            window.location.replace("/lams/apply/approve-application");
+          } else {
+            dispatch(login(userData));
+            window.location.replace("/hrms/ems/dashboard");
           }
         }
       } else {

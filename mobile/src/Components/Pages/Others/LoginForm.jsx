@@ -22,7 +22,7 @@ const LoginForm = () => {
     console.log("val", values)
     try {
       const res = await axios({
-        url: `https://aadrikainfomedia.com/auth/api/login`,
+        url: `http://127.0.0.1:8000/api/login`,
         method: "POST",
         data: {
           email: values.email,

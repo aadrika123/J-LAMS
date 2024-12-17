@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const ImageUploader = () => {
   const [files, setFiles] = useState([]);
@@ -14,6 +15,7 @@ const ImageUploader = () => {
   const [isOnHoldModalOpen, setisOnHoldModalOpen] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_REACT_URL;
   const DMS =  import.meta.env.DMS_UPLOAD;
+  const navigate = useNavigate();
 
   const [modalMessage, setModalMessage] = useState("");
   // const [modalSideMessage, setModalSideMessage] = useState(null);
@@ -58,9 +60,12 @@ const ImageUploader = () => {
       const uploadPromises = files.map(file => {
         const data = new FormData();
         data.append('file', file);
+        const APIDMS_BASE_URL = import.meta.env.VITE_REACT_DMS_UPLOAD;
 
+ console.log("tttttttttttt",APIDMS_BASE_URL)
         return axios.post(
-          "https://aadrikainfomedia.com/auth/api/lams/v1/dms/upload-gets",
+          // "https://aadrikainfomedia.com/auth/api/lams/v1/dms/upload-gets",
+          `${APIDMS_BASE_URL}`,
           data,
           {
             headers: {
@@ -260,6 +265,10 @@ const ImageUploader = () => {
   
 
   const handleApprove = () => {
+    if (files.length === 0) {
+      alert("Please upload at least one file before approving.");
+      return;
+    }
     handleSubmit(); // Trigger file submission on approval
   };
 
@@ -349,6 +358,7 @@ const ImageUploader = () => {
               "This action can be reverted.",
               setisOnHoldModalOpen(true)
             );
+            navigate("/field-officer")
           }}
         >
           On-Hold
@@ -376,6 +386,8 @@ const ImageUploader = () => {
               "This action is irreversible.",
               setIsModalOpen(true)
             );
+            navigate("/field-officer")
+            window.location.reload();
           }}
         >
           Approve

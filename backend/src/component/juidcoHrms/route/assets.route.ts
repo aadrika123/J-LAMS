@@ -119,6 +119,15 @@ class AssetManagementRoute {
     (req: Request, res: Response, next: NextFunction) =>
       this.assetManagementController.locationselect(req, res, next, "0114"),
   ); //0114
+
+  // Define the route for the filtered assets
+app
+.route(`${baseUrl}/assets/filtered-by-location`)
+.get(
+  (req: Request, res: Response, next: NextFunction) =>
+    this.assetManagementController.getFilteredAssets(req, res, next, "0115") 
+);
+  
   }
 }
 

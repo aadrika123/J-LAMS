@@ -26,6 +26,7 @@ type Urls = {
     marketcircle?:string;
     locationadd?: string;
     locationselect?: string;
+    notifications?: string;
   };
 };
 
@@ -46,6 +47,7 @@ export const ASSETS: Urls = {
     marketcircle: "/asset/marketcircle?",
     locationadd: "/asset/locationadd",
     locationselect: "asset/locationselect?",
+    notifications: "/notifications/get"
     
   },
 };
