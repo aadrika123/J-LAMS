@@ -6,7 +6,7 @@ import { ASSETS } from "@/utils/api/urls";
 import NotificationSidebar from '../../NotificationSidebar'
 
 import axios from "@/lib/axiosConfig";
-import { calcLength } from "framer-motion";
+// import { calcLength } from "framer-motion";
 
 interface UserDetails {
   user_type: string;
@@ -22,7 +22,7 @@ const Header: React.FC<SideBarProps> = (props) => {
 
   const [ulbId, setUlbId] = useState<string>("");
   const [ulbName, setUlbName] = useState<string>("");
-  const [userStorage, setUserStorage] = useState<string>("");
+  // const [userStorage, setUserStorage] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -81,7 +81,7 @@ const Header: React.FC<SideBarProps> = (props) => {
 
     if (userdata) {
       const parsedData: UserDetails = JSON.parse(userdata); // Parse the data into the UserDetails type
-      setUserStorage(parsedData.user_type);
+      // setUserStorage(parsedData.user_type);
     } else {
       console.log('No user data found');
     }
