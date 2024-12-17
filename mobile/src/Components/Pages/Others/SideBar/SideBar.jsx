@@ -55,13 +55,14 @@ const SideBar = (props) => {
     navigate("/approval-view"); // Change this path to the desired route
   };
   const handleNavigation1 = () => {
-    navigate("/Rejected-view"); // Change this path to the desired route
+    navigate("/admin-approve-view"); // Change this path to the desired route
   };
   const handleNavigation2 = () => {
     navigate("/on-hold-view"); // Change this path to the desired route
   };
   const handleHomeNavigation = () => {
     navigate("/field-officer"); // Change this path to the desired route
+    // window.location.reload();
   };
 
   useEffect(() => {
@@ -169,7 +170,7 @@ const SideBar = (props) => {
                         </li>
 
                         {/* ........................ */}
-                        {/* <li
+                        <li
                           className="bg-[#4338ca] text-white px-4 py-2 rounded hover:bg-[#5a50c8] hover:scale-95 transition duration-300 ease-in-out  cursor-pointer flex items-center mt-2 "
                           onClick={handleNavigation1}
                         >
@@ -178,8 +179,8 @@ const SideBar = (props) => {
                             alt="Approved Icon"
                             className="mr-2"
                           />
-                          Rejected Application
-                        </li> */}
+                          Admin Approved Assets
+                        </li>
                         {/* ........................ */}
                         <li
                           className="bg-[#4338ca] text-white px-4 py-2 rounded hover:bg-[#5a50c8] hover:scale-95 transition duration-300 ease-in-out cursor-pointer flex items-center mt-2"

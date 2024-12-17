@@ -198,3 +198,13 @@ model location {
   created_at   DateTime @db.Timestamp
   updated_at   DateTime @db.Timestamp
 }
+
+model notifications {
+  id           Int   @id @default(autoincrement())
+  asset_id     String   // Foreign key to the assets_list table
+  message      String
+  created_at   DateTime @default(now())
+  status       Int
+  role         String?  // Role (e.g., Municipal, Field Officer)
+}
+

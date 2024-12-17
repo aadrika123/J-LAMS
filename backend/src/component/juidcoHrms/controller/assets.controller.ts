@@ -457,6 +457,43 @@ class AssetManagementController {
               })
         }
     };
+
+    getFilteredAssets = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+      ): Promise<Response<any, Record<string, any>>> => {
+        try {
+          // Extract filters from query parameters
+          const location = req.query.location as string;
+          const building_name = req.query.building_name as string;
+    
+          // Call the DAO to fetch filtered assets
+          const data = await this.assetsManagementDao.getFilteredAssets(location, building_name);
+    
+          return res.json({
+            status: true,
+            message: "Assets fetched successfully",
+            "meta-data": {
+              apiId,
+              action: "GET",
+              version: "1.0",
+            },
+            data: data,
+          });
+        } catch (error) {
+          return res.json({
+            status: false,
+            message: "Error occurred while fetching assets",
+            "meta-data": {
+              apiId,
+              action: "GET",
+              version: "1.0",
+            },
+          });
+        }
+      };
     
 }
 

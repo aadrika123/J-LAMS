@@ -7,6 +7,7 @@
 import { Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import { generateRes } from "../../../util/generateRes";
+import NotificationsDao from "./notifications.dao";
 
 
 const prisma = new PrismaClient();
@@ -114,7 +115,9 @@ class AssetsManagementDao {
             ulb_id,
             location
         } = req.body;
-    
+
+        const notificationsDao = new NotificationsDao();
+
         try {
             const result = await prisma.$transaction(async (tx) => {
                 const lastAsset = await tx.assets_list.findFirst({
@@ -125,27 +128,27 @@ class AssetsManagementDao {
                         id: true,
                     },
                 });
-    
+
                 const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
                 const lastId = numericMatch ? Number(numericMatch[0]) : 0;
                 const newIncrementId = lastId + 1;
-                const formattedIds = newIncrementId.toString().padStart(3, '0'); 
-    
+                const formattedIds = newIncrementId.toString().padStart(3, '0');
+
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
-                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : ''; 
-    
-                const formattedId = validUlbId && validAssetType 
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : '';
+
+                const formattedId = validUlbId && validAssetType
                     ? `${validUlbId}${validAssetType}${formattedIds}`
-                    : 'invalid-id'; 
-    
+                    : 'invalid-id';
+
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-    
+
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
-    
+
                 const assetReq = await tx.assets_list.create({
                     data: {
                         id: formattedId,
@@ -156,7 +159,7 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name: building_name, 
+                        building_name: building_name,
                         ulb_id: ulb_id,
                         depreciation_method,
                         location,
@@ -182,9 +185,9 @@ class AssetsManagementDao {
                                     create: floor.details.map((detail: any) => ({
                                         index: detail.index,
                                         type: detail.type,
-                                        length: detail.length ? String(detail.length) : null, 
+                                        length: detail.length ? String(detail.length) : null,
                                         breadth: detail.breadth ? String(detail.breadth) : null,
-                                        height: detail.height ? String(detail.height) : null, 
+                                        height: detail.height ? String(detail.height) : null,
                                         name: detail.name,
                                         property_name: detail.property_name,
                                         type_of_plot: detail.type_of_plot
@@ -194,23 +197,23 @@ class AssetsManagementDao {
                         }
                     }
                 });
-    
+
                 await tx.asset_fieldOfficer_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-    
+
                 await tx.asset_checker_req.create({
                     data: {
                         assetId: assetReq?.id,
                     },
                 });
-    
+
                 const existingLocation = await tx.location.findFirst({
-                    where: { location: location }, 
+                    where: { location: location },
                 });
-    
+
                 if (existingLocation) {
                     if (!existingLocation.building_name || !existingLocation.address) {
                         const updatedLocation = await tx.location.update({
@@ -230,24 +233,28 @@ class AssetsManagementDao {
                             ulb_id: ulb_id,
                             building_name: req.body.building_name || '',
                             address: req.body.address || '',
-                            is_active: true, 
+                            is_active: true,
                             created_at: new Date(),
                             updated_at: new Date(),
                         },
                     });
                 }
-    
+                // Create a notification for the newly created asset
+                await notificationsDao.createNotification(assetReq.id, 0, role);
+
                 return assetReq;
             });
-    
+
+
+
             return generateRes(result);
-    
+
         } catch (error) {
             console.error('Error processing request:', error);
             throw { error: 400, msg: "duplicate" }
         }
     };
-    
+
 
     // post = async (req: Request) => {
     //     const {
@@ -450,7 +457,7 @@ class AssetsManagementDao {
 
     // };
 
-    
+
     getAll = async (req: Request) => {
 
         const page = Number(req.query.page) || 1;
@@ -458,7 +465,7 @@ class AssetsManagementDao {
         const search = req.query.search as string || '';
         const filter = req.query.filter as string || '';
         console.log(req.body.auth);
-        const {ulb_id} = req.body.auth ||2;
+        const { ulb_id } = req.body.auth || 2;
         // const id =  Number(req.query.id) || 1;
 
         const status = Number(req.query.status)
@@ -484,104 +491,6 @@ class AssetsManagementDao {
 
             const count = await prisma.assets_list.count({
 
-                    where: {
-                        OR: search
-                            ? [
-                                {
-                                    type_of_assets: {
-                                        contains: search,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    asset_sub_category_name: {
-                                        contains: search,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    khata_no: {
-                                        contains: search,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    assets_category_type: {
-                                        contains: search,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    area: {
-                                        contains: search,
-                                        mode: "insensitive",
-                                    },
-                                }
-                            ]
-                            : undefined,
-                        ulb_id: ulb_id,
-                        AND: [
-                            filter ? {
-                                OR: [
-                                    {
-                                        assets_category_type: {
-                                            equals: filter,
-                                            mode: "insensitive",
-                                        },
-                                    },
-                                    {
-                                        type_of_assets: {
-                                            equals: filter,
-                                            mode: "insensitive",
-                                        },
-                                    },
-                                ],
-                            } : {},
-                            (status === 0 || status) ? {
-                                status: {
-                                    equals: status,
-                                },
-                            } : {},
-                            land ? {
-                                type_of_land: {
-                                    equals: land,
-                                    mode: "insensitive",
-                                },
-                            } : {},
-                        ]
-                        
-    
-    
-                    },
-                    // ...(search && {
-                    //     OR: [
-                    //         { type_of_assets: { contains: search, mode: "insensitive" } },
-                    //         { asset_sub_category_name: { contains: search, mode: "insensitive" } },
-                    //         { khata_no: { contains: search, mode: "insensitive" } },
-                    //         { assets_category_type: { contains: search, mode: "insensitive" } },
-                    //         { area: { contains: search, mode: "insensitive" } },
-                    //     ],
-                    // }),
-                    // ...(filter && {
-                    //     OR: [
-                    //         {assets_category_type: { equals: filter,mode: "insensitive", },},
-                    //         { type_of_assets: {  equals: filter,  mode: "insensitive", },
-                    //         },
-                    //     ],
-                    // }),
-                    // ...(status !== undefined && {
-                    //     status: { equals: status },
-                    // }),
-                    // ...(land && {
-                    //     type_of_land: { equals: land, mode: "insensitive" },
-                    // }),
-            });
-    
-            const totalPages = Math.ceil(count / limit);
-    
-            const assetGet = await prisma.assets_list.findMany({
-                skip: skip,
-                take: limit,
                 where: {
                     OR: search
                         ? [
@@ -599,6 +508,12 @@ class AssetsManagementDao {
                             },
                             {
                                 khata_no: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                ward_no: {
                                     contains: search,
                                     mode: "insensitive",
                                 },
@@ -647,7 +562,111 @@ class AssetsManagementDao {
                             },
                         } : {},
                     ]
-                    
+
+
+
+                },
+                // ...(search && {
+                //     OR: [
+                //         { type_of_assets: { contains: search, mode: "insensitive" } },
+                //         { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                //         { khata_no: { contains: search, mode: "insensitive" } },
+                //         { assets_category_type: { contains: search, mode: "insensitive" } },
+                //         { area: { contains: search, mode: "insensitive" } },
+                //     ],
+                // }),
+                // ...(filter && {
+                //     OR: [
+                //         {assets_category_type: { equals: filter,mode: "insensitive", },},
+                //         { type_of_assets: {  equals: filter,  mode: "insensitive", },
+                //         },
+                //     ],
+                // }),
+                // ...(status !== undefined && {
+                //     status: { equals: status },
+                // }),
+                // ...(land && {
+                //     type_of_land: { equals: land, mode: "insensitive" },
+                // }),
+            });
+
+            const totalPages = Math.ceil(count / limit);
+
+            const assetGet = await prisma.assets_list.findMany({
+                skip: skip,
+                take: limit,
+                where: {
+                    OR: search
+                        ? [
+                            {
+                                type_of_assets: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                asset_sub_category_name: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                khata_no: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                ward_no: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                assets_category_type: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                area: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            }
+                        ]
+                        : undefined,
+                    ulb_id: ulb_id,
+                    AND: [
+                        filter ? {
+                            OR: [
+                                {
+                                    assets_category_type: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                                {
+                                    type_of_assets: {
+                                        equals: filter,
+                                        mode: "insensitive",
+                                    },
+                                },
+                            ],
+                        } : {},
+                        (status === 0 || status) ? {
+                            status: {
+                                equals: status,
+                            },
+                        } : {},
+                        land ? {
+                            type_of_land: {
+                                equals: land,
+                                mode: "insensitive",
+                            },
+                        } : {},
+                    ]
+
 
 
                 },
@@ -740,6 +759,7 @@ class AssetsManagementDao {
         } = req.body;
 
         const id = String(req.query.id);
+        const notificationsDao = new NotificationsDao();
 
         try {
             const result = await prisma.$transaction(async (tx) => {
@@ -761,6 +781,11 @@ class AssetsManagementDao {
                 if (!existingAsset) {
                     console.log("Asset not found");
                     throw new Error("Asset not found");
+                }
+
+                // Log change in status to notifications
+                if (existingAsset.status !== status) {
+                    await notificationsDao.createNotification(id, status, existingAsset.role);
                 }
 
                 await tx.assets_list_change_log.create({
@@ -1247,9 +1272,9 @@ class AssetsManagementDao {
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
 
-  
+
         const filter = req.query.filter as string || '';
-        const id =  Number(req.query.id) || 1;
+        const id = Number(req.query.id) || 1;
 
         const status = Number(req.query.status)
         const land = req.query.land as string || ''
@@ -1271,7 +1296,7 @@ class AssetsManagementDao {
 
         try {
 
-    
+
             const assetGet = await prisma.assets_list.findMany({
                 where: {
                     OR: search
@@ -1338,7 +1363,7 @@ class AssetsManagementDao {
                             },
                         } : {},
                     ]
-                    
+
 
 
                 },
@@ -1399,40 +1424,40 @@ class AssetsManagementDao {
 
     locationselect = async (req: Request) => {
 
-        const id = Number(req.query.id) || 1;  
+        const id = Number(req.query.id) || 1;
         try {
-          // Fetch circle data
-          const circleGet = await prisma.location.findMany({
-            where: {
-              ulb_id: id,
-            },
-            orderBy: {
-              created_at: 'desc', 
-            },
-          });
+            // Fetch circle data
+            const circleGet = await prisma.location.findMany({
+                where: {
+                    ulb_id: id,
+                },
+                orderBy: {
+                    created_at: 'desc',
+                },
+            });
 
 
-          return generateRes({
-            data: circleGet,  
-          });
-      
+            return generateRes({
+                data: circleGet,
+            });
+
         } catch (err) {
-          console.error("Error fetching market circle data:", err);
-          return generateRes({
-            data: [],  // Return empty data on error
-            message: 'Error fetching market circle data',
-          });
+            console.error("Error fetching market circle data:", err);
+            return generateRes({
+                data: [],  // Return empty data on error
+                message: 'Error fetching market circle data',
+            });
         }
-      };
-      
+    };
+
 
     //   marketcircle = async (req: Request) => {
     //     const page = Number(req.query.page) || 1; 
     //     const limit = Number(req.query.limit) || 5; 
     //     const id = Number(req.query.id) || 1;
-        
+
     //     const skip = (page - 1) * limit;
-    
+
     //     try {
     //         const circleGet = await prisma.location.findMany({
     //             where: {
@@ -1444,7 +1469,7 @@ class AssetsManagementDao {
     //             skip: skip,      
     //             take: limit,   
     //         });
-    
+
 
     //         const circleGets = await prisma.assets_list.findMany({
     //             where: {
@@ -1462,17 +1487,17 @@ class AssetsManagementDao {
     //             },
     //             skip: skip,     
     //             take: limit,   
-               
+
     //         });
 
     //         console.log("circleGet",circleGet)
     //         console.log("circleGets",circleGets)
-    
+
     //         let resultData = [];
 
     //         for (const item of circleGets) {
     //             const matchedAsset = circleGet.find(asset => asset.location === item.location);
-    
+
     //             if (matchedAsset) {
     //                 resultData.push(matchedAsset); 
     //             } else {
@@ -1487,7 +1512,7 @@ class AssetsManagementDao {
     //             limit,            
     //             totalPages: resultData.length, 
     //         });
-    
+
     //     } catch (err) {
     //         console.error("Error fetching market circle data:", err);
     //         return generateRes({
@@ -1496,10 +1521,10 @@ class AssetsManagementDao {
     //         });
     //     }
     // };
-    
+
     marketcircle = async (req: Request) => {
-        const page = Number(req.query.page) || 1; 
-        const limit = Number(req.query.limit) || 5; 
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 5;
         const id = Number(req.query.id) || 1;
         const skip = (page - 1) * limit;
         try {
@@ -1509,12 +1534,12 @@ class AssetsManagementDao {
                     ulb_id: id,
                 },
                 orderBy: {
-                    created_at: 'desc', 
+                    created_at: 'desc',
                 },
-                skip: skip,      
-                take: limit,   
+                skip: skip,
+                take: limit,
             });
-    
+
             const circleGets = await prisma.assets_list.findMany({
                 where: {
                     ulb_id: id,
@@ -1527,41 +1552,41 @@ class AssetsManagementDao {
                     address: true
                 },
                 orderBy: {
-                    created_at: 'desc', 
+                    created_at: 'desc',
                 },
-                skip: skip,     
-                take: limit,   
+                skip: skip,
+                take: limit,
             });
-    
+
             for (const asset of circleGet) {
                 const matchedAsset = circleGets.find(item => item.location === asset.location);
                 if (matchedAsset) {
                     resultData.push({
-                        ...asset, 
+                        ...asset,
                         building_name: matchedAsset.building_name || null,
-                        address: matchedAsset.address || null              
+                        address: matchedAsset.address || null
                     });
                 } else {
                     resultData.push(asset);
                 }
             }
-    
+
             return generateRes({
-                data: resultData, 
-                page,             
-                limit,            
-                totalPages: Math.ceil(resultData.length / limit), 
+                data: resultData,
+                page,
+                limit,
+                totalPages: Math.ceil(resultData.length / limit),
             });
-    
+
         } catch (err) {
             console.error("Error fetching market circle data:", err);
             return generateRes({
-                data: [],  
+                data: [],
                 message: 'Error fetching market circle data',
             });
         }
     };
-    
+
 
 
 
@@ -1570,39 +1595,82 @@ class AssetsManagementDao {
         const ids = req.body.id;
         try {
             const result = await prisma.$transaction(async (tx) => {
-                const existingLocation  = await tx.location.findFirst({
-                    where: { location:locationData, }, 
+                const existingLocation = await tx.location.findFirst({
+                    where: { location: locationData, },
                 });
-    
-    
-                if (existingLocation ) {
+
+
+                if (existingLocation) {
                     throw new Error(`${locationData} already exists`);
                 }
 
                 const assetReq = await tx.location.create({
                     data: {
-                        ulb_id: ids, 
-                        location: locationData||'',
-                        is_active: true, 
-                        building_name:"",
-                        address:"",   
-                        created_at: new Date(), 
-                        updated_at: new Date(), 
+                        ulb_id: ids,
+                        location: locationData || '',
+                        is_active: true,
+                        building_name: "",
+                        address: "",
+                        created_at: new Date(),
+                        updated_at: new Date(),
                     },
                 });
-    
-                return assetReq; 
+
+                return assetReq;
             });
 
             return generateRes(result);
-    
+
         } catch (error) {
             console.error('Error processing request:', error);
             throw { error: 400, msg: "Unable to add location due to a duplicate" };
         }
     };
 
-    
+    getFilteredAssets = async (location: string, building_name: string) => {
+        try {
+            const assets = await prisma.assets_list.findMany({
+                where: {
+                    status: 2, // Approved assets only
+                    location: {
+                        contains: location,
+                        mode: "insensitive",
+                    },
+                    building_name: {
+                        contains: building_name,
+                        mode: "insensitive",
+                    },
+                },
+                select: {
+                    id: true,
+                    type_of_assets: true,
+                    asset_sub_category_name: true,
+                    assets_category_type: true,
+                    khata_no: true,
+                    plot_no: true,
+                    ward_no: true,
+                    building_name: true,
+                    location: true,
+                    address: true,
+                    ulb_id: true,
+                    type_of_land: true,
+                    area: true,
+                    from_whom_acquired: true,
+                    mode_of_acquisition: true,
+                    no_of_floors: true,
+                },
+            });
+
+            return assets;
+        } catch (error) {
+            throw new Error("Error fetching filtered assets");
+        }
+    };
+
+
 }
+
+
+
 
 export default AssetsManagementDao;

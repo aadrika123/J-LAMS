@@ -21,6 +21,9 @@ const ViewByIdList = () => {
   const { id } = useParams();
  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
+
+  const [ulbId, setUlbId] = useState(null);
+  const [ulbName, setUlbName] = useState("");
   const API_BASE_URL = import.meta.env.VITE_REACT_URL;
 
   const openModal = (content) => {
@@ -33,7 +36,37 @@ const ViewByIdList = () => {
     setModalContent('');
   };
   
+  useEffect(() => {
+    // Retrieve user details from localStorage
+    if (typeof window !== "undefined") {
+      const user_det = localStorage.getItem("user_details");
+      if (user_det) {
+        const ulb_id = JSON.parse(user_det)?.ulb_id;
+        setUlbId(ulb_id);
+      }
+    }
+  }, []);
 
+  useEffect(() => {
+    // Fetch ULB name from API
+    const fetchData = async (ulbId) => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/lams/v1/assets/ulb-get?id=${ulbId}`, {
+          headers: {
+            Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
+          },
+        });
+        const ulbName = res.data?.data?.data[0]?.ulb_name || "not found";
+        setUlbName(ulbName);
+      } catch (error) {
+        console.error("Error fetching data:", error.response || error.message);
+      }
+    };
+
+    if (ulbId) {
+      fetchData(ulbId);
+    }
+  }, [ulbId]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -112,7 +145,7 @@ const ViewByIdList = () => {
         <div>
           <InnerHeading>ULB Name</InnerHeading>
           <p className='text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl'>
-            {ulbname }
+            {ulbName || "Loading..." }
                   </p>
         </div>
 
@@ -360,7 +393,7 @@ const ViewByIdList = () => {
           {/* Modal */}
           {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white p-4 rounded-lg w-full h-full max-w-lg md:max-w-3/4 max-h-3/4 md:h-auto flex flex-col">
+              <div className="bg-white p-4 rounded-lg w-[40rem] h-[50rem]  flex flex-col">
                 <button
                   className="self-end text-red-600 font-bold mb-2"
                   onClick={closeModal}

@@ -14,8 +14,8 @@ export function middleware(request: NextRequest) {
   }
 
   if (
-    request.url === "http://localhost:5000/" ||
-    request.url === "http://localhost:5000/lams"
+    request.url === "http://localhost:5005/" ||
+    request.url === "http://localhost:5005/lams"
   ) {
     return NextResponse.redirect(new URL("/lams/auth/login", request.url));
   }
@@ -26,9 +26,9 @@ export function middleware(request: NextRequest) {
 
   const u = paths?.find((i:any) => request.url.includes(i));
 
-  if (!u) {
-    return NextResponse.redirect(new URL("/lams/404", request.url));
-  }
+  // if (!u) {
+  //   return NextResponse.redirect(new URL("/lams/404", request.url));
+  // }
 }
 
 // See "Matching Paths" below to learn more

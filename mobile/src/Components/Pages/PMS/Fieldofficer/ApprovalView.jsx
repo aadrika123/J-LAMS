@@ -72,7 +72,7 @@ const ApprovalView = () => {
 
     try {
       const res = await axios({
-        url: `${API_BASE_URL}/api/lams/v1/asset/get?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}&status=1`,
+        url: `${API_BASE_URL}/api/lams/v1/asset/get?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}`,   
         method: "GET",
         headers: {
           Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
@@ -81,7 +81,7 @@ const ApprovalView = () => {
 
       // Filter data to include only items with status 2
       const filteredData =
-        res?.data?.data?.data.filter((item) => item.status === 1) || [];
+        res?.data?.data?.data.filter((item) => item.status === 1 || item.status === 2) || [];
       setFilteredData(filteredData);
       console.log("Response from the API >>> ", res?.data?.data?.totalPages);
       setTotalPages(res?.data?.data?.totalPages || 1);

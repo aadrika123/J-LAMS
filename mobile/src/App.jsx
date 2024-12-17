@@ -14,7 +14,7 @@ import AxiosInterceptors from '@/Components/Common/AxiosInterceptors';
 import FieldOfficer from "./Components/Pages/PMS/Fieldofficer/FieldOfficer";
 import ViewByIdList from "./Components/Pages/PMS/Fieldofficer/ViewByIdList";
 import ApprovalView from "./Components/Pages/PMS/Fieldofficer/ApprovalView";
-import RejectView from "./Components/Pages/PMS/Fieldofficer/RejectedView";
+import ApprovedView from "./Components/Pages/PMS/Fieldofficer/AdminApprovedView";
 import OnHoldView from "./Components/Pages/PMS/Fieldofficer/OnHoldView";
 import BarGraph from "./Components/Pages/PMS/Graphs/BarGraph";
 import FinanceGrant_Form from "./Components/Pages/PMS/Finance/FinanceGrant_Form";
@@ -70,7 +70,7 @@ function App() {
     { path: "/field-officer", element: <FieldOfficer /> },
     { path:"/approval-view" ,element: <ApprovalView/> },
     { path: "/on-hold-view", element: <OnHoldView/> },
-    { path: "/Rejected-view", element: <RejectView/> },
+    { path: "/admin-approve-view", element: <ApprovedView/> },
     { path: "/Graph-views", element: <BarGraph /> },
     { path: "/Finance_grant-Form", element: <FinanceGrant_Form /> },
     { path: "/Suda_scheme-Form", element: <SudaScheme_Dtl /> },
