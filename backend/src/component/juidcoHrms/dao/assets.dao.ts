@@ -1632,6 +1632,7 @@ class AssetsManagementDao {
             const assets = await prisma.assets_list.findMany({
                 where: {
                     status: 2, // Approved assets only
+                    type_of_assets: "Building",
                     location: {
                         contains: location,
                         mode: "insensitive",
@@ -1658,9 +1659,30 @@ class AssetsManagementDao {
                     from_whom_acquired: true,
                     mode_of_acquisition: true,
                     no_of_floors: true,
+                    floorData: {
+                        select: {
+                            id: true,
+                            floor: true,
+                            plotCount: true,
+                            type: true,
+                            details: {
+                                select: {
+                                    id: true,
+                                    index: true,
+                                    type: true,
+                                    length: true,
+                                    breadth: true,
+                                    height: true,
+                                    name: true,
+                                    property_name: true,
+                                    type_of_plot: true,
+                                },
+                            },
+                        },
+                    },
                 },
             });
-
+    
             return assets;
         } catch (error) {
             throw new Error("Error fetching filtered assets");
