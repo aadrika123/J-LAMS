@@ -93,7 +93,9 @@ const TopHeader = (props) => {
               id="logout"
               data-tooltip-content="Log Out"
               onClick={() => openModal()}
+              // className="bg-[#4338CA] text-white rounded-md p-1"
               className="text-2xl font-semibold bg-[#4338CA] text-white rounded-md p-1"
+
             >
               <BiLogOutCircle />
             </button>

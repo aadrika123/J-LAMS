@@ -1213,7 +1213,7 @@ export const DashboardMain = () => {
           <input
             type="text"
             className="border p-2 m-2"
-            placeholder="Unit Name"
+            placeholder="Owner Name"
             value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.name || "" : residentialUnits[selectedUnit.index]?.name || ""}
             onChange={(e) => handleUnitDetailsChange(e, "name")}
           />
