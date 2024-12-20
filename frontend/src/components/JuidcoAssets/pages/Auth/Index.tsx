@@ -5,21 +5,33 @@
  */
 
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 // import Login from ".";
 // import Lottie from "lottie-react";
 
 import img from "../../lotties/loginImage.json";
 import lock from "../../lotties/lock.json";
+
+import Logo from "@/assets/icons/housesAnimate.svg";
+import Image from "next/image";
 const LoginPage = dynamic(() => import("./Login"), {
-    ssr: false,
-  });
+  ssr: false,
+});
 
 const Lottie = dynamic(() => import("lottie-react"), {
-    ssr: false
+  ssr: false
 })
 const HeroLoginPage = () => {
+  const [showImage, setShowImage] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowImage(true);
+    }, 1000); 
+
+    return () => clearTimeout(timer); // Cleanup on unmount
+  }, []);
   return (
     <>
       <div className="h-screen border-2 border-red-200 flex flex-col justify-between bg-gray-100 darks:bg-gray-900 border-b darks:bg-opacity-40">
@@ -60,7 +72,14 @@ const HeroLoginPage = () => {
                 <div className="flex-shrink max-w-full px-4 w-full lg:w-1/2">
                   <div className="text-center  lg:mt-0">
                     <div className="relative">
-                      <Lottie
+                    {showImage && (
+                    <Image
+                      src={Logo}
+                      alt="Logo"
+                      className="w-full max-w-xs mx-auto md:max-w-sm lg:max-w-md"
+                    />
+                  )}
+                      {/* <Lottie
                         animationData={lock}
                         loop={true}
                         className="w-[20%] ml-[8rem] absolute"
@@ -71,7 +90,7 @@ const HeroLoginPage = () => {
                           loop={true}
                           className="m-0 w-full"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
