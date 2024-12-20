@@ -10,8 +10,8 @@ import dynamic from "next/dynamic";
 // import Login from ".";
 // import Lottie from "lottie-react";
 
-import img from "../../lotties/loginImage.json";
-import lock from "../../lotties/lock.json";
+// import img from "../../lotties/loginImage.json";
+// import lock from "../../lotties/lock.json";
 
 import Logo from "@/assets/icons/housesAnimate.svg";
 import Image from "next/image";
@@ -19,9 +19,9 @@ const LoginPage = dynamic(() => import("./Login"), {
   ssr: false,
 });
 
-const Lottie = dynamic(() => import("lottie-react"), {
-  ssr: false
-})
+// const Lottie = dynamic(() => import("lottie-react"), {
+//   ssr: false
+// })
 const HeroLoginPage = () => {
   const [showImage, setShowImage] = useState(false);
 
