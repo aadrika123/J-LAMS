@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState('');
+  const API_BASE_URL = import.meta.env.VITE_REACT_URL;
 
   // Creating schema
   const schema = Yup.object().shape({
@@ -22,7 +23,7 @@ const LoginForm = () => {
     console.log("val", values)
     try {
       const res = await axios({
-        url: `http://127.0.0.1:8000/api/login`,
+        url: `${API_BASE_URL}/api/login`,
         method: "POST",
         data: {
           email: values.email,
