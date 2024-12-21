@@ -1627,7 +1627,7 @@ class AssetsManagementDao {
         }
     };
 
-    getFilteredAssets = async (location: string, building_name: string) => {
+    getFilteredAssets = async (location: string, building_name: string, id?: string) => {
         try {
             const assets = await prisma.assets_list.findMany({
                 where: {
@@ -1641,6 +1641,7 @@ class AssetsManagementDao {
                         contains: building_name,
                         mode: "insensitive",
                     },
+                    ...(id && { id }), // Filter by id if provided
                 },
                 select: {
                     id: true,
