@@ -12,14 +12,14 @@ import { useParams } from 'react-router-dom';
 const ViewByIdList = () => {
   // Get the title bar visibility from the context
   const { titleBarVisibility } = useContext(contextVar);
- 
+
   // const [modalSideMessage, setModalSideMessage] = useState("");
   const [role, setRole] = useState('');
 
   const [viewData, setViewData] = useState(null);
 
   const { id } = useParams();
- const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
 
   const [ulbId, setUlbId] = useState(null);
@@ -35,7 +35,7 @@ const ViewByIdList = () => {
     setIsModalOpen(false);
     setModalContent('');
   };
-  
+
   useEffect(() => {
     // Retrieve user details from localStorage
     if (typeof window !== "undefined") {
@@ -117,8 +117,8 @@ const ViewByIdList = () => {
                   <div className="text-green-500">Approved by Admin</div>
                 ) : viewData?.status === 0 ? (
                   <div className="text-orange-500">Pending or Not Updated</div>
-                // ) : viewData?.status === -1 ? (
-                //   <div className="text-red-500">Rejected</div>
+                  // ) : viewData?.status === -1 ? (
+                  //   <div className="text-red-500">Rejected</div>
                 ) : viewData?.status === 1 ? (
                   <div className="text-green-500">
                     Approved by Field Officer
@@ -145,8 +145,8 @@ const ViewByIdList = () => {
         <div>
           <InnerHeading>ULB Name</InnerHeading>
           <p className='text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl'>
-            {ulbName || "Loading..." }
-                  </p>
+            {ulbName || "Loading..."}
+          </p>
         </div>
 
         <div>
@@ -426,7 +426,7 @@ const ViewByIdList = () => {
                     className="text-indigo-600 font-bold"
                     target="_blank"
                   >
-                    Download Document 
+                    Download Document
                   </a>
                 </div>
               </div>
@@ -436,48 +436,44 @@ const ViewByIdList = () => {
 
         <div></div>
 
+
+        {/* xcvbnm,.xcvgbhjklfghjk */}
+      </div>
+      <div className="border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
         {viewData?.type_of_assets === 'Building' && (
           <div>
             <InnerHeading>Floor Details</InnerHeading>
             <div className="mt-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 max-w-full">
                 {viewData?.floorData?.map((floor) =>
                   floor.details?.map((detail) => (
                     <div
                       key={detail.id}
-                      className="bg-white shadow-md rounded-lg p-4"
+                      className="bg-gradient-to-r from-[#D1E8E2] to-[#E4D1E8] shadow-lg rounded-lg p-6 transition-all cursor-pointer"
                     >
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Floor:</span>{' '}
-                        {floor.floor}
+                      <p className="text-lg font-bold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Floor:</span> {floor.floor}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Type:</span>{' '}
-                        {detail?.type}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Type:</span> {detail?.type}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Type of Plot:</span>{' '}
-                        {detail?.type_of_plot}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Type of Plot:</span> {detail?.type_of_plot}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Plot:</span>{' '}
-                        {detail.index}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Plot:</span> {detail.index}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Length:</span>{' '}
-                        {detail.length}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Length:</span> {detail.length}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Breadth:</span>{' '}
-                        {detail.breadth}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Breadth:</span> {detail.breadth}
                       </p>
-                      <p className="text-md font-bold mb-2 pb-1 border-b-2">
-                        <span className="text-[#4338CA]">Height:</span>{' '}
-                        {detail.height}
+                      <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]">
+                        <span className="text-[#4338CA]">Height:</span> {detail.height}
                       </p>
-                      <p className="text-md font-bold pb-1">
-                        <span className="text-[#4338CA]">Name:</span>{' '}
-                        {detail.name}
+                      <p className="text-lg font-semibold pb-1">
+                        <span className="text-[#4338CA]">Name:</span> {detail.name}
                       </p>
                     </div>
                   ))
@@ -486,15 +482,14 @@ const ViewByIdList = () => {
             </div>
           </div>
         )}
-
-        {/* xcvbnm,.xcvgbhjklfghjk */}
       </div>
+
 
       <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">
         <ImageUploader />
       </div>
 
-      
+
     </div>
   );
 };
