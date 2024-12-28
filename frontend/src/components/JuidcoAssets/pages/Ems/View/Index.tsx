@@ -385,7 +385,7 @@ const View = ({ id }: { id: number }) => {
                         <div>
                             {role === 'Field Officer' ? null :
                                 <>
-                                    Update Status - {data?.data?.status === 2 ? <div className='text-green-500'>Approved by Admin</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : data?.data?.status === 1 ? <div className='text-green-500'>Approved by Field Officer</div> :data?.data?.status === 3 ? <div className='text-orange-500'>Sent back by Field Officer</div>: <>null</>}
+                                    Update Status - {data?.data?.status === 2 ? <div className='text-green-500'>Approved by Admin</div> : data?.data?.status === 0 ? <div className='text-orange-500'> Pending or Not Updated</div> : data?.data?.status === -1 ? <div className='text-red-500'>Rejected</div> : data?.data?.status === 1 ? <div className='text-green-500'>Approved by Field Officer</div> : data?.data?.status === 3 ? <div className='text-orange-500'>Sent back by Field Officer</div> : <>null</>}
                                 </>
                             }
                         </div>
@@ -779,7 +779,7 @@ const View = ({ id }: { id: number }) => {
                                                                     <div key={floorIndex} className="m-2 grid grid-cols-3 gap-3">
                                                                         {floor?.details?.map((detail: any, detailIndex: any) => (
                                                                             <div key={detailIndex} className="bg-white shadow-md rounded-lg p-8 border border-gray-200">
-                                                                                
+
                                                                                 <div className="mb-4">
                                                                                     <label className="block text-sm font-medium text-gray-700  p-2 m-2">
                                                                                         Plot:
@@ -1046,6 +1046,7 @@ const View = ({ id }: { id: number }) => {
                         )}
                     </div>
                 </div>
+
                 <div>
                     <InnerHeading>BluePrint</InnerHeading>
                     {data?.data?.blue_print?.endsWith('.pdf') ? (
@@ -1062,24 +1063,35 @@ const View = ({ id }: { id: number }) => {
                         </>
                     )}
                 </div>
-                <div></div>
 
+                {/* <div></div> */}
+
+
+
+
+            </div>
+
+            <div className="border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
                 {data?.data?.type_of_assets === "Building" ? (
                     <div>
-                        <InnerHeading>Floor Details</InnerHeading>
-                        <div className="mt-5">
-                            <div className="grid grid-cols-3 gap-3 w-[55rem]">
+                        <SubHeading>
+                            <Image src={Home3} alt="employee" width={40} height={20} />
+                            <span className="ml-3">Floor Details</span>
+                        </SubHeading>
+                        {/* <InnerHeading></InnerHeading> */}
+                        <div className="mt-5 w-full">
+                            <div className="grid grid-cols-5 gap-5 w-full">
                                 {data?.data?.floorData?.map((floor: any) =>
                                     floor.details?.map((detail: any) => (
-                                        <div key={detail.id} className="bg-white shadow-md rounded-lg p-4">
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Floor :</span> {floor.floor}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Type :</span> {detail?.type}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Type of Plot :</span> {detail?.type_of_plot}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Plot :</span> {detail.index}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
-                                            <p className="text-md font-bold mb-2 pb-1 border-b-2"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
-                                            <p className="text-md font-bold pb-1"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
+                                        <div key={detail.id} className="bg-gradient-to-r from-[#D1E8E2] to-[#E4D1E8] shadow-lg rounded-lg p-6">
+                                            <p className="text-lg font-bold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Floor :</span> {floor.floor}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Type :</span> {detail?.type}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Type of Plot :</span> {detail?.type_of_plot}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Plot :</span> {detail.index}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
+                                            <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
+                                            <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
                                         </div>
                                     ))
                                 )}
@@ -1087,8 +1099,8 @@ const View = ({ id }: { id: number }) => {
                         </div>
                     </div>
                 ) : <></>}
-
             </div>
+
             <br></br>
 
             {role === 'Municipal' ? (
@@ -1103,12 +1115,12 @@ const View = ({ id }: { id: number }) => {
                         <div></div>
 
                         <div>
-                            <InnerHeading>Latitute</InnerHeading>
+                            <InnerHeading>Latitude</InnerHeading>
                             <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.lat === null ? <>Pending for Verification</> : <> {datas?.data[0]?.lat} </>}</p>
                         </div>
 
                         <div>
-                            <InnerHeading>Longitute</InnerHeading>
+                            <InnerHeading>Longitude</InnerHeading>
                             <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.long === null ? <>Pending for Verification</> : <>{datas?.data[0]?.long}</>}</p>
                         </div>
 
@@ -1123,22 +1135,22 @@ const View = ({ id }: { id: number }) => {
                             <div className="grid grid-cols-5 gap-4 mt-4 w-[50rem]">
 
                                 <div className='row'>
-                                        <span className='ml-2'>Image 1</span>
-                                        {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
-                                            <>
-                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
-                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
-                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
-                                                }
-                                            </>
-                                        )}
+                                    <span className='ml-2'>Image 1</span>
+                                    {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
                                 </div>
-                                
+
                                 <div className='row '>
                                     <span className='ml-2'>Image 2</span>
                                     {datas?.data[0]?.image_two?.endsWith('.pdf') ? (
@@ -1260,22 +1272,22 @@ const View = ({ id }: { id: number }) => {
                             <div className="grid grid-cols-5 gap-4 mt-4 w-[50rem]">
 
                                 <div className='row'>
-                                        <span className='ml-2'>Image 1</span>
-                                        {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
-                                            <>
-                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
-                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
-                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
-                                                }
-                                            </>
-                                        )}
+                                    <span className='ml-2'>Image 1</span>
+                                    {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
+                                        <>
+                                            {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
+                                            }
+                                        </>
+                                    ) : (
+                                        <>
+                                            {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
+                                            }
+                                        </>
+                                    )}
                                 </div>
-                                
+
                                 <div className='row '>
                                     <span className='ml-2'>Image 2</span>
                                     {datas?.data[0]?.image_two?.endsWith('.pdf') ? (

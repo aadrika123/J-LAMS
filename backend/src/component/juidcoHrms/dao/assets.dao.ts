@@ -178,7 +178,7 @@ class AssetsManagementDao {
                         status: 0,
                         floorData: {
                             create: floorData.map((floor: any) => ({
-                                floor: parseInt(floor.floor, 10),
+                                floor: floor.floor,
                                 plotCount: floor.plotCount,
                                 type: floor.type,
                                 details: {
@@ -254,6 +254,179 @@ class AssetsManagementDao {
             throw { error: 400, msg: "duplicate" }
         }
     };
+
+    postWithModifiedId = async (req: Request) => {
+        const {
+            type_of_assets,
+            asset_sub_category_name,
+            assets_category_type,
+            khata_no,
+            plot_no,
+            ward_no,
+            address,
+            depreciation_method,
+            apreciation_method,
+            blue_print,
+            ownership_doc,
+            type_of_land,
+            area,
+            order_no,
+            order_date,
+            acquisition,
+            from_whom_acquired,
+            mode_of_acquisition,
+            role,
+            floorData,
+            no_of_floors,
+            building_name,
+            ulb_id,
+            location,
+        } = req.body;
+    
+        const { assets_id } = req.query;
+        const assetId = Array.isArray(assets_id) ? assets_id[0] : assets_id;
+    
+        if (typeof assetId !== 'string') {
+            throw new Error("Invalid assets_id. It must be a string.");
+        }
+    
+        const notificationsDao = new NotificationsDao();
+    
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                // Find the next version of the asset ID
+                const existingAssets = await tx.assets_list.findMany({
+                    where: {
+                        id: {
+                            startsWith: assetId,
+                        },
+                    },
+                    select: { id: true },
+                });
+    
+                const maxVersion = existingAssets
+                    .map((asset) => {
+                        const parts = asset.id.split('-');
+                        return parts.length > 1 ? parseInt(parts[1], 10) : 0;
+                    })
+                    .reduce((max, current) => Math.max(max, current), 0);
+    
+                const newAssetsId = `${assetId}-${maxVersion + 1}`;
+    
+                // Ensure the new ID doesn't already exist
+                const existingAsset = await tx.assets_list.findUnique({
+                    where: { id: newAssetsId },
+                });
+    
+                if (existingAsset) {
+                    throw new Error(`Asset with ID ${newAssetsId} already exists`);
+                }
+    
+                const assetReq = await tx.assets_list.create({
+                    data: {
+                        id: newAssetsId,
+                        type_of_assets,
+                        asset_sub_category_name,
+                        assets_category_type,
+                        khata_no,
+                        plot_no,
+                        ward_no,
+                        address,
+                        building_name,
+                        ulb_id,
+                        depreciation_method,
+                        location,
+                        apreciation_method,
+                        ownership_doc,
+                        blue_print,
+                        type_of_land,
+                        area,
+                        order_no,
+                        order_date,
+                        acquisition,
+                        from_whom_acquired,
+                        mode_of_acquisition,
+                        role,
+                        no_of_floors,
+                        status: 0,
+                        is_restructured: true, // Add is_restructured field
+                        floorData: {
+                            create: floorData.map((floor: any) => ({
+                                floor: floor.floor,
+                                plotCount: floor.plotCount,
+                                type: floor.type,
+                                details: {
+                                    create: floor.details.map((detail: any) => ({
+                                        index: detail.index,
+                                        type: detail.type,
+                                        length: detail.length ? String(detail.length) : null,
+                                        breadth: detail.breadth ? String(detail.breadth) : null,
+                                        height: detail.height ? String(detail.height) : null,
+                                        name: detail.name,
+                                        property_name: detail.property_name,
+                                        type_of_plot: detail.type_of_plot,
+                                    })),
+                                },
+                            })),
+                        },
+                    },
+                });
+    
+                await tx.asset_fieldOfficer_req.create({
+                    data: {
+                        assetId: assetReq.id,
+                    },
+                });
+    
+                await tx.asset_checker_req.create({
+                    data: {
+                        assetId: assetReq.id,
+                    },
+                });
+    
+                const existingLocation = await tx.location.findFirst({
+                    where: { location },
+                });
+    
+                if (existingLocation) {
+                    if (!existingLocation.building_name || !existingLocation.address) {
+                        await tx.location.update({
+                            where: { id: existingLocation.id },
+                            data: {
+                                building_name: existingLocation.building_name || building_name || '',
+                                address: existingLocation.address || address || '',
+                                updated_at: new Date(),
+                            },
+                        });
+                    }
+                } else {
+                    await tx.location.create({
+                        data: {
+                            location: location || '',
+                            ulb_id: ulb_id,
+                            building_name: building_name || '',
+                            address: address || '',
+                            is_active: true,
+                            created_at: new Date(),
+                            updated_at: new Date(),
+                        },
+                    });
+                }
+    
+                // Create a notification for the newly created asset
+                await notificationsDao.createNotification(assetReq.id, 0, role);
+    
+                return assetReq;
+            });
+    
+            return generateRes(result);
+        } catch (error) {
+            console.error('Error processing request:', error);
+            throw { error: 400, msg: "duplicate" };
+        }
+    };
+    
+    
 
 
     // post = async (req: Request) => {
@@ -696,6 +869,89 @@ class AssetsManagementDao {
 
     };
 
+
+    getRestructuredAssets = async (req: Request) => {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const search = req.query.search as string || '';
+        const filter = req.query.filter as string || '';
+        const { ulb_id } = req.body.auth || 2; // Ensure a valid `ulb_id` is provided
+        const skip = (page - 1) * limit;
+    
+        try {
+            const count = await prisma.assets_list.count({
+                where: {
+                    is_restructured: true, // Only restructured assets
+                    OR: search
+                        ? [
+                            { type_of_assets: { contains: search, mode: "insensitive" } },
+                            { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                            { khata_no: { contains: search, mode: "insensitive" } },
+                            { ward_no: { contains: search, mode: "insensitive" } },
+                            { assets_category_type: { contains: search, mode: "insensitive" } },
+                            { area: { contains: search, mode: "insensitive" } },
+                        ]
+                        : undefined,
+                    ulb_id: ulb_id,
+                    AND: filter ? {
+                        OR: [
+                            { assets_category_type: { equals: filter, mode: "insensitive" } },
+                            { type_of_assets: { equals: filter, mode: "insensitive" } },
+                        ],
+                    } : undefined,
+                },
+            });
+    
+            const totalPages = Math.ceil(count / limit);
+    
+            const assets = await prisma.assets_list.findMany({
+                skip: skip,
+                take: limit,
+                where: {
+                    is_restructured: true, // Only restructured assets
+                    OR: search
+                        ? [
+                            { type_of_assets: { contains: search, mode: "insensitive" } },
+                            { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                            { khata_no: { contains: search, mode: "insensitive" } },
+                            { ward_no: { contains: search, mode: "insensitive" } },
+                            { assets_category_type: { contains: search, mode: "insensitive" } },
+                            { area: { contains: search, mode: "insensitive" } },
+                        ]
+                        : undefined,
+                    ulb_id: ulb_id,
+                    AND: filter ? {
+                        OR: [
+                            { assets_category_type: { equals: filter, mode: "insensitive" } },
+                            { type_of_assets: { equals: filter, mode: "insensitive" } },
+                        ],
+                    } : undefined,
+                },
+                include: {
+                    floorData: {
+                        include: {
+                            details: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    created_at: 'desc',
+                },
+            });
+    
+            return generateRes({
+                totalPages,
+                count,
+                page,
+                data: assets,
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching restructured assets");
+        }
+    };
+    
+    
     getAllbyId = async (req: Request) => {
         const id = String(req.query.id)
         try {

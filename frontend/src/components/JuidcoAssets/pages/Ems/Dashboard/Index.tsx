@@ -41,7 +41,7 @@ export const DashboardMain = () => {
   //   type_of_plot: string;
   // }
 
-  
+
   interface Unit {
     index: number;
     type: 'Commercial' | 'Residential';
@@ -50,13 +50,13 @@ export const DashboardMain = () => {
     height?: number;
     name?: string;
     property_name?: string;
-    [key: string]: any;  
+    [key: string]: any;
   }
 
-  
+
 
   interface FloorData {
-    floor: number;
+    floor: string;
     plotCount: number;
     units: Record<string, Unit[]>;
   }
@@ -117,7 +117,7 @@ export const DashboardMain = () => {
       try {
         const userDetails = JSON.parse(storedUserDetails);
         setUlbID(userDetails.ulb_id || null);
-         fetchData(userDetails.ulb_id);
+        fetchData(userDetails.ulb_id);
       } catch (error) {
         console.error('Error parsing user details:', error);
       }
@@ -232,7 +232,7 @@ export const DashboardMain = () => {
     }
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [succeessId, setSucceessId] = useState();
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
@@ -242,23 +242,23 @@ export const DashboardMain = () => {
         ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
         ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
       ];
-  
+
       const isUnitFilled = (unit: any) => {
         return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
       };
-  
+
       const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
 
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
       }
-  
+
       const fileUploadData2 = await handleUpload2();
       if (fileUploadData2) {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
-  
+
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors;
 
@@ -268,37 +268,43 @@ export const DashboardMain = () => {
         const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
 
         const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
-      
+        const floorName = selectedFloor === null
+          ? "Unknown Floor"  // Handle case when selectedFloor is null
+          : selectedFloor === 0
+            ? "Basement"
+            : `Floor ${selectedFloor - 1}`;
+
         const details = [{
-          index: 1,  
+          index: 1,
           type: unit.type,
           length: length,
           breadth: breadth,
-          height: height,  
+          height: height,
           name: unit.name,
           property_name: unit.property_name,
           type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
         }];
-      
+
         return {
-          floor: unit.name, 
-          plotCount: plotCount, 
-          type: unit.type, 
-          details: details,  
+          floor: floorName,
+          plotCount: plotCount,
+          type: unit.type,
+          details: details,
         };
       });
+      
 
       console.log("Mapped floorData:", values.floorData);
-  
+
       values.building_name = buildingName;
       values.location = selectedMarket;
 
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
-        method: "POST", 
+        method: "POST",
         data: values,
       });
-  
+
       if (res?.data?.status === true) {
         toast.success("Assets successfully added");
         resetForm();
@@ -310,18 +316,18 @@ export const DashboardMain = () => {
       } else {
         toast.error("Failed to add assets");
       }
-  
+
     } catch (error) {
       toast.error("Failed to add Assets");
       console.error('Error submitting data:', error);
     }
   };
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
 
 
 
@@ -481,20 +487,24 @@ export const DashboardMain = () => {
 
 
   const handleFloor = (index: any) => {
-    setSelectedFloor(index);
+    setSelectedFloor(index);  // Update the selected floor
+
     if (!data[index]) {
       setData((prevData: any) => {
         const updatedData = Array.isArray(prevData) ? [...prevData] : [];
         if (!updatedData[index]) {
-          updatedData[index] = { floor: index, units: {}, plotCount: 0 };
+          updatedData[index] = {
+            floor: selectedFloor === 0 ? "Basement" : `Floor ${selectedFloor}`,
+            units: {},
+            plotCount: 0
+          };
         }
         return updatedData;
       });
     }
-  
-    setNavigationStack((prevStack) => [...prevStack,] as any);
-  };
 
+    setNavigationStack((prevStack) => [...prevStack] as any);
+  };
   const handlePlotCountChange = (e: any, index: any) => {
     const plotNumber = parseInt(e.target.value);
     setPlotNo(plotNumber);
@@ -544,8 +554,8 @@ export const DashboardMain = () => {
 
     // setCount(count);
 
-    let ResidentialData:number = 0;
-    let commercialData:number = 0;
+    let ResidentialData: number = 0;
+    let commercialData: number = 0;
 
     if (type === 'Residential') {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -553,8 +563,8 @@ export const DashboardMain = () => {
     } else if (type === 'Commercial') {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       commercialData = count;
-      if (count > 10) {
-        toast.error("Max 10 Floors");
+      if (count > 50) {
+        toast.error("Max 50 Floors");
         return;
       }
     }
@@ -625,21 +635,21 @@ export const DashboardMain = () => {
   const handleUnitDetailsChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const value = e.target.value;
     if (selectedUnit) {
-        if (selectedUnit.type === "Commercial") {
-      const updatedUnits = [...commercialUnits];
-      updatedUnits[selectedUnit.index] = {
-        ...updatedUnits[selectedUnit.index],
-        [field]: value,
-      };
-      setCommercialUnits(updatedUnits);
-    } else if (selectedUnit.type === "Residential") {
-      const updatedUnits = [...residentialUnits];
-      updatedUnits[selectedUnit.index] = {
-        ...updatedUnits[selectedUnit.index],
-        [field]: value,
-      };
-      setResidentialUnits(updatedUnits);
-    }
+      if (selectedUnit.type === "Commercial") {
+        const updatedUnits = [...commercialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setCommercialUnits(updatedUnits);
+      } else if (selectedUnit.type === "Residential") {
+        const updatedUnits = [...residentialUnits];
+        updatedUnits[selectedUnit.index] = {
+          ...updatedUnits[selectedUnit.index],
+          [field]: value,
+        };
+        setResidentialUnits(updatedUnits);
+      }
     }
   };
 
@@ -1077,6 +1087,9 @@ export const DashboardMain = () => {
 
                             {selectedFloor !== null && (
                               <div key={`popup-${selectedFloor}`} className="flex items-center mb-4">
+                                <label className="mr-2 ml-4 font-semibold">
+                                  {selectedFloor === 0 ? "Basement" : `Floor ${selectedFloor - 1}`}
+                                </label>
                                 <input
                                   type="text"
                                   className="border p-2 m-2"
@@ -1107,7 +1120,7 @@ export const DashboardMain = () => {
                               </div>
                             )}
 
-                            {plotNo > 0 &&
+                            {plotNo > 0 && (
                               <div>
                                 <input
                                   key={`type-Commercial`}
@@ -1115,8 +1128,14 @@ export const DashboardMain = () => {
                                   className="border p-2 m-2"
                                   placeholder={`Number of Commercial units`}
                                   onChange={(e) => {
-                                    handleCommercial(parseInt(e.target.value));
-                                    handleTypeBox(e, 'Commercial', null);
+                                    const commercialUnits = parseInt(e.target.value) || 0;
+
+                                    if (commercialUnits + residentialCount > plotNo) {
+                                      alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
+                                      e.target.value = "";
+                                    } else {
+                                      handleCommercial(commercialUnits);
+                                    }
                                   }}
                                   maxLength={2}
                                   onKeyPress={(e) => {
@@ -1124,9 +1143,8 @@ export const DashboardMain = () => {
                                       e.preventDefault();
                                     }
                                   }}
-                                  // disabled={isCommercialChecked} // Disable if checked
                                 />
-                              <label htmlFor="">Commercial</label>
+                                <label htmlFor="">Commercial</label>
 
                                 <input
                                   key={`type-Residential`}
@@ -1134,8 +1152,14 @@ export const DashboardMain = () => {
                                   className="border p-2 m-2"
                                   placeholder={`Number of Residential units`}
                                   onChange={(e) => {
-                                    handleresidential(parseInt(e.target.value));
-                                    handleTypeBox(e, 'Residential', null);
+                                    const residentialUnits = parseInt(e.target.value) || 0;
+
+                                    if (commercialCount + residentialUnits > plotNo) {
+                                      alert("The total number of Commercial and Residential units cannot exceed the available shops.");
+                                      e.target.value = ""; // Clear the input if it exceeds the limit
+                                    } else {
+                                      handleresidential(residentialUnits);
+                                    }
                                   }}
                                   maxLength={2}
                                   onKeyPress={(e) => {
@@ -1143,170 +1167,176 @@ export const DashboardMain = () => {
                                       e.preventDefault();
                                     }
                                   }}
-                                  // disabled={isResidentialChecked} // Disable if checked
                                 />
-                               <label htmlFor="">Residential</label>
-                              </div>}
+                                <label htmlFor="">Residential</label>
+                              </div>
+                            )}
 
 
-                              <div className="count-display">
-        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Commercial Data:</h4>
-        <div className="boxes">
-          {generateBoxes(commercialCount).map((num) => (
-            <span
-              key={num}
-              className="box"
-              onClick={() => handleUnitClick("Commercial", num - 1)} // Handle click on commercial unit
-            >
-              {num}
-            </span>
-          ))}
-        </div>
+                            <div className="count-display">
+                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Commercial Units:</h4>
+                              <div className="boxes">
+                                {generateBoxes(commercialCount).map((num) => (
+                                  <span
+                                    key={num}
+                                    className="box"
+                                    onClick={() => handleUnitClick("Commercial", num - 1)} // Handle click on commercial unit
+                                  >
+                                    {num}
+                                  </span>
+                                ))}
+                              </div>
 
-        <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Residential Data:</h4>
-        <div className="boxes">
-          {generateBoxes(residentialCount).map((num) => (
-            <span
-              key={num}
-              className="box"
-              onClick={() => handleUnitClick("Residential", num - 1)} // Handle click on residential unit
-            >
-              {num}
-            </span>
-          ))}
-        </div>
-      </div>
+                              <h4 className="text-sm text-[#4338CA] font-semibold mx-4">Residential Units:</h4>
+                              <div className="boxes">
+                                {generateBoxes(residentialCount).map((num) => (
+                                  <span
+                                    key={num}
+                                    className="box"
+                                    onClick={() => handleUnitClick("Residential", num - 1)} // Handle click on residential unit
+                                  >
+                                    {num}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
 
-      {/* Show Input Fields When a Unit is Clicked */}
-      {selectedUnit && (
-        <div>
-          <h4>{selectedUnit.type} Unit {selectedUnit.index + 1} Details:</h4>
+                            {/* Show Input Fields When a Unit is Clicked */}
+                            {selectedUnit && (
+                              <div>
+                                <h4>{selectedUnit.type} Unit {selectedUnit.index + 1} Details:</h4>
 
-          {/* Length Input */}
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Length in meters"
-            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.length || "" : residentialUnits[selectedUnit.index]?.length || ""}
-            onChange={(e) => handleUnitDetailsChange(e, "length")}
-          />
+                                {/* Length Input */}
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder="Length in meters"
+                                  value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.length || "" : residentialUnits[selectedUnit.index]?.length || ""}
+                                  onChange={(e) => handleUnitDetailsChange(e, "length")}
+                                />
 
-          {/* Breadth Input */}
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Breadth in meters"
-            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.breadth || "" : residentialUnits[selectedUnit.index]?.breadth || ""}
-            onChange={(e) => handleUnitDetailsChange(e, "breadth")}
-          />
+                                {/* Breadth Input */}
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder="Breadth in meters"
+                                  value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.breadth || "" : residentialUnits[selectedUnit.index]?.breadth || ""}
+                                  onChange={(e) => handleUnitDetailsChange(e, "breadth")}
+                                />
 
-          {/* Height Input */}
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Height in meters"
-            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.height || "" : residentialUnits[selectedUnit.index]?.height || ""}
-            onChange={(e) => handleUnitDetailsChange(e, "height")}
-          />
+                                {/* Height Input */}
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder="Height in meters"
+                                  value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.height || "" : residentialUnits[selectedUnit.index]?.height || ""}
+                                  onChange={(e) => handleUnitDetailsChange(e, "height")}
+                                />
 
-          {/* Name Input */}
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Owner Name"
-            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.name || "" : residentialUnits[selectedUnit.index]?.name || ""}
-            onChange={(e) => handleUnitDetailsChange(e, "name")}
-          />
+                                {/* Name Input */}
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder="Owner Name"
+                                  value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.name || "" : residentialUnits[selectedUnit.index]?.name || ""}
+                                  onChange={(e) => handleUnitDetailsChange(e, "name")}
+                                />
 
-          {/* Property Name Input */}
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Property Name"
-            value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.property_name || "" : residentialUnits[selectedUnit.index]?.property_name || ""}
-            onChange={(e) => handleUnitDetailsChange(e, "property_name")}
-          />
+                                {/* Property Name Input */}
+                                <input
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder="Property Name"
+                                  value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.property_name || "" : residentialUnits[selectedUnit.index]?.property_name || ""}
+                                  onChange={(e) => handleUnitDetailsChange(e, "property_name")}
+                                />
 
-          {/* Save Button */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={()=>handleSave(true)}
-              className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-            >
-              Save & Move to Next Step
-            </button>
-          </div>
-        </div>
-      )}
+                                {/* Save Button */}
+                                <div className="flex justify-center mt-4">
+                                  <button
+                                    onClick={() => handleSave(true)}
+                                    className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+                                  >
+                                    Save & Move to Next Step
+                                  </button>
+                                </div>
+                              </div>
+                            )}
 
-      {/* Display Saved Data */}
-<div className="container mx-auto p-4">
-  {/* Commercial Units Section */}
-  <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
-  {commercialUnits?.length > 0 ? (
-    <div className="space-y-4">
-      {/* Displaying Commercial Units */}
-      <div className="grid grid-cols-4 gap-4">
-        {commercialUnits.map((unit, index) => {
-          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
-          
-          return (
-            <div 
-              key={index} 
-              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
-            >
-              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
-              <div className="space-y-2">
-                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
-                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
-                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
-                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
-                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
-              </div>
-              {/* If incomplete data, show an empty block (yellow) */}
-              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  ) : (
-    <p>No Commercial units saved yet.</p>
-  )}
+                            {/* Display Saved Data */}
+                            <div className="container mx-auto p-4">
+                              <h3 className="text-2xl font-semibold text-[#000000] mb-4">
+                                {selectedFloor === 0 ? "Basement" : `Floor : ${selectedFloor !== null ? selectedFloor - 1 : "No Floor Selected"}`} Details
+                              </h3>
+                              {/* Commercial Units Section */}
+                              <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
+                              {commercialUnits?.length > 0 ? (
+                                <div className="space-y-4">
+                                  {/* Displaying Commercial Units */}
+                                  <div className="grid grid-cols-4 gap-4">
+                                    {commercialUnits.map((unit, index) => {
+                                      const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
 
-  {/* Residential Units Section */}
-  <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
-  {residentialUnits?.length > 0 ? (
-    <div className="space-y-4">
-      {/* Displaying Residential Units */}
-      <div className="grid grid-cols-4 gap-4">
-        {residentialUnits.map((unit, index) => {
-          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
-          
-          return (
-            <div 
-              key={index} 
-              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`} 
-            >
-              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
-              <div className="space-y-2">
-                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
-                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
-                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
-                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
-                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
-              </div>
-              {/* If incomplete data, show an empty block (yellow) */}
-              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  ) : (
-    <p>No Residential units saved yet.</p>
-  )}
-</div>
+                                      return (
+                                        <div
+                                          key={index}
+                                          className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
+                                        >
+                                          <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+                                          <div className="space-y-2">
+                                            <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                                            <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                                            <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                                            <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                                            <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+                                          </div>
+                                          {/* If incomplete data, show an empty block (yellow) */}
+                                          {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>No Commercial units saved yet.</p>
+                              )}
+
+                              {/* Residential Units Section */}
+                              <h3 className="text-2xl font-semibold text-[#000000] mb-4">
+                                {selectedFloor === 0 ? "Basement" : `Floor : ${selectedFloor !== null ? selectedFloor - 1 : "No Floor Selected"}`} Details
+                              </h3>
+                              <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
+                              {residentialUnits?.length > 0 ? (
+                                <div className="space-y-4">
+                                  {/* Displaying Residential Units */}
+                                  <div className="grid grid-cols-4 gap-4">
+                                    {residentialUnits.map((unit, index) => {
+                                      const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+
+                                      return (
+                                        <div
+                                          key={index}
+                                          className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
+                                        >
+                                          <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+                                          <div className="space-y-2">
+                                            <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                                            <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                                            <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                                            <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                                            <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+                                          </div>
+                                          {/* If incomplete data, show an empty block (yellow) */}
+                                          {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>No Residential units saved yet.</p>
+                              )}
+                            </div>
 
 
 
@@ -1929,7 +1959,7 @@ export const DashboardMain = () => {
         </Formik>
 
 
-        
+
       </div>
       {isModalOpen && (
         <div className="modal">
@@ -1942,58 +1972,58 @@ export const DashboardMain = () => {
       )}
 
 
-{isModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center z-20">
-    {/* Background Overlay for Blur Effect */}
-    <div className="absolute inset-0 bg-black opacity-40 backdrop-blur-md z-10"></div>
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-20">
+          {/* Background Overlay for Blur Effect */}
+          <div className="absolute inset-0 bg-black opacity-40 backdrop-blur-md z-10"></div>
 
-    {/* Modal Content */}
-    <div className="bg-white p-8 rounded-2xl shadow-xl w-[22rem] max-h-[80vh] overflow-auto z-20">
+          {/* Modal Content */}
+          <div className="bg-white p-8 rounded-2xl shadow-xl w-[22rem] max-h-[80vh] overflow-auto z-20">
 
-      {/* Circle Icon and Text */}
-      <div className="flex flex-col items-center justify-center text-center space-y-6">
+            {/* Circle Icon and Text */}
+            <div className="flex flex-col items-center justify-center text-center space-y-6">
 
-        <div className="mb-6">
-          {/* Circle Tick Icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mb-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M16.707 4.293a1 1 0 011.414 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L7 13.586l9-9z" clipRule="evenodd" />
-          </svg>
-        </div>
+              <div className="mb-6">
+                {/* Circle Tick Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mb-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M16.707 4.293a1 1 0 011.414 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L7 13.586l9-9z" clipRule="evenodd" />
+                </svg>
+              </div>
 
-        {/* Success Message */}
-        {succeessId ? (
-          <div className="text-center space-y-3">
-            <div className="font-semibold text-2xl text-green-600 mb-3">Congratulation!! Asset Added Successfully </div>
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <p className="text-gray-700 text-lg font-bold">Number: <span className="font-semibold">{succeessId}</span></p>
-              
-              {/* Copy Icon Button */}
-              <button 
-                onClick={() => navigator.clipboard.writeText(succeessId)} 
-                className="flex items-center justify-center bg-gray-600 text-white p-3 rounded-md shadow-md hover:bg-white hover:text-black border-2 border-black transition-all duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 10v10a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1zM6 14H5V5h9v1a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2z"/></svg>
-                Copy
+              {/* Success Message */}
+              {succeessId ? (
+                <div className="text-center space-y-3">
+                  <div className="font-semibold text-2xl text-green-600 mb-3">Congratulation!! Asset Added Successfully </div>
+                  <div className="flex items-center justify-center space-x-4 mb-4">
+                    <p className="text-gray-700 text-lg font-bold">Number: <span className="font-semibold">{succeessId}</span></p>
+
+                    {/* Copy Icon Button */}
+                    <button
+                      onClick={() => navigator.clipboard.writeText(succeessId)}
+                      className="flex items-center justify-center bg-gray-600 text-white p-3 rounded-md shadow-md hover:bg-white hover:text-black border-2 border-black transition-all duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 10v10a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1zM6 14H5V5h9v1a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2a1 1 0 0 0 0-2z" /></svg>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-center text-gray-500 text-lg">No data available.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Close Modal Button */}
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={handleCloseSuccessModal}
+                className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-all duration-200">
+                Close
               </button>
             </div>
           </div>
-        ) : (
-          <div>
-            <p className="text-center text-gray-500 text-lg">No data available.</p>
-          </div>
-        )}
-      </div>
-
-      {/* Close Modal Button */}
-      <div className="flex justify-center mt-6">
-        <button 
-          onClick={handleCloseSuccessModal} 
-          className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-all duration-200">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
 
 

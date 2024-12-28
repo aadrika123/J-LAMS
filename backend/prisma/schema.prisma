@@ -72,6 +72,7 @@ model assets_list {
   // details                 details[]
 
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+  is_restructured Boolean @default(false)
 
 
   created_at DateTime @default(now()) @map("created_at")
@@ -80,7 +81,7 @@ model assets_list {
 
 model floorData {
   id           Int         @id @default(autoincrement())
-  floor        Int?
+  floor        String?
   plotCount    Int?
   type         String?
   assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)

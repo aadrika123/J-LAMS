@@ -38,7 +38,7 @@ interface ModalContent {
 
 
 
-const AdminApproved = () => {
+const RestructuredAsstes = () => {
 
 
     const router = useRouter()
@@ -105,7 +105,7 @@ const AdminApproved = () => {
         console.log("ulbIDulbID", ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&status=2`,
+                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -519,9 +519,10 @@ const AdminApproved = () => {
                                     <td className="px-6 py-4">
                                         <div className='flex'>
                                             {role === 'Admin' ? null : (
-                                                item.status === 3 ? (
+                                                item.status === 3 ?
+                                                 (
                                                     <Link
-                                                        href={`/assets/assets-approved/${item?.id}?status=clicked`}
+                                                        href={`/assets/restructured-assets/${item?.id}?status=clicked`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
                                                     >
 
@@ -560,9 +561,10 @@ const AdminApproved = () => {
                                                         </svg>
 
                                                     </Link>
-                                                ) : (
+                                                ) :
+                                                 (
                                                     <Link
-                                                        href={`/assets/assets-approved/${item?.id}?status=clicked`}
+                                                        href={`/assets/restructured-assets/${item?.id}?status=clicked`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
                                                     >
                                                         <svg
@@ -603,7 +605,7 @@ const AdminApproved = () => {
                                             )}
 
                                             <Link
-                                                href={`/assets/assets-approved/${item?.id}`}
+                                                href={`/assets/restructured-assets/${item?.id}`}
 
                                                 className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
                                                 <svg
@@ -640,7 +642,7 @@ const AdminApproved = () => {
                                                         <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Field Officer</div>
                                         }
                                     </td>
-  
+
                                     {role == 'Municipal' ? (
                                         <td>
                                             {item.status === 0 || item.status === 3 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
@@ -725,4 +727,4 @@ const AdminApproved = () => {
     )
 }
 
-export default AdminApproved
+export default RestructuredAsstes

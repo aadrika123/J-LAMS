@@ -60,6 +60,9 @@ const SideBar = (props) => {
   const handleNavigation2 = () => {
     navigate("/on-hold-view"); // Change this path to the desired route
   };
+  const handleNavigation3 = () => {
+    navigate("/restructured-assets-view"); // Change this path to the desired route
+  };
   const handleHomeNavigation = () => {
     navigate("/field-officer"); // Change this path to the desired route
     // window.location.reload();
@@ -192,6 +195,17 @@ const SideBar = (props) => {
                             className="mr-2"
                           />
                           On Hold
+                        </li>
+                        <li
+                          className="bg-[#4338ca] text-white px-4 py-2 rounded hover:bg-[#5a50c8] hover:scale-95 transition duration-300 ease-in-out cursor-pointer flex items-center mt-2"
+                          onClick={handleNavigation3}
+                        >
+                          <img
+                            src={ApprovedIcon}
+                            alt="Approved Icon"
+                            className="mr-2"
+                          />
+                          Restructured Assets
                         </li>
                       </div>
 

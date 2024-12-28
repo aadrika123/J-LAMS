@@ -37,7 +37,7 @@ const COLUMN = [
   { name: "FIELD OFFICER STATUS" },
   { name: "APPROVER STATUS" },
 ];
-const AdminApprovedView = () => {
+const RestructuredAssetsView = () => {
   const [search, setSearch] = useState("");
   const [currentAssetId, setCurrentAssetId] = useState(null);
   const [actionType, setActionType] = useState(null);
@@ -71,26 +71,25 @@ const AdminApprovedView = () => {
     setError(null);
 
     try {
-      const res = await axios({
-        url: `${API_BASE_URL}/api/lams/v1/asset/get?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}&status=2`,   
-        method: "GET",
-        headers: {
-          Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
-        },
-      });
+        const res = await axios({
+            url: `${API_BASE_URL}/api/lams/v1/assets/get-restructured?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}`,
+            method: "GET",
+            headers: {
+                Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
+            },
+        });
 
-      // Filter data to include only items with status 2
-      const filteredData =
-        res?.data?.data?.data.filter((item) =>  item.status === 2) || [];
-      setFilteredData(filteredData);
-      console.log("Response from the API >>> ", res?.data?.data?.totalPages);
-      setTotalPages(res?.data?.data?.totalPages || 1);
+        // Directly use the fetched data without filtering by status
+        const fetchedData = res?.data?.data?.data || [];
+        setFilteredData(fetchedData);  // Set the filtered data to all the fetched data
+        console.log("Response from the API >>> ", res?.data?.data?.totalPages);
+        setTotalPages(res?.data?.data?.totalPages || 1);
     } catch (error) {
-      setError("Error fetching data");
+        setError("Error fetching data");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   useEffect(() => {
     fetchData(currentPage);
@@ -494,4 +493,4 @@ const AdminApprovedView = () => {
   );
 };
 
-export default AdminApprovedView;
+export default RestructuredAssetsView;

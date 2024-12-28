@@ -1,12 +1,12 @@
 import React from 'react';
-import AdiminApprovedView from '@/components/JuidcoAssets/pages/Ems/AdminApprovedView/index';
+import RestructuredAssetsView from '@/components/JuidcoAssets/pages/Ems/RestructuredAssetsView';
 import PageLayout from '@/components/Layouts/PageLayout';
 
 const page = ({params} : {params:{id:number}})  => {
     const { id } = params;
   return (
           <PageLayout>
-              <AdiminApprovedView id={id} />
+              <RestructuredAssetsView id={id} />
           </PageLayout>
   )
 }

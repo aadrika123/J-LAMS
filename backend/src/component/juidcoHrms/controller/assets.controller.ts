@@ -50,6 +50,39 @@ class AssetManagementController {
         }
     };
 
+    createWithModifiedId = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+        try {
+            const data = await this.assetsManagementDao.postWithModifiedId(req);
+            return res.json({
+                "status": true,
+                "message": "Assets added with modified ID successfully",
+                "meta-data": {
+                    apiId,
+                    action: "POST",
+                    version: "1.0",
+                },
+                data: data,
+            });
+        } catch (error) {
+            return res.json({
+                "status": false,
+                "type": "DUPLICATE",
+                "message": "Error occurred while saving assets with modified ID",
+                "meta-data": {
+                    apiId,
+                    action: "POST",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+
     getAll = async (
         req: Request,
         res: Response,
@@ -84,6 +117,40 @@ class AssetManagementController {
             })
         }
     };
+
+    getRestructuredAssets = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+        try {
+            const data = await this.assetsManagementDao.getRestructuredAssets(req);
+    
+            return res.json({
+                status: true,
+                message: "Restructured assets fetched successfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data,
+            });
+        } catch (error) {
+            return res.json({
+                status: false,
+                message: "Error occurred while fetching restructured assets",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+    
 
     getAllbyId = async (
         req: Request,

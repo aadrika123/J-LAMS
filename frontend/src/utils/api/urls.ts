@@ -10,7 +10,9 @@ type UrlKeys =
 type Urls = {
   [key in UrlKeys]: {
     get?: string;
+    getRestructuredAssets?: string;
     create?: string;
+    reCreate?: string;
     update?: string;
     updateMany?: string;
     getById?: string;
@@ -33,7 +35,9 @@ type Urls = {
 export const ASSETS: Urls = {
   LIST: {
     get: "/asset/get",
+    getRestructuredAssets: "/assets/get-restructured",
     create: "/asset/create",
+    reCreate: "/asset/re-create",
     getById: "/asset/get-single",
     delete: "/asset/delete-single",
     update: "/asset/update-single",

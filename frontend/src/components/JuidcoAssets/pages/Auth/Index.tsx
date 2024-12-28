@@ -13,7 +13,8 @@ import dynamic from "next/dynamic";
 // import img from "../../lotties/loginImage.json";
 // import lock from "../../lotties/lock.json";
 
-import Logo from "@/assets/icons/housesAnimate.svg";
+import Logo2 from "@/assets/icons/01 LMS.svg";
+import Logo1 from "@/assets/icons/02 LMS.svg";
 import Image from "next/image";
 const LoginPage = dynamic(() => import("./Login"), {
   ssr: false,
@@ -28,7 +29,7 @@ const HeroLoginPage = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowImage(true);
-    }, 1000); 
+    }, 1000);
 
     return () => clearTimeout(timer); // Cleanup on unmount
   }, []);
@@ -70,27 +71,22 @@ const HeroLoginPage = () => {
                   <LoginPage />
                 </div>
                 <div className="flex-shrink max-w-full px-4 w-full lg:w-1/2">
-                  <div className="text-center  lg:mt-0">
+                  <div className="text-center lg:mt-0" >
                     <div className="relative">
-                    {showImage && (
-                    <Image
-                      src={Logo}
-                      alt="Logo"
-                      className="w-full max-w-xs mx-auto md:max-w-sm lg:max-w-md"
-                    />
-                  )}
-                      {/* <Lottie
-                        animationData={lock}
-                        loop={true}
-                        className="w-[20%] ml-[8rem] absolute"
-                      />
-                      <div className="absolute top-2/4 ">
-                        <Lottie
-                          animationData={img}
-                          loop={true}
-                          className="m-0 w-full"
-                        />
-                      </div> */}
+                      {showImage && (
+                        <>
+                          <Image
+                            src={Logo1}
+                            alt="Logo"
+                            className="w-full mx-auto md:max-w-5xl lg:max-w-6xl xl:max-w-7xl absolute top-[-80px] left-0 "
+                          />
+                          <Image
+                            src={Logo2}
+                            alt="Logo"
+                            className="w-[20rem] mx-auto max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg absolute left-0 top-[9.35rem] "
+                          />
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
