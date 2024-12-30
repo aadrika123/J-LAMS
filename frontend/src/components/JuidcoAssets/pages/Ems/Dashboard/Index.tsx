@@ -2101,7 +2101,7 @@ export const DashboardMain = () => {
   const [sessionData, setSessionData] = useState<FloorData[]>([]);
   const [floorDisable, setFloorDisable] = useState(false);
   const [plotNos, setPlotNos] = useState<Array<number | string>>([]); // Initialize plot numbers
-  const [selectedFloor, setSelectedFloor] = useState(null);
+  const [selectedFloor, setSelectedFloor] = useState<any>(null);
   const [ulbID, setUlbID] = useState<string | null>();
   const [commercialCount, setCommercialCount] = useState<any>(0);
   const [residentialCount, setResidentialCount] = useState<any>(0);
@@ -2112,9 +2112,10 @@ export const DashboardMain = () => {
   const [selectedUnit, setSelectedUnit] = useState<any>(null); // Track selected unit details for edit
 
 
-  const [editedFloor, setEditedFloor] = useState(null); 
-  const [editedDetails, setEditedDetails] = useState([]);
-  const [editedFloorIndex, setEditedFloorIndex] = useState(null); // To store the index of the floor being edited
+  const [editedFloor, setEditedFloor] = useState<any>(null); 
+  const [editedDetails, setEditedDetails] = useState<any>([]);
+  const [editedFloorIndex, setEditedFloorIndex] = useState<any>(null); // To store the index of the floor being edited
+  console.log("data",data,sessionData,editedFloor)
 
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMarket(event.target.value);
@@ -2394,33 +2395,27 @@ const handleSaveFloorData = () => {
 };
 
 
-const handleEditFloor = (floor, index) => {
+const handleEditFloor = (floor:any, index:any) => {
   setEditedFloor(floor.floor); // Store the floor number of the edited floor
-  setEditedDetails(floor.details.map((detail) => ({ ...detail }))); // Copy the floor details
+  setEditedDetails(floor.details.map((detail:any) => ({ ...detail }))); // Copy the floor details
   setEditedFloorIndex(index); // Store the index of the floor being edited
 };
 
-const handleInputChange = (e, detailIndex, field) => {
+const handleInputChange = (e:any, detailIndex:any, field:any) => {
   const { value } = e.target;
-  const updatedDetails = [...editedDetails];
+  const updatedDetails:any = [...editedDetails];
   updatedDetails[detailIndex][field] = value; // Update the specific detail field
   setEditedDetails(updatedDetails); // Save the updated details to state
 };
 
 const handleSaves = () => {
-  // Create a copy of the savedFloors array
   const updatedFloors = [...savedFloors];
-
-  // Find the floor at the editedFloorIndex and update its details
   updatedFloors[editedFloorIndex] = {
-    ...updatedFloors[editedFloorIndex], // Keep other properties of the floor
-    details: editedDetails, // Update the details with the edited details
+    ...updatedFloors[editedFloorIndex], 
+    details: editedDetails,
   };
-
-  // Update the main savedFloors array with the modified floor
   setSavedFloors(updatedFloors);
 
-  // Optionally log the updated floor data
   console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
 
   // Clear the state after saving
@@ -2676,12 +2671,12 @@ const handleSaves = () => {
       return updatedData;
     });
   };
-  const handleCommercial = (val: any) => {
-    setCommercialCount(parseInt(val) || 0);
-  }
-  const handleresidential = (val: any) => {
-    setResidentialCount(parseInt(val) || 0);
-  }
+  // const handleCommercial = (val: any) => {
+  //   setCommercialCount(parseInt(val) || 0);
+  // }
+  // const handleresidential = (val: any) => {
+  //   setResidentialCount(parseInt(val) || 0);
+  // }
   const handleTypeBox = (e: any, type: string, index: number | null) => {
     const count = parseInt(e?.target?.value) || e || 0;
     if (isNaN(count)) return;
@@ -2750,163 +2745,163 @@ const handleSaves = () => {
     }
   };
 
-  const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
-    const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
-    const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex);
-    const unitData = floorData?.units[type]?.[unitIndex] || {};
+  // const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
+  //   const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
+  //   const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex);
+  //   const unitData = floorData?.units[type]?.[unitIndex] || {};
 
-    const innerBoxes = (
-      <>
-        <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex + 1}</span></h4></div>
-        <div key={`${floorIndex}-${type}-${unitIndex}`}>
+  //   const innerBoxes = (
+  //     <>
+  //       <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex + 1}</span></h4></div>
+  //       <div key={`${floorIndex}-${type}-${unitIndex}`}>
 
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Length in meter"
-            defaultValue={unitData.length || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
-            maxLength={10}
-            onKeyPress={(e: any) => {
-              if (!(e.key >= "0" && e.key <= "9")) {
-                e.preventDefault();
-              }
-            }}
-          />
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Breadth in meter"
-            defaultValue={unitData.breadth || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
-            maxLength={10}
-            onKeyPress={(e: any) => {
-              if (!(e.key >= "0" && e.key <= "9")) {
-                e.preventDefault();
-              }
-            }}
-          />
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Height in meter"
-            defaultValue={unitData.height || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
-            maxLength={10}
-            onKeyPress={(e: any) => {
-              if (!(e.key >= "0" && e.key <= "9")) {
-                e.preventDefault();
-              }
-            }}
-          />
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Name"
-            defaultValue={unitData.name || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
-            maxLength={30}
-            onKeyPress={(e: any) => {
-              if (
-                !(
-                  (e.key >= "a" || e.key >= "z") ||
-                  (e.key <= "A" || e.key <= "Z") ||
-                  e.key === " "
-                )
-              ) {
-                e.preventDefault();
-              }
-            }}
-          />
-          <input
-            type="text"
-            className="border p-2 m-2"
-            placeholder="Property Name"
-            defaultValue={unitData.property_name || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
-            maxLength={10}
-            onKeyPress={(e: any) => {
-              if (
-                !(
-                  (e.key >= "a" || e.key >= "z") ||
-                  (e.key <= "A" || e.key <= "Z") ||
-                  (e.key <= "0" || e.key <= "9") ||
-                  e.key === " "
-                )
-              ) {
-                e.preventDefault();
-              }
-            }}
-          />
+  //         <input
+  //           type="text"
+  //           className="border p-2 m-2"
+  //           placeholder="Length in meter"
+  //           defaultValue={unitData.length || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
+  //           maxLength={10}
+  //           onKeyPress={(e: any) => {
+  //             if (!(e.key >= "0" && e.key <= "9")) {
+  //               e.preventDefault();
+  //             }
+  //           }}
+  //         />
+  //         <input
+  //           type="text"
+  //           className="border p-2 m-2"
+  //           placeholder="Breadth in meter"
+  //           defaultValue={unitData.breadth || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
+  //           maxLength={10}
+  //           onKeyPress={(e: any) => {
+  //             if (!(e.key >= "0" && e.key <= "9")) {
+  //               e.preventDefault();
+  //             }
+  //           }}
+  //         />
+  //         <input
+  //           type="text"
+  //           className="border p-2 m-2"
+  //           placeholder="Height in meter"
+  //           defaultValue={unitData.height || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
+  //           maxLength={10}
+  //           onKeyPress={(e: any) => {
+  //             if (!(e.key >= "0" && e.key <= "9")) {
+  //               e.preventDefault();
+  //             }
+  //           }}
+  //         />
+  //         <input
+  //           type="text"
+  //           className="border p-2 m-2"
+  //           placeholder="Name"
+  //           defaultValue={unitData.name || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
+  //           maxLength={30}
+  //           onKeyPress={(e: any) => {
+  //             if (
+  //               !(
+  //                 (e.key >= "a" || e.key >= "z") ||
+  //                 (e.key <= "A" || e.key <= "Z") ||
+  //                 e.key === " "
+  //               )
+  //             ) {
+  //               e.preventDefault();
+  //             }
+  //           }}
+  //         />
+  //         <input
+  //           type="text"
+  //           className="border p-2 m-2"
+  //           placeholder="Property Name"
+  //           defaultValue={unitData.property_name || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
+  //           maxLength={10}
+  //           onKeyPress={(e: any) => {
+  //             if (
+  //               !(
+  //                 (e.key >= "a" || e.key >= "z") ||
+  //                 (e.key <= "A" || e.key <= "Z") ||
+  //                 (e.key <= "0" || e.key <= "9") ||
+  //                 e.key === " "
+  //               )
+  //             ) {
+  //               e.preventDefault();
+  //             }
+  //           }}
+  //         />
 
-          <select className="border p-2 m-2"
-            value={unitData.type_of_plot}
-            defaultValue={unitData.type_of_plot || ""}
-            onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
-            <option>Choose the below options</option>
-            <option value="Enclosed">Enclosed</option>
-            <option value="Non-Enclosed">Non-Enclosed</option>
-          </select>
+  //         <select className="border p-2 m-2"
+  //           value={unitData.type_of_plot}
+  //           defaultValue={unitData.type_of_plot || ""}
+  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
+  //           <option>Choose the below options</option>
+  //           <option value="Enclosed">Enclosed</option>
+  //           <option value="Non-Enclosed">Non-Enclosed</option>
+  //         </select>
 
-          <br></br>
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => {
-                handleSave(true);
-                setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
-              }}
-              className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-            >
-              Save & Move to Floor Part
-            </button>
-          </div>
-        </div>
-      </>
-    );
+  //         <br></br>
+  //         <div className="flex justify-center mt-4">
+  //           <button
+  //             onClick={() => {
+  //               handleSave(true);
+  //               setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+  //             }}
+  //             className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+  //           >
+  //             Save & Move to Floor Part
+  //           </button>
+  //         </div>
+  //       </div>
+  //     </>
+  //   );
 
-    setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
-  };
+  //   setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
+  // };
 
-  const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
-    const value = e.target.value;
-    setData((prevData: any) => {
-      // Get existing data from sessionStorage
-      const storedData = sessionStorage.getItem('unitData');
-      const initialData = storedData ? JSON.parse(storedData) : [];
+  // const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
+  //   const value = e.target.value;
+  //   setData((prevData: any) => {
+  //     // Get existing data from sessionStorage
+  //     const storedData = sessionStorage.getItem('unitData');
+  //     const initialData = storedData ? JSON.parse(storedData) : [];
 
-      // Create a copy of the initial data
-      const updatedData = Array.isArray(prevData) ? [...prevData] : [...initialData];
+  //     // Create a copy of the initial data
+  //     const updatedData = Array.isArray(prevData) ? [...prevData] : [...initialData];
 
-      // Find or create floor object
-      let floorObj = updatedData.find((floor) => floor?.floor === floorIndex);
-      if (!floorObj) {
-        floorObj = { floor: floorIndex, units: {}, plotCount: 0 };
-        updatedData.push(floorObj); // Use push instead of setting at an index
-      }
+  //     // Find or create floor object
+  //     let floorObj = updatedData.find((floor) => floor?.floor === floorIndex);
+  //     if (!floorObj) {
+  //       floorObj = { floor: floorIndex, units: {}, plotCount: 0 };
+  //       updatedData.push(floorObj); // Use push instead of setting at an index
+  //     }
 
-      // Ensure the units object for the specific type exists
-      if (!floorObj.units[type]) {
-        floorObj.units[type] = [];
-      }
+  //     // Ensure the units object for the specific type exists
+  //     if (!floorObj.units[type]) {
+  //       floorObj.units[type] = [];
+  //     }
 
-      // Check if unit already exists for the specified unitIndex
-      let unit = floorObj.units[type].find((u: any) => u.index === unitIndex);
-      if (!unit) {
-        // If not, create a new unit
-        unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
-        floorObj.units[type].push(unit);
-      }
+  //     // Check if unit already exists for the specified unitIndex
+  //     let unit = floorObj.units[type].find((u: any) => u.index === unitIndex);
+  //     if (!unit) {
+  //       // If not, create a new unit
+  //       unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
+  //       floorObj.units[type].push(unit);
+  //     }
 
-      // Update the field value for the specific unit
-      unit[field] = value;
+  //     // Update the field value for the specific unit
+  //     unit[field] = value;
 
-      // Save updated data to sessionStorage
-      sessionStorage.setItem('unitData', JSON.stringify(updatedData));
+  //     // Save updated data to sessionStorage
+  //     sessionStorage.setItem('unitData', JSON.stringify(updatedData));
 
-      // Return the updated data for the state
-      return updatedData;
-    });
-  };
+  //     // Return the updated data for the state
+  //     return updatedData;
+  //   });
+  // };
 
   const handleBackss = () => {
     setNavigationStack((prevStack) => {
@@ -3442,14 +3437,14 @@ const handleSaves = () => {
           }
           acc[floorNumber].push(floor);
           return acc;
-        }, {})).map((floorGroup, idx) => (
+        }, {})).map((floorGroup:any, idx) => (
           <div key={idx} className="mb-6">
             <h3 className="text-2xl font-semibold text-[#4338CA] mb-4">
               {floorGroup[0]?.floor === 0 ? "Basement" : `Floor ${floorGroup[0]?.floor}`}
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {floorGroup.map((floor, index) => {
+              {floorGroup.map((floor:any, index:any) => {
                 const isOccupied = floor.plotCount > 0;
                 const floorColorClass = isOccupied ? 'bg-green-100' : 'bg-yellow-100'; // Light Green for occupied, Light Yellow for vacant
 
@@ -3465,7 +3460,7 @@ const handleSaves = () => {
 
                     <h5 className="font-semibold mt-4 text-lg">Floor Details:</h5>
                     <ul className="list-disc pl-6 space-y-3">
-                      {floor.details.map((detail, idx) => (
+                      {floor.details.map((detail:any, idx:any) => (
                         <li key={idx}>
                           <div className="space-y-2">
                             {isEditMode ? (
@@ -3537,7 +3532,7 @@ const handleSaves = () => {
                     {isEditMode ? (
                       <div className="mt-4">
                         <button
-                          onClick={() => handleSaves(floor)}
+                          onClick={() => handleSaves()}
                           className="bg-blue-600 text-white-500 hover:text-white-700 transition duration-200"
                         >
                           Save

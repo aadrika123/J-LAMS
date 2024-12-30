@@ -22,8 +22,8 @@ import pdf from '@/assets/icons/pdf.svg'
 import notfound from '@/assets/icons/not-found.png'
 // import goBack from '@/utils/helper';
 import autoTable from 'jspdf-autotable'
-import { useRouter } from 'next/navigation'
-import toast, { Toaster } from 'react-hot-toast';
+// import { useRouter } from 'next/navigation'
+import  { Toaster } from 'react-hot-toast';
 import Papa from 'papaparse';
 
 
@@ -41,17 +41,18 @@ interface ModalContent {
 const RestructuredAsstes = () => {
 
 
-    const router = useRouter()
+    // const router = useRouter()
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
     const [role, setRole] = useState('');
     const [count, setCount] = useState<any>([])
-    const [remarks, setRemarks] = useState<any>('')
-    const [currentAssetId, setCurrentAssetId] = useState(null);
-    const [actionType, setActionType] = useState<any>(null);
-    const [audit, setAudit] = useState<any>();
+    // const [remarks, setRemarks] = useState<any>('')
+    // const [currentAssetId, setCurrentAssetId] = useState(null);
+    // const [actionType, setActionType] = useState<any>(null);
+    // const [audit, setAudit] = useState<any>();
+    let audit:any;
 
     const [itemsPerPage, setItemsPerPage] = useState(5);
 
