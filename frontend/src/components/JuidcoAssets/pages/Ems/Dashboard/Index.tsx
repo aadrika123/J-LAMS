@@ -2336,24 +2336,87 @@ export const DashboardMain = () => {
 
   const [savedFloors, setSavedFloors] = useState<any[]>([]);
 
+  console.log("commercialUnits  line 2341",commercialUnits)
+  console.log("residentialUnits line 2341",residentialUnits)
+
+  // old
+// const processFloorData = () => {
+
+//   const mergedUnits = [
+//     ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
+//     ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
+//   ];
+
+//   console.log("-------imp--------",mergedUnits)
+
+//   const isUnitFilled = (unit: any) => {
+//     return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+//   };
+
+//   const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+
+//   return filledUnits.map((unit) => {
+//     const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
+//     const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
+//     const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
+
+//     const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
+//     const floorName = selectedFloor === null
+//       ? "Unknown Floor"
+//       : selectedFloor === 0
+//         ? "Basement"
+//         : `Floor ${selectedFloor - 1}`;
+
+//     const details = [{
+//       index: 1,
+//       type: unit.type,
+//       length: length,
+//       breadth: breadth,
+//       height: height,
+//       name: unit.name,
+//       property_name: unit.property_name,
+//       type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
+//     }];
+
+//     return {
+//       floor: floorName,
+//       plotCount: plotCount,
+//       type: unit.type,
+//       details: details,
+//     };
+//   });
+// };
+
+// new 
+
 const processFloorData = () => {
+  // Merge and classify units with empty handling
   const mergedUnits = [
-    ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
-    ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
+    ...((Array.isArray(commercialUnits) ? commercialUnits : [])).map(unit => ({type: 'Commercial', ...unit,})),
+    ...((Array.isArray(residentialUnits) ? residentialUnits : [])).map(unit => ({ type: 'Residential', ...unit, })),
   ];
 
-  const isUnitFilled = (unit: any) => {
+  console.log("-------Merged Units--------", mergedUnits);
+
+  const isUnitFilled = (unit) => {
     return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
   };
 
+  // Separate filled and incomplete units
   const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+  const incompleteUnits = mergedUnits.filter(unit => !isUnitFilled(unit));
 
-  return filledUnits.map((unit) => {
+  console.log("-------Filled Units--------", filledUnits);
+  console.log("-------Incomplete Units--------", incompleteUnits);
+
+  return mergedUnits.map((unit, index) => {
     const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
     const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
     const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
+    const name = unit.name || `Unnamed Unit ${index + 1}`;
+    const propertyName = unit.property_name || "Unknown Property";
 
-    const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
+    const plotCount = filledUnits.filter((filledUnit) => filledUnit.name === unit.name).length;
     const floorName = selectedFloor === null
       ? "Unknown Floor"
       : selectedFloor === 0
@@ -2361,13 +2424,13 @@ const processFloorData = () => {
         : `Floor ${selectedFloor - 1}`;
 
     const details = [{
-      index: 1,
+      index: index + 1,
       type: unit.type,
-      length: length,
-      breadth: breadth,
-      height: height,
-      name: unit.name,
-      property_name: unit.property_name,
+      length: length || "Not Provided",
+      breadth: breadth || "Not Provided",
+      height: height || "Not Provided",
+      name: name,
+      property_name: propertyName,
       type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
     }];
 
@@ -2383,8 +2446,6 @@ const processFloorData = () => {
 
 const handleSaveFloorData = () => {
   const floorData = processFloorData();
-
-  // Add the current floor's data to the saved floors
   setSavedFloors((prevFloors) => [...prevFloors, ...floorData]);
 
   console.log("Saved Floors: ", savedFloors); // For debugging
@@ -2719,8 +2780,29 @@ const handleSaves = () => {
   };
 
   // Handle click on unit number to show input fields
-  const handleUnitClick = (unitType: string, unitIndex: number) => {
-    setSelectedUnit({ type: unitType, index: unitIndex });
+  // const handleUnitClick = (unitType: string, unitIndex: number) => {
+  //   setSelectedUnit({ type: unitType, index: unitIndex });
+  // };
+
+  const handleUnitClick = (type: string, index: number) => {
+    if (type === "Commercial") {
+      // Add a new commercial unit if it doesn't exist
+      if (!commercialUnits[index]) {
+        const updatedUnits = [...commercialUnits];
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "" };
+        setCommercialUnits(updatedUnits);
+      }
+    } else if (type === "Residential") {
+      // Add a new residential unit if it doesn't exist
+      if (!residentialUnits[index]) {
+        const updatedUnits = [...residentialUnits];
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "" };
+        setResidentialUnits(updatedUnits);
+      }
+    }
+  
+    // Set the selected unit
+    setSelectedUnit({ type, index });
   };
 
   // Handle input change for unit details
@@ -3167,8 +3249,8 @@ const handleSaves = () => {
                                 </button> */}
                               </div>
                             )}
-
-{plotNo > 0 && (
+{/* old */}
+{/* {plotNo > 0 && (
   <div>
     <input
       key={`type-Commercial`}
@@ -3208,6 +3290,81 @@ const handleSaves = () => {
           e.target.value = ""; // Clear the input if it exceeds the limit
         } else {
           setResidentialCount(residentialUnits);
+        }
+      }}
+      value={residentialCount}
+      maxLength={2}
+      onKeyPress={(e) => {
+        if (!(e.key >= "0" && e.key <= "9")) {
+          e.preventDefault();
+        }
+      }}
+    />
+    <label htmlFor="">Residential</label>
+  </div>
+)} */}
+{/* new */}
+
+{plotNo > 0 && (
+  <div>
+    <input
+      key={`type-Commercial`}
+      type="text"
+      className="border p-2 m-2"
+      placeholder={`Number of Commercial units`}
+      onChange={(e) => {
+        const commercialUnitsCount = parseInt(e.target.value) || 0;
+
+        if (commercialUnitsCount + residentialCount > plotNo) {
+          alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
+          e.target.value = "";
+        } else {
+          setCommercialCount(commercialUnitsCount);
+
+          // Initialize empty commercial units
+          const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, () => ({
+            length: "",
+            breadth: "",
+            height: "",
+            name: "",
+            property_name: ""
+          }));
+          setCommercialUnits(emptyCommercialUnits);
+        }
+      }}
+      value={commercialCount}
+      maxLength={2}
+      onKeyPress={(e) => {
+        if (!(e.key >= "0" && e.key <= "9")) {
+          e.preventDefault();
+        }
+      }}
+    />
+    <label htmlFor="">Commercial</label>
+
+    <input
+      key={`type-Residential`}
+      type="text"
+      className="border p-2 m-2"
+      placeholder={`Number of Residential units`}
+      onChange={(e) => {
+        const residentialUnitsCount = parseInt(e.target.value) || 0;
+
+        if (commercialCount + residentialUnitsCount > plotNo) {
+          alert("The total number of Commercial and Residential units cannot exceed the available shops.");
+          e.target.value = ""; // Clear the input if it exceeds the limit
+        } else {
+          setResidentialCount(residentialUnitsCount);
+
+          // Initialize empty residential units
+          const emptyResidentialUnits = Array.from({ length: residentialUnitsCount }, () => ({
+            length: "",
+            breadth: "",
+            height: "",
+            name: "",
+            property_name: ""
+          }));
+          setResidentialUnits(emptyResidentialUnits);
         }
       }}
       value={residentialCount}
