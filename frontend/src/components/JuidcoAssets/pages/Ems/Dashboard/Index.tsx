@@ -2085,6 +2085,8 @@ export const DashboardMain = () => {
     units: Record<string, Unit[]>;
   }
 
+
+
   type NavigationStackType = React.ReactNode[][];
 
   const [isLoading, setIsLoading] = useState(true);
@@ -2392,13 +2394,13 @@ export const DashboardMain = () => {
 const processFloorData = () => {
   // Merge and classify units with empty handling
   const mergedUnits = [
-    ...((Array.isArray(commercialUnits) ? commercialUnits : [])).map(unit => ({type: 'Commercial', ...unit,})),
-    ...((Array.isArray(residentialUnits) ? residentialUnits : [])).map(unit => ({ type: 'Residential', ...unit, })),
+    ...((Array.isArray(commercialUnits) ? commercialUnits : [])).map(unit => ({ unitType: 'Commercial', ...unit })),
+    ...((Array.isArray(residentialUnits) ? residentialUnits : [])).map(unit => ({ unitType: 'Residential', ...unit })),
   ];
 
   console.log("-------Merged Units--------", mergedUnits);
 
-  const isUnitFilled = (unit) => {
+  const isUnitFilled = (unit:any) => {
     return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
   };
 
@@ -2788,15 +2790,15 @@ const handleSaves = () => {
     if (type === "Commercial") {
       // Add a new commercial unit if it doesn't exist
       if (!commercialUnits[index]) {
-        const updatedUnits = [...commercialUnits];
-        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "" };
+        const updatedUnits:any = [...commercialUnits];
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "",index: index, type: "Commercial" };
         setCommercialUnits(updatedUnits);
       }
     } else if (type === "Residential") {
       // Add a new residential unit if it doesn't exist
       if (!residentialUnits[index]) {
         const updatedUnits = [...residentialUnits];
-        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "" };
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "",index: index, type: "Residential" };
         setResidentialUnits(updatedUnits);
       }
     }
@@ -3322,13 +3324,16 @@ const handleSaves = () => {
           setCommercialCount(commercialUnitsCount);
 
           // Initialize empty commercial units
-          const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, () => ({
-            length: "",
-            breadth: "",
-            height: "",
+          const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, (_, i) => ({
+            length: 0,  // Initialize as number
+            breadth: 0, // Initialize as number
+            height: 0,  // Initialize as number
             name: "",
-            property_name: ""
+            property_name: "",
+            index: i,
+            type: "Commercial" as const // Ensure type is "Commercial"
           }));
+          
           setCommercialUnits(emptyCommercialUnits);
         }
       }}
@@ -3357,14 +3362,17 @@ const handleSaves = () => {
           setResidentialCount(residentialUnitsCount);
 
           // Initialize empty residential units
-          const emptyResidentialUnits = Array.from({ length: residentialUnitsCount }, () => ({
-            length: "",
-            breadth: "",
-            height: "",
+          const emptyCommercialUnits = Array.from({ length: residentialUnitsCount }, (_, i) => ({
+            length: 0, 
+            breadth: 0, 
+            height: 0,  
             name: "",
-            property_name: ""
+            property_name: "",
+            index: i,
+            type: "Residential" as const
           }));
-          setResidentialUnits(emptyResidentialUnits);
+          
+          setCommercialUnits(emptyCommercialUnits);
         }
       }}
       value={residentialCount}
