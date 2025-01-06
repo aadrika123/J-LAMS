@@ -143,7 +143,7 @@ class AssetManagementRoute {
       );
 
     app
-      .route(`${baseUrl}/asset/getCircleByLocation`)
+      .route(`${baseUrl}/asset/get-circle-by-location`)
       .get(
         (req: Request, res: Response, next: NextFunction) =>
           this.assetManagementController.getBuildingNameByLocation(req, res, next, "0118"),
