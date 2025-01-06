@@ -438,6 +438,43 @@ class AssetManagementController {
             })
         }
     };
+
+    getBuildingNameByLocation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+    
+        try {
+            const data = await this.assetsManagementDao.getBuildingNameByLocation(req);
+    
+            return res.json({
+                status: true,
+                message: "Building name fetched successfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data,
+            });
+    
+        } catch (error) {
+            console.error("Error occurred while fetching building name:", error);
+            return res.json({
+                status: false,
+                message: "Error occurred while fetching building name",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+    
     
     marketcircle = async (
         req: Request,

@@ -1679,24 +1679,21 @@ class AssetsManagementDao {
 
 
     locationselect = async (req: Request) => {
-
-        const id = Number(req.query.id) || 1;
+        const id = req.query.id ? Number(req.query.id) : null;
+    
         try {
             // Fetch circle data
             const circleGet = await prisma.location.findMany({
-                where: {
-                    ulb_id: id,
-                },
+                where: id !== null ? { ulb_id: id } : undefined, // Conditional where clause
                 orderBy: {
                     created_at: 'desc',
                 },
             });
-
-
+    
             return generateRes({
                 data: circleGet,
             });
-
+    
         } catch (err) {
             console.error("Error fetching market circle data:", err);
             return generateRes({
@@ -1705,6 +1702,40 @@ class AssetsManagementDao {
             });
         }
     };
+
+    getBuildingNameByLocation = async (req: Request) => {
+        const locationId = req.query.location_id ? Number(req.query.location_id) : undefined;
+    
+        try {
+            // if (!locationId) {
+            //     throw new Error("Location ID is required");
+            // }
+    
+            const asset = await prisma.assets_list.findFirst({
+                where: {
+                    location_id: locationId,
+                },
+                select: {
+                    location_id: true,
+                    building_name: true,
+                    address: true,
+                    ulb_id: true,
+                },
+            });
+    
+            return generateRes({
+                data: asset || {},
+            });
+    
+        } catch (err) {
+            console.error("Error fetching building name by location:", err);
+            return generateRes({
+                data: {},
+                message: 'Error fetching building name by location',
+            });
+        }
+    };
+    
 
 
     //   marketcircle = async (req: Request) => {
