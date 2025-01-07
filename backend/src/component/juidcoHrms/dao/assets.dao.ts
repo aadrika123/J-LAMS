@@ -1711,7 +1711,7 @@ class AssetsManagementDao {
             //     throw new Error("Location ID is required");
             // }
     
-            const asset = await prisma.assets_list.findFirst({
+            const asset = await prisma.assets_list.findMany({
                 where: {
                     location_id: locationId,
                 },
@@ -1724,13 +1724,13 @@ class AssetsManagementDao {
             });
     
             return generateRes({
-                data: asset || {},
+                data: asset || [],
             });
     
         } catch (err) {
             console.error("Error fetching building name by location:", err);
             return generateRes({
-                data: {},
+                data: [],
                 message: 'Error fetching building name by location',
             });
         }

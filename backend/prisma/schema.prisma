@@ -73,6 +73,7 @@ model assets_list {
 
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
   is_restructured Boolean @default(false)
+  is_drafted              Boolean @default(false) 
   location_id             Int     @default(2)    // Foreign key to location model
 
   locationRelation        location   @relation(fields: [location_id], references: [id])
