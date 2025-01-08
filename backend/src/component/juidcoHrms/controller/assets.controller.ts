@@ -562,6 +562,39 @@ class AssetManagementController {
         }
     };
 
+    locationEdit = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+        try {
+            const data = await this.assetsManagementDao.locationEdit(req);
+    
+            return res.json({
+                status: 200,
+                message: "Location updated successfully",
+                "meta-data": {
+                    apiId,
+                    action: "PUT",
+                    version: "1.0",
+                },
+                data: data,
+            });
+        } catch (error) {
+            return res.json({
+                status: 400,
+                message: "Error occurred while updating location",
+                "meta-data": {
+                    apiId,
+                    action: "PUT",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+
     getFilteredAssets = async (
         req: Request,
         res: Response,
@@ -570,12 +603,12 @@ class AssetManagementController {
     ): Promise<Response<any, Record<string, any>>> => {
         try {
             // Extract filters from query parameters
-            const location = req.query.location as string;
+            const location_id = parseInt(req.query.location_id as string); // Parse location_id as number
             const building_name = req.query.building_name as string;
             const id = req.query.id as string | undefined; // Parse id as string
     
             // Call the DAO to fetch filtered assets
-            const data = await this.assetsManagementDao.getFilteredAssets(location, building_name, id);
+            const data = await this.assetsManagementDao.getFilteredAssets(location_id, building_name, id);
     
             return res.json({
                 status: true,
@@ -590,7 +623,7 @@ class AssetManagementController {
         } catch (error) {
             return res.json({
                 status: false,
-                message: "Error occurred while fetching assets",
+                message: "Error occurred while fetching assets provide correct fillters",
                 "meta-data": {
                     apiId,
                     action: "GET",
@@ -599,6 +632,7 @@ class AssetManagementController {
             });
         }
     };
+    
     
 }
 
