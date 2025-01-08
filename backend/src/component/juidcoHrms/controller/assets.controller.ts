@@ -633,6 +633,42 @@ class AssetManagementController {
         }
     };
     
+
+    getShopById = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const shopId = parseInt(req.query.id as string, 10); // Parse shop ID from query parameter
+    
+            // Call the DAO to fetch shop details by ID
+            const shopDetails = await this.assetsManagementDao.getShopById(shopId);
+    
+            return res.json({
+                status: true,
+                message: "Shop details fetched successfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: shopDetails,
+            });
+        } catch (error) {
+            return res.json({
+                status: false,
+                message: "Error fetching shop details",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
     
 }
 

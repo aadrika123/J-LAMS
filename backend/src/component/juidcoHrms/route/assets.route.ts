@@ -155,6 +155,12 @@ class AssetManagementRoute {
         (req: Request, res: Response, next: NextFunction) =>
           this.assetManagementController.locationEdit(req, res, next, "0119"),
       ); //0119
+      app
+      .route(`${baseUrl}/asset/shop`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getShopById(req, res, next, "0120"),
+      ); //0120
 
   }
 }
