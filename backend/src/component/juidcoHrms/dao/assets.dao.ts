@@ -1969,32 +1969,28 @@ class AssetsManagementDao {
                         mode: "insensitive",
                     },
                     ...(id && { id }), // Filter by id if provided
+                    floorData: {
+                        some: {
+                            details: {
+                                some: {
+                                    type: "Commercial",
+                                },
+                            },
+                        },
+                    },
                 },
                 select: {
                     id: true,
-                    ulb_id: true,
                     location_id: true,
-                    type_of_assets: true,
-                    asset_sub_category_name: true,
-                    assets_category_type: true,
-                    khata_no: true,
-                    plot_no: true,
-                    ward_no: true,
                     building_name: true,
                     location: true,
                     address: true,
-                    type_of_land: true,
-                    area: true,
-                    from_whom_acquired: true,
-                    mode_of_acquisition: true,
-                    no_of_floors: true,
                     floorData: {
                         select: {
-                            id: true,
-                            floor: true,
-                            plotCount: true,
-                            type: true,
                             details: {
+                                where: {
+                                    type: "Commercial",
+                                },
                                 select: {
                                     id: true,
                                     index: true,
@@ -2012,11 +2008,73 @@ class AssetsManagementDao {
                 },
             });
     
-            return assets;
+            // Transform to nest asset details under each shop
+            return assets.map(asset => ({
+                shops: asset.floorData.flatMap(floor => floor.details.map(detail => ({
+                    ...detail,
+                    building_id: asset.id,
+                    location_id: asset.location_id,
+                    building_name: asset.building_name,
+                    location: asset.location,
+                    address: asset.address,
+                }))),
+            }));
         } catch (error) {
             throw new Error("Error fetching filtered assets");
         }
     };
+    
+
+    async getShopById(shopId: number) {
+        try {
+            const shop = await prisma.details.findUnique({
+                where: {
+                    id: shopId,
+                },
+                select: {
+                    id: true,
+                    index: true,
+                    type: true,
+                    length: true,
+                    breadth: true,
+                    height: true,
+                    name: true,
+                    property_name: true,
+                    type_of_plot: true,
+                    floorData: {
+                        select: {
+                            assetsList: {
+                                select: {
+                                    id: true,
+                                    location_id: true,
+                                    building_name: true,
+                                    location: true,
+                                    address: true,
+                                }
+                            }
+                        }
+                    }
+                },
+            });
+
+            if (!shop) {
+                throw new Error("Shop not found");
+            }
+
+            // Flatten the structure to match the required response
+            return {
+                ...shop,
+                building_id: shop.floorData.assetsList.id,
+                location_id: shop.floorData.assetsList.location_id,
+                building_name: shop.floorData.assetsList.building_name,
+                location: shop.floorData.assetsList.location,
+                address: shop.floorData.assetsList.address,
+                floorData: undefined // Remove the nested floorData object
+            };
+        } catch (error) {
+            throw new Error("Error fetching shop details");
+        }
+    }
     
 
 }
