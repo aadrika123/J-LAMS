@@ -1717,6 +1717,7 @@ class AssetsManagementDao {
                 },
                 select: {
                     location_id: true,
+                    location:true,
                     building_name: true,
                     address: true,
                     ulb_id: true,
@@ -1810,18 +1811,24 @@ class AssetsManagementDao {
     // };
 
     marketcircle = async (req: Request) => {
-        const page = Number(req.query.page) || 1;
+        const page = Number(req.query.page) || 2;
         const limit = Number(req.query.limit) || 5;
         const id = Number(req.query.id) || 1;
         const skip = (page - 1) * limit;
         try {
+
+            const totalRecords = await prisma.location.count({
+                where: {
+                    ulb_id: id,
+                },
+            });
             let resultData = [];
             const circleGet = await prisma.location.findMany({
                 where: {
                     ulb_id: id,
                 },
                 orderBy: {
-                    created_at: 'desc',
+                    created_at: 'asc',
                 },
                 skip: skip,
                 take: limit,
@@ -1839,7 +1846,7 @@ class AssetsManagementDao {
                     address: true
                 },
                 orderBy: {
-                    created_at: 'desc',
+                    created_at: 'asc',
                 },
                 skip: skip,
                 take: limit,
@@ -1862,7 +1869,7 @@ class AssetsManagementDao {
                 data: resultData,
                 page,
                 limit,
-                totalPages: Math.ceil(resultData.length / limit),
+                totalPages: Math.ceil(totalRecords / limit),
             });
 
         } catch (err) {
@@ -1879,11 +1886,14 @@ class AssetsManagementDao {
 
     locationAdd = async (req: Request) => {
         const locationData = req.body.location || '';
+        const addressData = req.body.address || '';
         const ids = req.body.id;
         try {
             const result = await prisma.$transaction(async (tx) => {
                 const existingLocation = await tx.location.findFirst({
-                    where: { location: locationData, },
+                    where: { location: locationData,
+                        address: addressData,
+                     },
                 });
 
 
@@ -1897,7 +1907,7 @@ class AssetsManagementDao {
                         location: locationData || '',
                         is_active: true,
                         building_name: "",
-                        address: "",
+                        address: addressData,
                         created_at: new Date(),
                         updated_at: new Date(),
                     },
@@ -1914,16 +1924,46 @@ class AssetsManagementDao {
         }
     };
 
-    getFilteredAssets = async (location: string, building_name: string, id?: string) => {
+    locationEdit = async (req: Request) => {
+        const { location, address, id } = req.body;
+    
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                const existingLocation = await tx.location.findUnique({
+                    where: { id },
+                });
+    
+                if (!existingLocation) {
+                    throw new Error("Location not found");
+                }
+    
+                const updatedLocation = await tx.location.update({
+                    where: { id },
+                    data: {
+                        location: location || existingLocation.location,
+                        address: address || existingLocation.address,
+                        updated_at: new Date(),
+                    },
+                });
+    
+                return updatedLocation;
+            });
+    
+            return generateRes(result);
+        } catch (error) {
+            console.error('Error updating location:', error);
+            throw { error: 400, msg: "Unable to update location" };
+        }
+    };
+    
+
+    getFilteredAssets = async (location_id: number, building_name: string, id?: string) => {
         try {
             const assets = await prisma.assets_list.findMany({
                 where: {
                     status: 2, // Approved assets only
                     type_of_assets: "Building",
-                    location: {
-                        contains: location,
-                        mode: "insensitive",
-                    },
+                    location_id, // Directly filter by location_id
                     building_name: {
                         contains: building_name,
                         mode: "insensitive",
@@ -1932,6 +1972,8 @@ class AssetsManagementDao {
                 },
                 select: {
                     id: true,
+                    ulb_id: true,
+                    location_id: true,
                     type_of_assets: true,
                     asset_sub_category_name: true,
                     assets_category_type: true,
@@ -1941,7 +1983,6 @@ class AssetsManagementDao {
                     building_name: true,
                     location: true,
                     address: true,
-                    ulb_id: true,
                     type_of_land: true,
                     area: true,
                     from_whom_acquired: true,
@@ -1976,7 +2017,7 @@ class AssetsManagementDao {
             throw new Error("Error fetching filtered assets");
         }
     };
-
+    
 
 }
 

@@ -149,6 +149,13 @@ class AssetManagementRoute {
           this.assetManagementController.getBuildingNameByLocation(req, res, next, "0118"),
       ); //0118
 
+      app
+      .route(`${baseUrl}/asset/location-edit`)
+      .post(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.locationEdit(req, res, next, "0119"),
+      ); //0119
+
   }
 }
 
