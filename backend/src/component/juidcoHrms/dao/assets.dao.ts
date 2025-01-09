@@ -1822,7 +1822,7 @@ class AssetsManagementDao {
                     ulb_id: id,
                 },
             });
-            let resultData = [];
+            // let resultData = [];
             const circleGet = await prisma.location.findMany({
                 where: {
                     ulb_id: id,
@@ -1834,39 +1834,39 @@ class AssetsManagementDao {
                 take: limit,
             });
 
-            const circleGets = await prisma.assets_list.findMany({
-                where: {
-                    ulb_id: id,
-                },
-                select: {
-                    location: true,
-                    id: true,
-                    ulb_id: true,
-                    building_name: true,
-                    address: true
-                },
-                orderBy: {
-                    created_at: 'asc',
-                },
-                skip: skip,
-                take: limit,
-            });
+            // const circleGets = await prisma.assets_list.findMany({
+            //     where: {
+            //         ulb_id: id,
+            //     },
+            //     select: {
+            //         location: true,
+            //         id: true,
+            //         ulb_id: true,
+            //         building_name: true,
+            //         address: true
+            //     },
+            //     orderBy: {
+            //         created_at: 'asc',
+            //     },
+            //     skip: skip,
+            //     take: limit,
+            // });
 
-            for (const asset of circleGet) {
-                const matchedAsset = circleGets.find(item => item.location === asset.location);
-                if (matchedAsset) {
-                    resultData.push({
-                        ...asset,
-                        building_name: matchedAsset.building_name || null,
-                        address: matchedAsset.address || null
-                    });
-                } else {
-                    resultData.push(asset);
-                }
-            }
+            // for (const asset of circleGet) {
+            //     const matchedAsset = circleGets.find(item => item.location === asset.location);
+            //     if (matchedAsset) {
+            //         resultData.push({
+            //             ...asset,
+            //             building_name: matchedAsset.building_name || null,
+            //             address: matchedAsset.address || null
+            //         });
+            //     } else {
+            //         resultData.push(asset);
+            //     }
+            // }
 
             return generateRes({
-                data: resultData,
+                data: circleGet,
                 page,
                 limit,
                 totalPages: Math.ceil(totalRecords / limit),
@@ -1955,15 +1955,92 @@ class AssetsManagementDao {
             throw { error: 400, msg: "Unable to update location" };
         }
     };
+
+    locationDelete = async (req: Request) => {
+        const id = Number(req.query.id);
+      
+        try {
+          const result = await prisma.$transaction(async (tx) => {
+            const existingLocation = await tx.location.findUnique({
+              where: { id },
+            });
+      
+            if (!existingLocation) {
+              return {
+                status: 400,
+                message: "Location not found",
+                "meta-data": {
+                  apiId: req.body.apiId,  // You can pass the apiId from the request body
+                  action: "DELETE",
+                  version: "1.0",
+                },
+              };
+            }
+      
+            // Attempt to delete the location
+            try {
+              await tx.location.delete({
+                where: { id },
+              });
+              return {
+                status: 200,
+                message: "Location deleted successfully",
+                "meta-data": {
+                  apiId: req.body.apiId,
+                  action: "DELETE",
+                  version: "1.0",
+                },
+              };
+            } catch (error:any) {
+              if (error.code === 'P2003') {
+                return {
+                  status: 400,
+                  message: "You cannot delete this location because it is referenced by other records.",
+                  "meta-data": {
+                    apiId: req.body.apiId,
+                    action: "DELETE",
+                    version: "1.0",
+                  },
+                };
+              }
+              // Handle other errors if necessary
+              return {
+                status: 400,
+                message: "Unable to delete location",
+                "meta-data": {
+                  apiId: req.body.apiId,
+                  action: "DELETE",
+                  version: "1.0",
+                },
+              };
+            }
+          });
+      
+          return result; // Return the response generated in the transaction
+        } catch (error) {
+          console.error('Error deleting location:', error);
+          return {
+            status: 400,
+            message: "Unable to delete location",
+            "meta-data": {
+              apiId: req.body.apiId,
+              action: "DELETE",
+              version: "1.0",
+            },
+          };
+        }
+      };
+      
+      
     
 
-    getFilteredAssets = async (location_id: number, building_name: string, id?: string) => {
+      getFilteredAssets = async (location_id: number, building_name: string, id?: string) => {
         try {
             const assets = await prisma.assets_list.findMany({
                 where: {
                     status: 2, // Approved assets only
                     type_of_assets: "Building",
-                    location_id, // Directly filter by location_id
+                    location_id, // Filter by location_id
                     building_name: {
                         contains: building_name,
                         mode: "insensitive",
@@ -1982,6 +2059,7 @@ class AssetsManagementDao {
                 select: {
                     id: true,
                     location_id: true,
+                    ulb_id: true,
                     building_name: true,
                     location: true,
                     address: true,
@@ -2007,22 +2085,29 @@ class AssetsManagementDao {
                     },
                 },
             });
-    
-            // Transform to nest asset details under each shop
-            return assets.map(asset => ({
-                shops: asset.floorData.flatMap(floor => floor.details.map(detail => ({
-                    ...detail,
-                    building_id: asset.id,
-                    location_id: asset.location_id,
-                    building_name: asset.building_name,
-                    location: asset.location,
-                    address: asset.address,
-                }))),
-            }));
+
+            // Flatten the assets and map the data to the desired structure
+            const shops = assets.flatMap(asset => 
+                asset.floorData.flatMap(floor => 
+                    floor.details.map(detail => ({
+                        ...detail,
+                        building_id: asset.id,
+                        location_id: asset.location_id,
+                        ulb_id: asset.ulb_id,
+                        building_name: asset.building_name,
+                        location: asset.location,
+                        address: asset.address,
+                    }))
+                )
+            );
+
+            // Return the transformed data
+            return { shops };
         } catch (error) {
             throw new Error("Error fetching filtered assets");
         }
     };
+
     
 
     async getShopById(shopId: number) {

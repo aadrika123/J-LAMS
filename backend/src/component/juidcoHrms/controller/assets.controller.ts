@@ -525,7 +525,7 @@ class AssetManagementController {
             // if (!data?.error) {
                 return res.json({
                 // "status": true,
-                status: 201,
+                status: true,
                 "message": "Location Added Succesfully",
                 "meta-data": {
                     apiId,
@@ -572,7 +572,7 @@ class AssetManagementController {
             const data = await this.assetsManagementDao.locationEdit(req);
     
             return res.json({
-                status: 200,
+                status: true,
                 message: "Location updated successfully",
                 "meta-data": {
                     apiId,
@@ -583,7 +583,7 @@ class AssetManagementController {
             });
         } catch (error) {
             return res.json({
-                status: 400,
+                status: false,
                 message: "Error occurred while updating location",
                 "meta-data": {
                     apiId,
@@ -594,6 +594,37 @@ class AssetManagementController {
         }
     };
     
+    locationDelete = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+      ): Promise<object> => {
+        try {
+          const data = await this.assetsManagementDao.locationDelete(req);
+      
+          return res.json({
+            status: true,
+            message: "Location deleted successfully",
+            "meta-data": {
+              apiId,
+              action: "DELETE",
+              version: "1.0",
+            },
+            data: data,
+          });
+        } catch (error) {
+          return res.json({
+            status: 400,
+            message: "Error occurred while deleting location",
+            "meta-data": {
+              apiId,
+              action: "DELETE",
+              version: "1.0",
+            },
+          });
+        }
+      };
 
     getFilteredAssets = async (
         req: Request,
