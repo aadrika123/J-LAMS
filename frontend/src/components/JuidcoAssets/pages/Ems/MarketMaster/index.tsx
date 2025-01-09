@@ -22,6 +22,11 @@ import AddMarketModal from '@/components/Modal/AddMarketModal/AddMarketModal';
 //     src: string;
 // }
 
+interface BuildingModalProps {
+    onClose: () => void;
+    data: any; // You can adjust the type based on the structure of your data
+}
+
 const Marketmaster = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
@@ -42,6 +47,89 @@ const Marketmaster = () => {
     // const [isLoadingCSV, setIsLoadingCSV] = useState(false);
     // const [modalClose, setModalClose] = useState(false);
     const [modalMarketClose, setModalMarketClose] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalData, setModalData] = useState(null);
+    const [editData, setEditData] = useState<any>(null);
+    const [locations, setLocations] = useState<any[]>([]);
+
+    const handleIconClick = async (id: any) => {
+        try {
+            const response = await axios({
+                url: `${ASSETS.LIST.buildingName}?location_id=${id}`,
+                method: "GET"
+            });
+            const data = await response.data;
+            setModalData(data); // Store the data to display in the modal
+            setIsModalOpen(true); // Open the modal
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setModalData(null);
+    };
+
+    const BuildingModal: React.FC<BuildingModalProps> = ({ onClose, data }) => (
+        <div
+            className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+            onClick={onClose}
+            aria-label="Close modal"
+        >
+            <div
+                className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative"
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-labelledby="modalTitle"
+                aria-modal="true"
+            >
+                
+                <button
+                    onClick={onClose}
+                    className="absolute top-2 right-2 w-6 h-6 items-center bg-red-500 hover:bg-red-300 text-sm rounded-full  overflow-auto"
+                    aria-label="Close"
+                >
+                <span className=' text-white'>X</span>
+                    
+                </button>
+                <h2 id="modalTitle" className="text-xl text-black font-bold mb-4">
+                    Building Information
+                </h2>
+                {data && data.data ? (
+                    <ul className="list-disc list-inside text-gray-800">
+                        {data.data.data.map((item: any, index: number) => (
+                            <li key={index}>Building Name: {item.building_name || '---'}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No data available or loading...</p>
+                )}
+            </div>
+        </div>
+    );
+
+    const handleDelete = async (id: any) => {
+        try {
+          const response = await axios({
+            url: `${ASSETS.LIST.locationDelete}?id=${id}`, // API URL to delete the location
+            method: 'POST', // HTTP method to delete
+          });
+      
+          // Handle the response from the API
+          if (response.data.status === true) {
+           
+            toast.success("Location deleted successfully.");
+            
+          } else {
+            toast.error(response.data.message || "Failed to delete location.");
+          }
+          window.location.reload()
+        } catch (error) {
+          console.error('Error deleting location:', error);
+          toast.error("Error occurred while deleting the location.");
+        }
+      };
 
     useEffect(() => {
         const storedUserDetails = localStorage.getItem("user_details");
@@ -83,26 +171,7 @@ const Marketmaster = () => {
         }
     };
 
-    const fetchDataforDelete = async (id: number) => {
-        try {
-            const res = await axios({
-                url: `${ASSETS.LIST.delete}?id=${id}`,
-                method: "POST",
-            });
-
-            if (res?.data?.status === true) {
-                toast.success("Assets succesfully deleted");
-                window.location.reload()
-                return res?.data?.data;
-
-            } else {
-                toast.error("Failed to delete");
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            return [];
-        }
-    };
+    
 
 
 
@@ -149,27 +218,7 @@ const Marketmaster = () => {
         return <div>Error</div>;
     }
 
-    /////////////////////////////// delete & update data /////////////////////////////
-
-    // const handleDelete = async (id: number) => {
-    //     setDeleteId(id);
-    //     setShowModal(true);
-    // };
-
-    const confirmDelete = async () => {
-        if (deleteId !== null) {
-            const data = await fetchDataforDelete(deleteId);
-            console.log('Deleted data:', data);
-            setShowModal(false);
-        }
-    };
-
-    const cancelDelete = () => {
-        setShowModal(false);
-        setDeleteId(null);
-    };
-
-    /////////////////////////////// delete & update data /////////////////////////////
+   
 
     const totalPages = data?.totalPages;
 
@@ -190,8 +239,10 @@ const Marketmaster = () => {
         setCurrentPage(1);
     };
 
-    const handleMarketOpenModal = (val: boolean) => {
+    const handleMarketOpenModal = (val: boolean, item: any = null) => {
+        console.log("iytemmmm", item)
         setModalMarketClose(val)
+        setEditData(item);
     }
 
     const handleMarketCloseModal = () => {
@@ -305,7 +356,7 @@ const Marketmaster = () => {
                                     <div className="flex">
                                         <div className="ms-3 text-sm font-normal">
                                             <span className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">Assets Log Data</span> <br></br>
-                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({ 0})</span></span><br></br>
+                                            <span className="mb-1 text-sm font-semibold text-[#4338CA] dark:text-white"> Total- <span className='text-slate-700'>({0})</span></span><br></br>
                                             <div className="mb-2 text-sm text-slate-800 font-normal mt-2">Hi, <span className='text-[#4338CA] font-bold'>{role}</span>  , you have recieved <span className='text-sm font-semibold text-[#42ca38] dark:text-white'>({0})</span> for audit changes in assets data. </div>
                                             <Link href={'/apply/request-update'} className="inline-flex px-2.5 py-1.5 text-xs font-medium text-center mt-3 text-white bg-[#4338CA] rounded-lg hover:bg-[#4338CA] focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-[#4338CA] dark:hover:bg-[#4338CA]">View All Logs</Link>
                                         </div>
@@ -367,7 +418,7 @@ const Marketmaster = () => {
 
 
 
-                        <button onClick={() => handleMarketOpenModal(true)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" disabled={count == 0 ? true : false}>
+                        <button onClick={() => handleMarketOpenModal(true)}  type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" disabled={count == 0 ? true : false}>
                             Add Location
                         </button>
 
@@ -389,146 +440,96 @@ const Marketmaster = () => {
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
                                     <td className="px-6 py-4">{item?.location || "---"}</td>
-                                    <td className="px-6 py-4">{item?.building_name || "---"}</td>
+                                    {/* <td className="px-6 py-4">{item.building_name || "---"}</td> */}
+                                    <td className="px-6 py-4 cursor-pointer">{(<svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="21"
+                                        height="20"
+                                        viewBox="0 0 21 20"
+                                        fill="none"
+                                        onClick={() => handleIconClick(item.id)}
+                                    >
+                                        <rect
+                                            x="0.578644"
+                                            y="0.578644"
+                                            width="19.8427"
+                                            height="18.8427"
+                                            rx="4.42136"
+                                            stroke="#726E6E"
+                                            strokeWidth="1.15729"
+                                        />
+                                        <path
+                                            d="M10 9.1C10.3617 9.1 10.7085 9.2475 10.9642 9.51005C11.22 9.7726 11.3636 10.1287 11.3636 10.5C11.3636 10.8713 11.22 11.2274 10.9642 11.4899C10.7085 11.7525 10.3617 11.9 10 11.9C9.63834 11.9 9.29149 11.7525 9.03576 11.4899C8.78003 11.2274 8.63636 10.8713 8.63636 10.5C8.63636 10.1287 8.78003 9.7726 9.03576 9.51005C9.29149 9.2475 9.63834 9.1 10 9.1ZM10 7C12.2727 7 14.2136 8.45133 15 10.5C14.2136 12.5487 12.2727 14 10 14C7.72727 14 5.78636 12.5487 5 10.5C5.78636 8.45133 7.72727 7 10 7ZM5.99091 10.5C6.3583 11.2701 6.92878 11.919 7.63749 12.3729C8.34621 12.8267 9.16473 13.0673 10 13.0673C10.8353 13.0673 11.6538 12.8267 12.3625 12.3729C13.0712 11.919 13.6417 11.2701 14.0091 10.5C13.6417 9.72986 13.0712 9.08098 12.3625 8.62715C11.6538 8.17331 10.8353 7.93272 10 7.93272C9.16473 7.93272 8.34621 8.17331 7.63749 8.62715C6.92878 9.08098 6.3583 9.72986 5.99091 10.5Z"
+                                            fill="black"
+                                            fillOpacity="0.41"
+                                        />
+                                    </svg>)}
+                                        {isModalOpen && <BuildingModal onClose={handleCloseModal} data={modalData} />}
+                                    </td>
                                     <td className="px-6 py-4">{item?.address || "---"}</td>
 
 
                                     <td className="px-6 py-4">
-                                        <div className='flex'>
-                                            {role === 'Admin' ? null : (
-                                                item.status === 3 ? (
-                                                    // <Link
-                                                    //     href={`/apply/approve-application/${item?.id}?status=clicked`}
-                                                    //     className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
-                                                    // >
-
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="23"
-                                                        height="20"
-                                                        viewBox="0 0 23 20"
-                                                        fill="none"
-                                                    >
-                                                        <g clipPath="url(#clip0_1440_7941)">
-                                                            <rect
-                                                                x="1.63591"
-                                                                y="0.63591"
-                                                                width="18.7282"
-                                                                height="18.7282"
-                                                                rx="4.36409"
-                                                                stroke="#726E6E"
-                                                                strokeWidth="1.27182"
-                                                            />
-                                                            <path
-                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                                                                fill="black"
-                                                                fillOpacity="0.41"
-                                                            />
-                                                        </g>
-                                                        <defs>
-                                                            <clipPath id="clip0_1440_7941">
-                                                                <rect
-                                                                    width="22.7692"
-                                                                    height="19.7333"
-                                                                    fill="white"
-                                                                />
-                                                            </clipPath>
-                                                        </defs>
-                                                    </svg>
-
-                                                    // </Link>
-                                                ) : (
-                                                    // <Link
-                                                    //     href={`/apply/approve-application/${item?.id}?status=clicked`}
-                                                    //     className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
-                                                    // >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="23"
-                                                        height="20"
-                                                        viewBox="0 0 23 20"
-                                                        fill="none"
-                                                    >
-                                                        <g clipPath="url(#clip0_1440_7941)">
-                                                            <rect
-                                                                x="1.63591"
-                                                                y="0.63591"
-                                                                width="18.7282"
-                                                                height="18.7282"
-                                                                rx="4.36409"
-                                                                stroke="#726E6E"
-                                                                strokeWidth="1.27182"
-                                                            />
-                                                            <path
-                                                                d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                                                                fill="black"
-                                                                fillOpacity="0.41"
-                                                            />
-                                                        </g>
-                                                        <defs>
-                                                            <clipPath id="clip0_1440_7941">
-                                                                <rect
-                                                                    width="22.7692"
-                                                                    height="19.7333"
-                                                                    fill="white"
-                                                                />
-                                                            </clipPath>
-                                                        </defs>
-                                                    </svg>
-                                                    // </Link>
-                                                )
-                                            )}
-
-                                            {/* <Link   href={`/apply/approve-application/${item?.id}`}  className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"> */}
+                                        <div className="flex cursor-pointer">
+                                            {/* Edit Icon */}
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                width="21"
+                                                width="23"
                                                 height="20"
-                                                viewBox="0 0 21 20"
+                                                viewBox="0 0 23 20"
                                                 fill="none"
+                                                onClick={() => handleMarketOpenModal(true, item)} // Open modal on click
+                                            >
+                                                <g clipPath="url(#clip0_1440_7941)">
+                                                    <rect
+                                                        x="1.63591"
+                                                        y="0.63591"
+                                                        width="18.7282"
+                                                        height="18.7282"
+                                                        rx="4.36409"
+                                                        stroke="#726E6E"
+                                                        strokeWidth="1.27182"
+                                                    />
+                                                    <path
+                                                        d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                        fill="black"
+                                                        fillOpacity="0.41"
+                                                    />
+                                                </g>
+                                                <defs>
+                                                    <clipPath id="clip0_1440_7941">
+                                                        <rect width="22.7692" height="19.7333" fill="white" />
+                                                    </clipPath>
+                                                </defs>
+                                            </svg>
+
+                                            {/* Delete Icon */}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 20 20"
+                                                fill="none"
+                                                onClick={() => handleDelete(item?.id)} // Handle delete on click
                                             >
                                                 <rect
-                                                    x="0.578644"
-                                                    y="0.578644"
-                                                    width="19.8427"
-                                                    height="18.8427"
-                                                    rx="4.42136"
+                                                    x="0.563881"
+                                                    y="0.563881"
+                                                    width="18.362"
+                                                    height="18.1851"
+                                                    rx="5.07493"
                                                     stroke="#726E6E"
-                                                    strokeWidth="1.15729"
+                                                    strokeWidth="1.12776"
                                                 />
                                                 <path
-                                                    d="M10 9.1C10.3617 9.1 10.7085 9.2475 10.9642 9.51005C11.22 9.7726 11.3636 10.1287 11.3636 10.5C11.3636 10.8713 11.22 11.2274 10.9642 11.4899C10.7085 11.7525 10.3617 11.9 10 11.9C9.63834 11.9 9.29149 11.7525 9.03576 11.4899C8.78003 11.2274 8.63636 10.8713 8.63636 10.5C8.63636 10.1287 8.78003 9.7726 9.03576 9.51005C9.29149 9.2475 9.63834 9.1 10 9.1ZM10 7C12.2727 7 14.2136 8.45133 15 10.5C14.2136 12.5487 12.2727 14 10 14C7.72727 14 5.78636 12.5487 5 10.5C5.78636 8.45133 7.72727 7 10 7ZM5.99091 10.5C6.3583 11.2701 6.92878 11.919 7.63749 12.3729C8.34621 12.8267 9.16473 13.0673 10 13.0673C10.8353 13.0673 11.6538 12.8267 12.3625 12.3729C13.0712 11.919 13.6417 11.2701 14.0091 10.5C13.6417 9.72986 13.0712 9.08098 12.3625 8.62715C11.6538 8.17331 10.8353 7.93272 10 7.93272C9.16473 7.93272 8.34621 8.17331 7.63749 8.62715C6.92878 9.08098 6.3583 9.72986 5.99091 10.5Z"
+                                                    d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z"
                                                     fill="black"
                                                     fillOpacity="0.41"
                                                 />
                                             </svg>
-                                            {/* </Link> */}
-
-
-                                            {role == 'Admin' ? null : (
-                                                <>
-                                                    {/* <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed" disabled> */}
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                        <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
-                                                        <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />
-                                                    </svg>
-                                                    {/* </button> */}
-
-                                                    {showModal && (
-                                                        <div className="fixed inset-0 flex items-center justify-center">
-                                                            <div className="bg-white p-6 rounded shadow-md">
-                                                                <p>Are you sure you want to delete this asset?</p>
-                                                                <div className="mt-4">
-                                                                    <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded mr-2">Yes</button>
-                                                                    <button onClick={cancelDelete} className="px-4 py-2 bg-gray-300 rounded">No</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
                                         </div>
                                     </td>
+
 
 
 
@@ -644,7 +645,9 @@ const Marketmaster = () => {
                     isOpen={modalMarketClose}
                     onClose={handleMarketCloseModal}
                     ulbID={ulbID}
-                 
+                    editData={editData}
+
+
 
                 />
             }

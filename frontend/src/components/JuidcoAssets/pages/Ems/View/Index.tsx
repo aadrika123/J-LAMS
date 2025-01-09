@@ -7,7 +7,7 @@
 
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { InnerHeading, SubHeading } from '@/components/Helpers/Heading'
 import Image from 'next/image'
 import Home from "@/assets/icons/home-address.png";
@@ -23,6 +23,7 @@ import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
 import { Field, FieldArray, Formik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation'
+import { useReactToPrint } from "react-to-print";
 
 
 const View = ({ id }: { id: number }) => {
@@ -37,6 +38,43 @@ const View = ({ id }: { id: number }) => {
     const [role, setRole] = useState('');
     const [datas, setData] = useState<any>()
     const [datass, setDatas] = useState<any>()
+
+    const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
+
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+        pageStyle: `
+          @media print {
+            @page {
+              size: 1000mm 1500mm;
+              margin: 25mm;
+            }
+            
+            /* Custom table styling */
+            table {
+              width: 50%;
+              margin: 0;
+              padding: 0;
+              border-collapse: collapse; /* Removes space between cells */
+            }
+            
+            /* Reducing padding inside table cells */
+            th, td {
+              padding: 0px; /* Adjust as needed */
+              margin: 0;
+            }
+            
+            /* Optional: Font size adjustments for better fit */
+            th, td {
+              font-size: 12px; /* Adjust as needed */
+            }
+          }
+        `,
+      });
+
+    
+    
 
     const togglePopup = () => {
         setIsOpen(!isOpen);
@@ -346,7 +384,7 @@ const View = ({ id }: { id: number }) => {
                         buttonType="button"
                         variant={"cancel"}
                         onClick={goBack}
-                        className="border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center"
+                        className="  border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center"
                     >
                         <i>
                             <svg
@@ -377,8 +415,11 @@ const View = ({ id }: { id: number }) => {
                         Back
                     </PrimaryButton>
                 </div>
+                <button onClick={handlePrint} className="text-blue-800 border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center">
+                    Download as PDF
+                </button>
+                
             </div>
-
             <div>
                 <div className='mb-5'>
                     {status && status == 'clicked' && (
@@ -914,7 +955,11 @@ const View = ({ id }: { id: number }) => {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
+            {/* ----------------------------------- */}
+
+            <div ref={componentRef}>
+
+            <div   className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
                 <div className="flex justify-between mb-10">
                     <SubHeading>
                         <Image src={Home} alt="employee" width={40} height={20} />
@@ -1367,6 +1412,7 @@ const View = ({ id }: { id: number }) => {
             )
             }
             <div>
+            </div>
             </div>
         </div>
     )

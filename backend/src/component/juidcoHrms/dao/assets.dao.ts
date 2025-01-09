@@ -255,7 +255,7 @@ class AssetsManagementDao {
         }
     };
 
-    postWithModifiedId = async (req: Request) => {
+    postWithModifiedId =  async (req: Request) => {
         const {
             type_of_assets,
             asset_sub_category_name,
@@ -1718,6 +1718,7 @@ class AssetsManagementDao {
                 select: {
                     location_id: true,
                     location:true,
+                    id:true,
                     building_name: true,
                     address: true,
                     ulb_id: true,

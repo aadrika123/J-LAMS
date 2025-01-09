@@ -134,7 +134,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
 
             <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
               <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
-              <InnerHeading className="text-xl text-white">Market Master </InnerHeading>
+              <InnerHeading className="text-xl text-white">Location Master </InnerHeading>
             </div>
           </Link>
           <Link href="/assets/restructured-assets" className="text-xl text-white">
