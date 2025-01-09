@@ -292,7 +292,7 @@
 //           details: details,
 //         };
 //       });
-      
+
 
 //       console.log("Mapped floorData:", values.floorData);
 
@@ -2114,10 +2114,11 @@ export const DashboardMain = () => {
   const [selectedUnit, setSelectedUnit] = useState<any>(null); // Track selected unit details for edit
 
 
-  const [editedFloor, setEditedFloor] = useState<any>(null); 
+  const [editedFloor, setEditedFloor] = useState<any>(null);
   const [editedDetails, setEditedDetails] = useState<any>([]);
   const [editedFloorIndex, setEditedFloorIndex] = useState<any>(null); // To store the index of the floor being edited
-  console.log("data",data,sessionData,editedFloor)
+  const [draft, setDraft] = useState<Boolean>(false);
+  console.log("data", data, sessionData, editedFloor)
 
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMarket(event.target.value);
@@ -2305,7 +2306,7 @@ export const DashboardMain = () => {
   //         details: details,
   //       };
   //     });
-      
+
 
   //     console.log("Mapped floorData:", values.floorData);
 
@@ -2338,212 +2339,215 @@ export const DashboardMain = () => {
 
   const [savedFloors, setSavedFloors] = useState<any[]>([]);
 
-  console.log("commercialUnits  line 2341",commercialUnits)
-  console.log("residentialUnits line 2341",residentialUnits)
+  console.log("commercialUnits  line 2341", commercialUnits)
+  console.log("residentialUnits line 2341", residentialUnits)
 
   // old
-// const processFloorData = () => {
+  // const processFloorData = () => {
 
-//   const mergedUnits = [
-//     ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
-//     ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
-//   ];
+  //   const mergedUnits = [
+  //     ...((Array.isArray(commercialUnits) ? commercialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Commercial' })),
+  //     ...((Array.isArray(residentialUnits) ? residentialUnits : []) as any[]).map(unit => ({ ...unit, type: 'Residential' }))
+  //   ];
 
-//   console.log("-------imp--------",mergedUnits)
+  //   console.log("-------imp--------",mergedUnits)
 
-//   const isUnitFilled = (unit: any) => {
-//     return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
-//   };
+  //   const isUnitFilled = (unit: any) => {
+  //     return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+  //   };
 
-//   const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+  //   const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
 
-//   return filledUnits.map((unit) => {
-//     const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
-//     const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
-//     const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
+  //   return filledUnits.map((unit) => {
+  //     const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
+  //     const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
+  //     const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
 
-//     const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
-//     const floorName = selectedFloor === null
-//       ? "Unknown Floor"
-//       : selectedFloor === 0
-//         ? "Basement"
-//         : `Floor ${selectedFloor - 1}`;
+  //     const plotCount = filledUnits.filter((unit) => unit.name === unit.name).length;
+  //     const floorName = selectedFloor === null
+  //       ? "Unknown Floor"
+  //       : selectedFloor === 0
+  //         ? "Basement"
+  //         : `Floor ${selectedFloor - 1}`;
 
-//     const details = [{
-//       index: 1,
-//       type: unit.type,
-//       length: length,
-//       breadth: breadth,
-//       height: height,
-//       name: unit.name,
-//       property_name: unit.property_name,
-//       type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
-//     }];
+  //     const details = [{
+  //       index: 1,
+  //       type: unit.type,
+  //       length: length,
+  //       breadth: breadth,
+  //       height: height,
+  //       name: unit.name,
+  //       property_name: unit.property_name,
+  //       type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
+  //     }];
 
-//     return {
-//       floor: floorName,
-//       plotCount: plotCount,
-//       type: unit.type,
-//       details: details,
-//     };
-//   });
-// };
+  //     return {
+  //       floor: floorName,
+  //       plotCount: plotCount,
+  //       type: unit.type,
+  //       details: details,
+  //     };
+  //   });
+  // };
 
-// new 
+  // new 
 
-const processFloorData = () => {
-  // Merge and classify units with empty handling
-  const mergedUnits = [
-    ...((Array.isArray(commercialUnits) ? commercialUnits : [])).map(unit => ({ unitType: 'Commercial', ...unit })),
-    ...((Array.isArray(residentialUnits) ? residentialUnits : [])).map(unit => ({ unitType: 'Residential', ...unit })),
-  ];
+  const processFloorData = () => {
+    // Merge and classify units with empty handling
+    const mergedUnits = [
+      ...((Array.isArray(commercialUnits) ? commercialUnits : [])).map(unit => ({ unitType: 'Commercial', ...unit })),
+      ...((Array.isArray(residentialUnits) ? residentialUnits : [])).map(unit => ({ unitType: 'Residential', ...unit })),
+    ];
 
-  console.log("-------Merged Units--------", mergedUnits);
+    console.log("-------Merged Units--------", mergedUnits);
 
-  const isUnitFilled = (unit:any) => {
-    return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
-  };
-
-  // Separate filled and incomplete units
-  const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
-  const incompleteUnits = mergedUnits.filter(unit => !isUnitFilled(unit));
-
-  console.log("-------Filled Units--------", filledUnits);
-  console.log("-------Incomplete Units--------", incompleteUnits);
-
-  return mergedUnits.map((unit, index) => {
-    const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
-    const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
-    const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
-    const name = unit.name || `Unnamed Unit ${index + 1}`;
-    const propertyName = unit.property_name || "Unknown Property";
-
-    const plotCount = filledUnits.filter((filledUnit) => filledUnit.name === unit.name).length;
-    const floorName = selectedFloor === null
-      ? "Unknown Floor"
-      : selectedFloor === 0
-        ? "Basement"
-        : `Floor ${selectedFloor - 1}`;
-
-    const details = [{
-      index: index + 1,
-      type: unit.type,
-      length: length || "Not Provided",
-      breadth: breadth || "Not Provided",
-      height: height || "Not Provided",
-      name: name,
-      property_name: propertyName,
-      type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
-    }];
-
-    return {
-      floor: floorName,
-      plotCount: plotCount,
-      type: unit.type,
-      details: details,
+    const isUnitFilled = (unit: any) => {
+      return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
     };
-  });
-};
 
+    // Separate filled and incomplete units
+    const filledUnits = mergedUnits.filter(unit => isUnitFilled(unit));
+    const incompleteUnits = mergedUnits.filter(unit => !isUnitFilled(unit));
 
-const handleSaveFloorData = () => {
-  const floorData = processFloorData();
-  setSavedFloors((prevFloors) => [...prevFloors, ...floorData]);
+    console.log("-------Filled Units--------", filledUnits);
+    console.log("-------Incomplete Units--------", incompleteUnits);
 
-  console.log("Saved Floors: ", savedFloors); // For debugging
+    return mergedUnits.map((unit, index) => {
+      const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null;
+      const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null;
+      const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null;
+      const name = unit.name || `Unnamed Unit ${index + 1}`;
+      const propertyName = unit.property_name || "Unknown Property";
 
+      const plotCount = filledUnits.filter((filledUnit) => filledUnit.name === unit.name).length;
+      const floorName = selectedFloor === null
+        ? "Unknown Floor"
+        : selectedFloor === 0
+          ? "Basement"
+          : `Floor ${selectedFloor - 1}`;
 
-  // Optionally, you can reset or do other operations here
-  // If you need to clear out the previous floor data, you can call: setSavedFloors([]) at the right time
-};
+      const details = [{
+        index: index + 1,
+        type: unit.type,
+        length: length || "Not Provided",
+        breadth: breadth || "Not Provided",
+        height: height || "Not Provided",
+        name: name,
+        property_name: propertyName,
+        type_of_plot: unit.type === 'Commercial' ? 'Commercial' : 'Residential',
+      }];
 
-
-const handleEditFloor = (floor:any, index:any) => {
-  setEditedFloor(floor.floor); // Store the floor number of the edited floor
-  setEditedDetails(floor.details.map((detail:any) => ({ ...detail }))); // Copy the floor details
-  setEditedFloorIndex(index); // Store the index of the floor being edited
-};
-
-const handleInputChange = (e:any, detailIndex:any, field:any) => {
-  const { value } = e.target;
-  const updatedDetails:any = [...editedDetails];
-  updatedDetails[detailIndex][field] = value; // Update the specific detail field
-  setEditedDetails(updatedDetails); // Save the updated details to state
-};
-
-const handleSaves = () => {
-  const updatedFloors = [...savedFloors];
-  updatedFloors[editedFloorIndex] = {
-    ...updatedFloors[editedFloorIndex], 
-    details: editedDetails,
+      return {
+        floor: floorName,
+        plotCount: plotCount,
+        type: unit.type,
+        details: details,
+      };
+    });
   };
-  setSavedFloors(updatedFloors);
-
-  console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
-
-  // Clear the state after saving
-  setEditedFloor(null);
-  setEditedFloorIndex(null);
-  setEditedDetails([]);
-};
 
 
+  const handleSaveFloorData = () => {
+    const floorData = processFloorData();
+    setSavedFloors((prevFloors) => [...prevFloors, ...floorData]);
 
-  const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>) => {
+    console.log("Saved Floors: ", savedFloors); // For debugging
+
+
+    // Optionally, you can reset or do other operations here
+    // If you need to clear out the previous floor data, you can call: setSavedFloors([]) at the right time
+  };
+
+
+  const handleEditFloor = (floor: any, index: any) => {
+    setEditedFloor(floor.floor); // Store the floor number of the edited floor
+    setEditedDetails(floor.details.map((detail: any) => ({ ...detail }))); // Copy the floor details
+    setEditedFloorIndex(index); // Store the index of the floor being edited
+  };
+
+  const handleInputChange = (e: any, detailIndex: any, field: any) => {
+    const { value } = e.target;
+    const updatedDetails: any = [...editedDetails];
+    updatedDetails[detailIndex][field] = value; // Update the specific detail field
+    setEditedDetails(updatedDetails); // Save the updated details to state
+  };
+
+  const handleSaves = () => {
+    const updatedFloors = [...savedFloors];
+    updatedFloors[editedFloorIndex] = {
+      ...updatedFloors[editedFloorIndex],
+      details: editedDetails,
+    };
+    setSavedFloors(updatedFloors);
+
+    console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
+
+    // Clear the state after saving
+    setEditedFloor(null);
+    setEditedFloorIndex(null);
+    setEditedDetails([]);
+  };
+
+
+
+  const handleSubmitFormik = async (values: any, { resetForm, setSubmitting, setStatus, setErrors }: FormikHelpers<any>, draft: Boolean) => {
     try {
       // Merging commercial and residential units
-    
-  
+
+
       // Handling file uploads
       const fileUploadData = await handleUpload();
       if (fileUploadData) {
         values.blue_print = fileUploadData.blue_print;
       }
-  
+
       const fileUploadData2 = await handleUpload2();
       if (fileUploadData2) {
         values.ownership_doc = fileUploadData2.ownership_doc;
       }
-  
+
       values.role = initialValues.role;
       values.no_of_floors = initialValues.no_of_floors;
-  
+
       // Processing floor data
-      console.log("savedFloors",savedFloors)
+      console.log("savedFloors", savedFloors)
       values.floorData = savedFloors;
-  
+
       console.log("Mapped floorData:", values.floorData);
-  
+
+      // Adding status based on the button clicked
+      values.is_drafted = draft;  // This will set the status to -5 for Save As Draft, or 0 for Save
+
+
       // Adding building information
       values.building_name = buildingName;
       values.location = selectedMarket;
-  
+
       // Sending data to the server
       const res = await axios({
         url: `${ASSETS.LIST.create}`,
         method: "POST",
         data: values,
       });
-  
+
       // Handling server response
       if (res?.data?.status === true) {
-        toast.success("Assets successfully added");
-        resetForm();
+        toast.success(res?.data?.data?.is_drafted === true ? "Draft saved successfully" : "Assets successfully added");
+        resetForm(); // Reset the form after submission
         setIsModalOpen(true);
-        console.log("Asset ID:", res?.data?.data?.id);
         setSucceessId(res?.data?.data?.id);
       } else if (res?.data?.type === "DUPLICATE") {
         toast.error("Duplicate asset data found. Please check and try again.");
       } else {
         toast.error("Failed to add assets");
       }
-  
+
     } catch (error) {
       toast.error("Failed to add Assets");
       console.error('Error submitting data:', error);
     }
   };
-  
+
 
 
 
@@ -2689,18 +2693,18 @@ const handleSaves = () => {
   };
 
   const handleFloor = (index: number) => {
-    setSelectedFloor(index); 
-    setPlotNos([]); 
+    setSelectedFloor(index);
+    setPlotNos([]);
 
     setCommercialCount(0); // Reset commercial count
-  setResidentialCount(0); 
-  setCommercialUnits([])
-  setResidentialUnits([])
+    setResidentialCount(0);
+    setCommercialUnits([])
+    setResidentialUnits([])
 
-  setSelectedUnit(null);
-  
+    setSelectedUnit(null);
+
     setData((prevData: any) => {
-      const updatedData = [...prevData]; 
+      const updatedData = [...prevData];
       if (!updatedData[index]) {
         updatedData[index] = {
           floor: index === 0 ? "Basement" : `Floor ${index + 1}`,
@@ -2708,12 +2712,12 @@ const handleSaves = () => {
           plotCount: 0,
         };
       }
-      return updatedData; 
+      return updatedData;
     });
-  
+
     setNavigationStack((prevStack) => [...prevStack]); // Ensure the navigation stack is consistent
   };
-  
+
   const handlePlotCountChange = (e: any, index: any) => {
     const plotNumber = parseInt(e.target.value);
     setPlotNo(plotNumber);
@@ -2743,7 +2747,7 @@ const handleSaves = () => {
   const handleTypeBox = (e: any, type: string, index: number | null) => {
     const count = parseInt(e?.target?.value) || e || 0;
     if (isNaN(count)) return;
-  
+
     setData((prevData: any) => {
       const updatedData = [...prevData];
       if (index !== null && index >= 0 && index < updatedData.length) {
@@ -2757,20 +2761,20 @@ const handleSaves = () => {
       }
       return updatedData;
     });
-  
+
     const newBoxes = Array.from({ length: count }, (_, boxIndex) => (
       <div key={`box-${index}-${boxIndex}`} className="flex flex-column">
         {/* Render boxes based on type */}
       </div>
     ));
-  
+
     setNavigationStack((prevStack) => {
       const newStack = [...prevStack];
       newStack[index || 0] = [newBoxes];
       return newStack;
     });
   };
-  
+
 
 
 
@@ -2790,19 +2794,19 @@ const handleSaves = () => {
     if (type === "Commercial") {
       // Add a new commercial unit if it doesn't exist
       if (!commercialUnits[index]) {
-        const updatedUnits:any = [...commercialUnits];
-        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "",index: index, type: "Commercial" };
+        const updatedUnits: any = [...commercialUnits];
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "", index: index, type: "Commercial" };
         setCommercialUnits(updatedUnits);
       }
     } else if (type === "Residential") {
       // Add a new residential unit if it doesn't exist
       if (!residentialUnits[index]) {
         const updatedUnits = [...residentialUnits];
-        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "",index: index, type: "Residential" };
+        updatedUnits[index] = { length: Number(""), breadth: Number(""), height: Number(""), name: "", property_name: "", index: index, type: "Residential" };
         setResidentialUnits(updatedUnits);
       }
     }
-  
+
     // Set the selected unit
     setSelectedUnit({ type, index });
   };
@@ -3016,7 +3020,7 @@ const handleSaves = () => {
   // console.log("commercialUnits",commercialUnits)
   // console.log("residentialUnits",residentialUnits)
 
-  console.log("savedFloors",savedFloors)
+  console.log("savedFloors", savedFloors)
 
   return (
     <div>
@@ -3075,7 +3079,7 @@ const handleSaves = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={employeeValidationSchema}
-          onSubmit={handleSubmitFormik}
+          onSubmit={(values, formikHelpers) => handleSubmitFormik(values, formikHelpers, draft)}
         >
           {({
             values,
@@ -3185,32 +3189,32 @@ const handleSaves = () => {
                             <button onClick={() => { handleSave(false) }} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
 
                             {floorDisable ? (
-  <div className="flex flex-row">
-    {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => {
-      const savedFloorNumbers = savedFloors.map(floor => {
-        const match = floor.floor.match(/\d+/); // Extract floor number
-        return match ? Number(match[0]) : null;
-      });
+                              <div className="flex flex-row">
+                                {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => {
+                                  const savedFloorNumbers = savedFloors.map(floor => {
+                                    const match = floor.floor.match(/\d+/); // Extract floor number
+                                    return match ? Number(match[0]) : null;
+                                  });
 
-      const isSaved = savedFloorNumbers.includes(index - 1); // Adjust for offset
+                                  const isSaved = savedFloorNumbers.includes(index - 1); // Adjust for offset
 
-      return (
-        <div key={index}>
-          <input
-            type="text"
-            readOnly
-            className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white rounded-md 
+                                  return (
+                                    <div key={index}>
+                                      <input
+                                        type="text"
+                                        readOnly
+                                        className={`border p-2 ml-2 justify-center items-center w-[3rem] text-white rounded-md 
             ${isSaved ? 'bg-[#006400] cursor-not-allowed' : 'bg-[#4338CA]'} 
             ${selectedFloor === index ? 'bg-[#d6fce7]' : ''}`}
-            placeholder={index === 0 ? 'B' : (index - 1).toString()} // Adjust placeholder
-            onClick={() => !isSaved && handleFloor(index)} // Reset fields on floor change
-            disabled={isSaved} // Disable if floor is saved
-          />
-        </div>
-      );
-    })}
-  </div>
-) : null}
+                                        placeholder={index === 0 ? 'B' : (index - 1).toString()} // Adjust placeholder
+                                        onClick={() => !isSaved && handleFloor(index)} // Reset fields on floor change
+                                        disabled={isSaved} // Disable if floor is saved
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : null}
 
 
 
@@ -3251,8 +3255,8 @@ const handleSaves = () => {
                                 </button> */}
                               </div>
                             )}
-{/* old */}
-{/* {plotNo > 0 && (
+                            {/* old */}
+                            {/* {plotNo > 0 && (
   <div>
     <input
       key={`type-Commercial`}
@@ -3305,87 +3309,87 @@ const handleSaves = () => {
     <label htmlFor="">Residential</label>
   </div>
 )} */}
-{/* new */}
+                            {/* new */}
 
-{plotNo > 0 && (
-  <div>
-    <input
-      key={`type-Commercial`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Commercial units`}
-      onChange={(e) => {
-        const commercialUnitsCount = parseInt(e.target.value) || 0;
+                            {plotNo > 0 && (
+                              <div>
+                                <input
+                                  key={`type-Commercial`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Commercial units`}
+                                  onChange={(e) => {
+                                    const commercialUnitsCount = parseInt(e.target.value) || 0;
 
-        if (commercialUnitsCount + residentialCount > plotNo) {
-          alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
-          e.target.value = "";
-        } else {
-          setCommercialCount(commercialUnitsCount);
+                                    if (commercialUnitsCount + residentialCount > plotNo) {
+                                      alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
+                                      e.target.value = "";
+                                    } else {
+                                      setCommercialCount(commercialUnitsCount);
 
-          // Initialize empty commercial units
-          const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, (_, i) => ({
-            length: 0,  // Initialize as number
-            breadth: 0, // Initialize as number
-            height: 0,  // Initialize as number
-            name: "",
-            property_name: "",
-            index: i,
-            type: "Commercial" as const // Ensure type is "Commercial"
-          }));
-          
-          setCommercialUnits(emptyCommercialUnits);
-        }
-      }}
-      value={commercialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Commercial</label>
+                                      // Initialize empty commercial units
+                                      const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, (_, i) => ({
+                                        length: 0,  // Initialize as number
+                                        breadth: 0, // Initialize as number
+                                        height: 0,  // Initialize as number
+                                        name: "",
+                                        property_name: "",
+                                        index: i,
+                                        type: "Commercial" as const // Ensure type is "Commercial"
+                                      }));
 
-    <input
-      key={`type-Residential`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Residential units`}
-      onChange={(e) => {
-        const residentialUnitsCount = parseInt(e.target.value) || 0;
+                                      setCommercialUnits(emptyCommercialUnits);
+                                    }
+                                  }}
+                                  value={commercialCount}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="">Commercial</label>
 
-        if (commercialCount + residentialUnitsCount > plotNo) {
-          alert("The total number of Commercial and Residential units cannot exceed the available shops.");
-          e.target.value = ""; // Clear the input if it exceeds the limit
-        } else {
-          setResidentialCount(residentialUnitsCount);
+                                <input
+                                  key={`type-Residential`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Residential units`}
+                                  onChange={(e) => {
+                                    const residentialUnitsCount = parseInt(e.target.value) || 0;
 
-          // Initialize empty residential units
-          const emptyCommercialUnits = Array.from({ length: residentialUnitsCount }, (_, i) => ({
-            length: 0, 
-            breadth: 0, 
-            height: 0,  
-            name: "",
-            property_name: "",
-            index: i,
-            type: "Residential" as const
-          }));
-          
-          setCommercialUnits(emptyCommercialUnits);
-        }
-      }}
-      value={residentialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Residential</label>
-  </div>
-)}
+                                    if (commercialCount + residentialUnitsCount > plotNo) {
+                                      alert("The total number of Commercial and Residential units cannot exceed the available shops.");
+                                      e.target.value = ""; // Clear the input if it exceeds the limit
+                                    } else {
+                                      setResidentialCount(residentialUnitsCount);
+
+                                      // Initialize empty residential units
+                                      const emptyCommercialUnits = Array.from({ length: residentialUnitsCount }, (_, i) => ({
+                                        length: 0,
+                                        breadth: 0,
+                                        height: 0,
+                                        name: "",
+                                        property_name: "",
+                                        index: i,
+                                        type: "Residential" as const
+                                      }));
+
+                                      setCommercialUnits(emptyCommercialUnits);
+                                    }
+                                  }}
+                                  value={residentialCount}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="">Residential</label>
+                              </div>
+                            )}
 
 
                             <div className="count-display">
@@ -3468,13 +3472,13 @@ const handleSaves = () => {
 
                                 {/* Save Button */}
                                 <div className="flex justify-center mt-4">
-                                    <button
-                                        onClick={handleSaveFloorData} // Save the floor data
-                                className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-                                 >
-                                           Save & Move to Next Step
-                                   </button>
-                                            </div>
+                                  <button
+                                    onClick={handleSaveFloorData} // Save the floor data
+                                    className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+                                  >
+                                    Save & Move to Next Step
+                                  </button>
+                                </div>
 
                               </div>
                             )}
@@ -3482,245 +3486,245 @@ const handleSaves = () => {
 
 
 
-{/* Display Saved Data */}
-<div className="container mx-auto p-4">
-  <h3 className="text-2xl font-semibold text-[#000000] mb-4">
-    {selectedFloor === 0 ? "Basement" : `Floor : ${selectedFloor !== null ? selectedFloor - 1 : "No Floor Selected"}`} Details
-  </h3>
+                            {/* Display Saved Data */}
+                            <div className="container mx-auto p-4">
+                              <h3 className="text-2xl font-semibold text-[#000000] mb-4">
+                                {selectedFloor === 0 ? "Basement" : `Floor : ${selectedFloor !== null ? selectedFloor - 1 : "No Floor Selected"}`} Details
+                              </h3>
 
-  {/* Building Layout */}
-  <div className="space-y-4">
-    {/* Commercial Units Section */}
-    <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
-    {commercialUnits?.length > 0 ? (
-      <div className="grid grid-cols-4 gap-4">
-        {commercialUnits.map((unit, index) => {
-          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+                              {/* Building Layout */}
+                              <div className="space-y-4">
+                                {/* Commercial Units Section */}
+                                <h4 className="text-lg font-semibold text-[#4338CA] mb-4">Commercial Units:</h4>
+                                {commercialUnits?.length > 0 ? (
+                                  <div className="grid grid-cols-4 gap-4">
+                                    {commercialUnits.map((unit, index) => {
+                                      const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
 
-          return (
-            <div
-              key={index}
-              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
-            >
-              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
-              <div className="space-y-2">
-                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
-                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
-                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
-                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
-                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
-              </div>
-              {/* If incomplete data, show an empty block (yellow) */}
-              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <p>No Commercial units saved yet.</p>
-    )}
+                                      return (
+                                        <div
+                                          key={index}
+                                          className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
+                                        >
+                                          <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+                                          <div className="space-y-2">
+                                            <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                                            <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                                            <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                                            <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                                            <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+                                          </div>
+                                          {/* If incomplete data, show an empty block (yellow) */}
+                                          {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p>No Commercial units saved yet.</p>
+                                )}
 
-    {/* Residential Units Section */}
-    <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
-    {residentialUnits?.length > 0 ? (
-      <div className="grid grid-cols-4 gap-4">
-        {residentialUnits.map((unit, index) => {
-          const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
+                                {/* Residential Units Section */}
+                                <h4 className="text-lg font-semibold text-[#4338CA] mb-4 mt-8">Residential Units:</h4>
+                                {residentialUnits?.length > 0 ? (
+                                  <div className="grid grid-cols-4 gap-4">
+                                    {residentialUnits.map((unit, index) => {
+                                      const isValid = unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name;
 
-          return (
-            <div
-              key={index}
-              className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
-            >
-              <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
-              <div className="space-y-2">
-                <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
-                <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
-                <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
-                <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
-                <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
-              </div>
-              {/* If incomplete data, show an empty block (yellow) */}
-              {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <p>No Residential units saved yet.</p>
-    )}
-  </div>
+                                      return (
+                                        <div
+                                          key={index}
+                                          className={`card p-4 rounded-lg ${isValid ? 'bg-green-100' : 'bg-yellow-100'} shadow-lg`}
+                                        >
+                                          <h5 className={`font-semibold text-lg ${isValid ? 'text-green-600' : 'text-yellow-600'}`}>Unit {index + 1}</h5>
+                                          <div className="space-y-2">
+                                            <p><strong>Length:</strong> {unit?.length || "N/A"} meters</p>
+                                            <p><strong>Breadth:</strong> {unit?.breadth || "N/A"} meters</p>
+                                            <p><strong>Height:</strong> {unit?.height || "N/A"} meters</p>
+                                            <p><strong>Name:</strong> {unit?.name || "N/A"}</p>
+                                            <p><strong>Property Name:</strong> {unit?.property_name || "N/A"}</p>
+                                          </div>
+                                          {/* If incomplete data, show an empty block (yellow) */}
+                                          {!isValid && <div className="w-full h-24 bg-yellow-300 mt-2 rounded"></div>}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p>No Residential units saved yet.</p>
+                                )}
+                              </div>
 
 
-</div>
+                            </div>
 
                             <h3 className='text-sm text-[#4338CA] font-bold mx-4'>Entered Data:-</h3>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Floor: <span className="font-normal">{floorCount || 0}</span></h4>
                             <h4 className='text-sm text-[#4338CA] font-semibold mx-4'>Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span></h4>
-                          
+
                           </div>
                         </div>
                       </div>
                     )}
 
                     {/* Data Modal */}
-{/* Data Modal */}
-{isModalVisibleData && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white rounded-lg p-8 max-w-4xl w-full shadow-xl transform transition-all ease-in-out duration-300">
-      <div className="flex justify-between items-center border-b pb-4 mb-6">
-        <h3 className="text-2xl font-semibold text-[#4338CA]">
-          {selectedFloor === 0 ? "Basement" : `Floor Details`}
-        </h3>
-        <button
-          onClick={handleCloseDataModal}
-          className="text-gray-500 hover:text-gray-800 transition ease-in-out duration-150"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Group Floors and Separate Cards */}
-      <div className="max-h-[80vh] overflow-y-auto">
-        {Object.values(savedFloors?.reduce((acc, floor) => {
-          const floorNumber = floor.floor;
-          if (!acc[floorNumber]) {
-            acc[floorNumber] = [];
-          }
-          acc[floorNumber].push(floor);
-          return acc;
-        }, {})).map((floorGroup:any, idx) => (
-          <div key={idx} className="mb-6">
-            <h3 className="text-2xl font-semibold text-[#4338CA] mb-4">
-              {floorGroup[0]?.floor === 0 ? "Basement" : `Floor ${floorGroup[0]?.floor}`}
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {floorGroup.map((floor:any, index:any) => {
-                const isOccupied = floor.plotCount > 0;
-                const floorColorClass = isOccupied ? 'bg-green-100' : 'bg-yellow-100'; // Light Green for occupied, Light Yellow for vacant
-
-                const isEditMode = editedFloorIndex === index; // Check if the current floor is in edit mode
-
-                return (
-                  <div
-                    key={index}
-                    className={`rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out ${floorColorClass}`}
-                  >
-                    <h4 className="text-xl font-semibold text-[#4338CA]">{`Floor ${floor.floor}`}</h4>
-                    <p className="mt-2"><strong>Plot Count:</strong> {floor.plotCount}</p>
-
-                    <h5 className="font-semibold mt-4 text-lg">Floor Details:</h5>
-                    <ul className="list-disc pl-6 space-y-3">
-                      {floor.details.map((detail:any, idx:any) => (
-                        <li key={idx}>
-                          <div className="space-y-2">
-                            {isEditMode ? (
-                              <div className="space-y-2">
-                                <label className="block text-sm">Type:</label>
-                                <input
-                                  type="text"
-                                  value={editedDetails[idx]?.type}
-                                  onChange={(e) => handleInputChange(e, idx, "type")}
-                                  className="border p-2 rounded w-full"
+                    {/* Data Modal */}
+                    {isModalVisibleData && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                        <div className="bg-white rounded-lg p-8 max-w-4xl w-full shadow-xl transform transition-all ease-in-out duration-300">
+                          <div className="flex justify-between items-center border-b pb-4 mb-6">
+                            <h3 className="text-2xl font-semibold text-[#4338CA]">
+                              {selectedFloor === 0 ? "Basement" : `Floor Details`}
+                            </h3>
+                            <button
+                              onClick={handleCloseDataModal}
+                              className="text-gray-500 hover:text-gray-800 transition ease-in-out duration-150"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
                                 />
-
-                                <label className="block text-sm">Length:</label>
-                                <input
-                                  type="number"
-                                  value={editedDetails[idx]?.length}
-                                  onChange={(e) => handleInputChange(e, idx, "length")}
-                                  className="border p-2 rounded w-full"
-                                />
-
-                                <label className="block text-sm">Breadth:</label>
-                                <input
-                                  type="number"
-                                  value={editedDetails[idx]?.breadth}
-                                  onChange={(e) => handleInputChange(e, idx, "breadth")}
-                                  className="border p-2 rounded w-full"
-                                />
-
-                                <label className="block text-sm">Height:</label>
-                                <input
-                                  type="number"
-                                  value={editedDetails[idx]?.height}
-                                  onChange={(e) => handleInputChange(e, idx, "height")}
-                                  className="border p-2 rounded w-full"
-                                />
-
-                                <label className="block text-sm">Name:</label>
-                                <input
-                                  type="text"
-                                  value={editedDetails[idx]?.name}
-                                  onChange={(e) => handleInputChange(e, idx, "name")}
-                                  className="border p-2 rounded w-full"
-                                />
-
-                                <label className="block text-sm">Property Name:</label>
-                                <input
-                                  type="text"
-                                  value={editedDetails[idx]?.property_name}
-                                  onChange={(e) => handleInputChange(e, idx, "property_name")}
-                                  className="border p-2 rounded w-full"
-                                />
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                <p><strong>Type:</strong> {detail.type}</p>
-                                <p><strong>Length:</strong> {detail.length} meters</p>
-                                <p><strong>Breadth:</strong> {detail.breadth} meters</p>
-                                <p><strong>Height:</strong> {detail.height} meters</p>
-                                <p><strong>Name:</strong> {detail.name}</p>
-                                <p><strong>Property Name:</strong> {detail.property_name}</p>
-                              </div>
-                            )}
+                              </svg>
+                            </button>
                           </div>
-                        </li>
-                      ))}
-                    </ul>
 
-                    {/* Edit Button */}
-                    {isEditMode ? (
-                      <div className="mt-4">
-                        <button
-                          onClick={() => handleSaves()}
-                          className="bg-blue-600 text-white-500 hover:text-white-700 transition duration-200"
-                        >
-                          Save
-                        </button>
+                          {/* Group Floors and Separate Cards */}
+                          <div className="max-h-[80vh] overflow-y-auto">
+                            {Object.values(savedFloors?.reduce((acc, floor) => {
+                              const floorNumber = floor.floor;
+                              if (!acc[floorNumber]) {
+                                acc[floorNumber] = [];
+                              }
+                              acc[floorNumber].push(floor);
+                              return acc;
+                            }, {})).map((floorGroup: any, idx) => (
+                              <div key={idx} className="mb-6">
+                                <h3 className="text-2xl font-semibold text-[#4338CA] mb-4">
+                                  {floorGroup[0]?.floor === 0 ? "Basement" : `Floor ${floorGroup[0]?.floor}`}
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                  {floorGroup.map((floor: any, index: any) => {
+                                    const isOccupied = floor.plotCount > 0;
+                                    const floorColorClass = isOccupied ? 'bg-green-100' : 'bg-yellow-100'; // Light Green for occupied, Light Yellow for vacant
+
+                                    const isEditMode = editedFloorIndex === index; // Check if the current floor is in edit mode
+
+                                    return (
+                                      <div
+                                        key={index}
+                                        className={`rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out ${floorColorClass}`}
+                                      >
+                                        <h4 className="text-xl font-semibold text-[#4338CA]">{`Floor ${floor.floor}`}</h4>
+                                        <p className="mt-2"><strong>Plot Count:</strong> {floor.plotCount}</p>
+
+                                        <h5 className="font-semibold mt-4 text-lg">Floor Details:</h5>
+                                        <ul className="list-disc pl-6 space-y-3">
+                                          {floor.details.map((detail: any, idx: any) => (
+                                            <li key={idx}>
+                                              <div className="space-y-2">
+                                                {isEditMode ? (
+                                                  <div className="space-y-2">
+                                                    <label className="block text-sm">Type:</label>
+                                                    <input
+                                                      type="text"
+                                                      value={editedDetails[idx]?.type}
+                                                      onChange={(e) => handleInputChange(e, idx, "type")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Length:</label>
+                                                    <input
+                                                      type="number"
+                                                      value={editedDetails[idx]?.length}
+                                                      onChange={(e) => handleInputChange(e, idx, "length")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Breadth:</label>
+                                                    <input
+                                                      type="number"
+                                                      value={editedDetails[idx]?.breadth}
+                                                      onChange={(e) => handleInputChange(e, idx, "breadth")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Height:</label>
+                                                    <input
+                                                      type="number"
+                                                      value={editedDetails[idx]?.height}
+                                                      onChange={(e) => handleInputChange(e, idx, "height")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Name:</label>
+                                                    <input
+                                                      type="text"
+                                                      value={editedDetails[idx]?.name}
+                                                      onChange={(e) => handleInputChange(e, idx, "name")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Property Name:</label>
+                                                    <input
+                                                      type="text"
+                                                      value={editedDetails[idx]?.property_name}
+                                                      onChange={(e) => handleInputChange(e, idx, "property_name")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+                                                  </div>
+                                                ) : (
+                                                  <div className="space-y-2">
+                                                    <p><strong>Type:</strong> {detail.type}</p>
+                                                    <p><strong>Length:</strong> {detail.length} meters</p>
+                                                    <p><strong>Breadth:</strong> {detail.breadth} meters</p>
+                                                    <p><strong>Height:</strong> {detail.height} meters</p>
+                                                    <p><strong>Name:</strong> {detail.name}</p>
+                                                    <p><strong>Property Name:</strong> {detail.property_name}</p>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </li>
+                                          ))}
+                                        </ul>
+
+                                        {/* Edit Button */}
+                                        {isEditMode ? (
+                                          <div className="mt-4">
+                                            <button
+                                              onClick={() => handleSaves()}
+                                              className="bg-blue-600 text-white-500 hover:text-white-700 transition duration-200"
+                                            >
+                                              Save
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <button
+                                            onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
+                                            className="mt-4 bg-green-600 text-white-500 hover:text-white-700 transition duration-200"
+                                          >
+                                            Edit
+                                          </button>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
-                        className="mt-4 bg-green-600 text-white-500 hover:text-white-700 transition duration-200"
-                      >
-                        Edit
-                      </button>
                     )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
 
 
 
@@ -4075,7 +4079,26 @@ const handleSaves = () => {
                     >
                       Reset
                     </PrimaryButton>
-                    <PrimaryButton buttonType="submit" variant="primary" onClick={() => sessionStorage.clear()}>
+                    {/* Save As Draft Button */}
+                    <PrimaryButton
+                      buttonType="submit"
+                      variant="primary"
+                      onClick={() => {
+                        setDraft(true); // Set status to -5 for Save As Draft
+                        sessionStorage.clear()
+                      }}
+                    >
+                      Save As Draft
+                    </PrimaryButton>
+                    {/* Save Button */}
+                    <PrimaryButton
+                      buttonType="submit"
+                      variant="primary"
+                      onClick={() => {
+                        setDraft(false); // Set status to 1 for Save
+                        sessionStorage.clear() 
+                      }}
+                    >
                       Save
                     </PrimaryButton>
                   </div>

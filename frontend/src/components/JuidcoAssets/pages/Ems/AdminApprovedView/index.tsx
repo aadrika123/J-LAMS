@@ -7,7 +7,7 @@
 
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useRef } from 'react'
 import { InnerHeading, SubHeading } from '@/components/Helpers/Heading'
 import Image from 'next/image'
 import Home from "@/assets/icons/home-address.png";
@@ -23,6 +23,8 @@ import SelectForNoApi from '@/components/global/atoms/SelectForNoApi';
 import { Field, FieldArray, Formik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation'
+import { useReactToPrint } from "react-to-print";
+
 
 
 const AdiminApprovedView = ({ id }: { id: number }) => {
@@ -36,7 +38,44 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
     const [file2, setFile2] = useState<File | null>(null);
     const [role, setRole] = useState('');
     const [datas, setData] = useState<any>()
-    const [datass, setDatas] = useState<any>()
+    const [datass, setDatas] = useState<any>();
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [updatedAssetId, setUpdatedAssetId] = useState("");
+
+    const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
+    
+    
+        const handlePrint = useReactToPrint({
+            content: () => componentRef.current,
+            pageStyle: `
+              @media print {
+                @page {
+                  size: 1000mm 1500mm;
+                  margin: 25mm;
+                }
+                
+                /* Custom table styling */
+                table {
+                  width: 50%;
+                  margin: 0;
+                  padding: 0;
+                  border-collapse: collapse; /* Removes space between cells */
+                }
+                
+                /* Reducing padding inside table cells */
+                th, td {
+                  padding: 0px; /* Adjust as needed */
+                  margin: 0;
+                }
+                
+                /* Optional: Font size adjustments for better fit */
+                th, td {
+                  font-size: 12px; /* Adjust as needed */
+                }
+              }
+            `,
+          });
+    
 
     const togglePopup = () => {
         setIsOpen(!isOpen);
@@ -134,43 +173,56 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
         }
     };
 
-    const dataUpdate = async (values: any) => {
+    const dataUpdate = async (values: any): Promise<boolean> => {
         try {
             const fileUploadData = await handleUploadOwnershipDoc();
             if (fileUploadData) {
                 values.ownership_doc = fileUploadData.ownership_doc;
             }
-
+    
             const fileUploadData2 = await handleUploadBlueprint();
             if (fileUploadData2) {
                 values.blue_print = fileUploadData2.blue_print;
             }
-            values.status = 0
-
-
+    
+            values.status = 0;
+    
             const res = await axios({
-                url: `${ASSETS.LIST.update}?id=${id}`,
+                url: `${ASSETS.LIST.reCreate}?assets_id=${id}`,
                 method: "POST",
                 data: {
                     id,
-                    ...values
-                }
+                    ...values,
+                },
             });
-
-            if (res?.data?.status === 201) {
-                toast.success("Assets successfully send for approval.");
+    
+            console.log("API Response:", res);
+    
+            if (res?.data?.status === true || res?.status === 200) {
+                toast.success("Assets successfully sent for approval.");
                 setIsOpen(false);
-                window.location.reload()
+                // window.location.reload();
+                const modifiedAssetId = res?.data?.data?.id;
+            setUpdatedAssetId(modifiedAssetId);
+            setShowSuccessMessage(true);
+            setTimeout(() => setShowSuccessMessage(false), 5000);
+                return true;
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
-                toast.error("Duplicate asset data found. Please check and try again.");
+                toast.error(res?.data?.message || "Duplicate asset data found. Please check and try again.");
             } else if (res?.data?.status === 400) {
-                toast.success("There is already a pending update request for this asset");
+                toast.error("There is already a pending update request for this asset");
             }
+    
+            
+    
+            return false;
         } catch (error) {
             console.error("Error updating data:", error);
-            return [];
+            toast.error("An error occurred. Please try again.");
+            return false;
         }
     };
+    
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -248,6 +300,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
         blue_print: data?.data?.blue_print,
         ownership_doc: data?.data?.ownership_doc,
         ward_no: data?.data?.ward_no,
+        ulb_id:data?.data?.ulb_id,
         address: data?.data?.address,
         type_of_land: data?.data?.type_of_land,
         area: data?.data?.area,
@@ -377,6 +430,9 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
                         Back
                     </PrimaryButton>
                 </div>
+                <button onClick={handlePrint} className="text-blue-800 border-0 bg-transparent hover:bg-transparent hover:text-[#3592FF] flex items-center">
+                    Download as PDF
+                </button>
             </div>
 
             <div>
@@ -912,8 +968,13 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
                         </div>
                     </div>
                 )}
+                {showSuccessMessage && (
+                <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
+                    Assets updated successfully! Modified Asset ID: {updatedAssetId}
+                </div>
+            )}
             </div>
-
+            <div ref={componentRef}>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
                 <div className="flex justify-between mb-10">
                     <SubHeading>
@@ -1368,6 +1429,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
             }
             <div>
             </div>
+        </div>
         </div>
     )
 }
