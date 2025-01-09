@@ -2117,7 +2117,7 @@ export const DashboardMain = () => {
   const [editedFloor, setEditedFloor] = useState<any>(null);
   const [editedDetails, setEditedDetails] = useState<any>([]);
   const [editedFloorIndex, setEditedFloorIndex] = useState<any>(null); // To store the index of the floor being edited
-  const [draft, setDraft] = useState<Boolean>(false);
+  const [draft, setDraft] = useState<boolean>(false);
   console.log("data", data, sessionData, editedFloor)
 
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -2490,7 +2490,7 @@ export const DashboardMain = () => {
 
 
 
-  const handleSubmitFormik = async (values: any, { resetForm, setSubmitting, setStatus, setErrors }: FormikHelpers<any>, draft: Boolean) => {
+  const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
     try {
       // Merging commercial and residential units
 

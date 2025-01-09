@@ -34,7 +34,7 @@ const Marketmaster = () => {
     // const [filter, setFilter] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [deleteId, setDeleteId] = useState<number | null>(null);
+    // const [deleteId, setDeleteId] = useState<number | null>(null);
     const [count, setCount] = useState<any>([])
     const [box, setBox] = useState<any>(false)
     const [remarks, setRemarks] = useState<any>('')
@@ -50,7 +50,7 @@ const Marketmaster = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalData, setModalData] = useState(null);
     const [editData, setEditData] = useState<any>(null);
-    const [locations, setLocations] = useState<any[]>([]);
+    // const [locations, setLocations] = useState<any[]>([]);
 
     const handleIconClick = async (id: any) => {
         try {
@@ -261,6 +261,7 @@ const Marketmaster = () => {
             appReject(currentAssetId);
         }
         setShowModal(false);
+        console.log(showModal)
     };
 
     const handleApprove = (assetId: any) => {
