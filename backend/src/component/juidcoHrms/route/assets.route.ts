@@ -156,6 +156,12 @@ class AssetManagementRoute {
           this.assetManagementController.locationEdit(req, res, next, "0119"),
       ); //0119
       app
+      .route(`${baseUrl}/asset/location-delete`)
+      .post(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.locationDelete(req, res, next, "0121"),
+      ); //0121
+      app
       .route(`${baseUrl}/asset/shop`)
       .get(
         (req: Request, res: Response, next: NextFunction) =>
