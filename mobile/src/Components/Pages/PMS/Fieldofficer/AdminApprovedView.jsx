@@ -127,7 +127,7 @@ const AdminApprovedView = () => {
       <div className="p-4">
         <TitleBar
           titleBarVisibility={titleBarVisibility}
-          titleText={"Approve Application View"}
+          titleText={"Approved Application View"}
         />
       </div>
 

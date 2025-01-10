@@ -383,6 +383,31 @@ class AssetsManagementDao {
                         assetId: assetReq.id,
                     },
                 });
+                await tx.assets_list_change_log.create({
+                    data: {
+                        assetId: newAssetsId,
+                        type_of_assets: type_of_assets,
+                        asset_sub_category_name: asset_sub_category_name,
+                        assets_category_type: assets_category_type,
+                        khata_no: khata_no,
+                        plot_no: plot_no,
+                        ward_no: ward_no,
+                        address: address,
+                        depreciation_method: depreciation_method,
+                        apreciation_method: apreciation_method,
+                        blue_print: blue_print,
+                        ownership_doc: ownership_doc,
+                        type_of_land: type_of_land,
+                        area: area,
+                        order_no: order_no,
+                        order_date: order_date,
+                        acquisition: acquisition,
+                        from_whom_acquired: from_whom_acquired,
+                        mode_of_acquisition: mode_of_acquisition,
+                        status:  0,
+                        role: role,
+                    }
+                });
     
                 const existingLocation = await tx.location.findFirst({
                     where: { location },
@@ -632,216 +657,75 @@ class AssetsManagementDao {
 
 
     getAll = async (req: Request) => {
-
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = req.query.search as string || '';
         const filter = req.query.filter as string || '';
-        console.log(req.body.auth);
-        const { ulb_id } = req.body.auth || 2;
-        // const id =  Number(req.query.id) || 1;
-
-        const status = Number(req.query.status)
-        const land = req.query.land as string || ''
+        const { ulb_id } = req.body.auth || { ulb_id: 2 };
+        const status = Number(req.query.status);
+        const land = req.query.land as string || '';
+        const ward_no = req.query.ward_no as string || ''; // Extract ward_no from query
         const skip = (page - 1) * limit;
-        const status1Items = await prisma.assets_list.count({
-            where: {
-                status: 2,
-            },
-        });
-        const statusMinus1Items = await prisma.assets_list.count({
-            where: {
-                status: -2,
-            },
-        });
-        const statusPendingAssets = await prisma.assets_list.count({
-            where: {
-                status: 1,
-            },
-        });
-
+    
+        // Status counts
+        const status1Items = await prisma.assets_list.count({ where: { status: 2 } });
+        const statusMinus1Items = await prisma.assets_list.count({ where: { status: -2 } });
+        const statusPendingAssets = await prisma.assets_list.count({ where: { status: 1 } });
+    
         try {
-
+            // Count with filters
             const count = await prisma.assets_list.count({
-
                 where: {
-                    OR: search
-                        ? [
-                            {
-                                type_of_assets: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                asset_sub_category_name: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                khata_no: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                ward_no: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                assets_category_type: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                area: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            }
-                        ]
-                        : undefined,
+                    OR: search ? [
+                        { type_of_assets: { contains: search, mode: "insensitive" } },
+                        { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                        { khata_no: { contains: search, mode: "insensitive" } },
+                        { ward_no: { contains: search, mode: "insensitive" } },
+                        { assets_category_type: { contains: search, mode: "insensitive" } },
+                        { area: { contains: search, mode: "insensitive" } }
+                    ] : undefined,
                     ulb_id: ulb_id,
                     AND: [
                         filter ? {
                             OR: [
-                                {
-                                    assets_category_type: {
-                                        equals: filter,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    type_of_assets: {
-                                        equals: filter,
-                                        mode: "insensitive",
-                                    },
-                                },
-                            ],
+                                { assets_category_type: { equals: filter, mode: "insensitive" } },
+                                { type_of_assets: { equals: filter, mode: "insensitive" } }
+                            ]
                         } : {},
-                        (status === 0 || status) ? {
-                            status: {
-                                equals: status,
-                            },
-                        } : {},
-                        land ? {
-                            type_of_land: {
-                                equals: land,
-                                mode: "insensitive",
-                            },
-                        } : {},
+                        (status === 0 || status) ? { status: { equals: status } } : {},
+                        land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
+                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
                     ]
-
-
-
-                },
-                // ...(search && {
-                //     OR: [
-                //         { type_of_assets: { contains: search, mode: "insensitive" } },
-                //         { asset_sub_category_name: { contains: search, mode: "insensitive" } },
-                //         { khata_no: { contains: search, mode: "insensitive" } },
-                //         { assets_category_type: { contains: search, mode: "insensitive" } },
-                //         { area: { contains: search, mode: "insensitive" } },
-                //     ],
-                // }),
-                // ...(filter && {
-                //     OR: [
-                //         {assets_category_type: { equals: filter,mode: "insensitive", },},
-                //         { type_of_assets: {  equals: filter,  mode: "insensitive", },
-                //         },
-                //     ],
-                // }),
-                // ...(status !== undefined && {
-                //     status: { equals: status },
-                // }),
-                // ...(land && {
-                //     type_of_land: { equals: land, mode: "insensitive" },
-                // }),
+                }
             });
-
+    
             const totalPages = Math.ceil(count / limit);
-
+    
+            // Get assets with filters
             const assetGet = await prisma.assets_list.findMany({
                 skip: skip,
                 take: limit,
                 where: {
-                    OR: search
-                        ? [
-                            {
-                                type_of_assets: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                asset_sub_category_name: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                khata_no: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                ward_no: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                assets_category_type: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                area: {
-                                    contains: search,
-                                    mode: "insensitive",
-                                },
-                            }
-                        ]
-                        : undefined,
+                    OR: search ? [
+                        { type_of_assets: { contains: search, mode: "insensitive" } },
+                        { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+                        { khata_no: { contains: search, mode: "insensitive" } },
+                        { ward_no: { contains: search, mode: "insensitive" } },
+                        { assets_category_type: { contains: search, mode: "insensitive" } },
+                        { area: { contains: search, mode: "insensitive" } }
+                    ] : undefined,
                     ulb_id: ulb_id,
                     AND: [
                         filter ? {
                             OR: [
-                                {
-                                    assets_category_type: {
-                                        equals: filter,
-                                        mode: "insensitive",
-                                    },
-                                },
-                                {
-                                    type_of_assets: {
-                                        equals: filter,
-                                        mode: "insensitive",
-                                    },
-                                },
-                            ],
+                                { assets_category_type: { equals: filter, mode: "insensitive" } },
+                                { type_of_assets: { equals: filter, mode: "insensitive" } }
+                            ]
                         } : {},
-                        (status === 0 || status) ? {
-                            status: {
-                                equals: status,
-                            },
-                        } : {},
-                        land ? {
-                            type_of_land: {
-                                equals: land,
-                                mode: "insensitive",
-                            },
-                        } : {},
+                        (status === 0 || status) ? { status: { equals: status } } : {},
+                        land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
+                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
                     ]
-
-
-
                 },
                 include: {
                     floorData: {
@@ -854,6 +738,7 @@ class AssetsManagementDao {
                     created_at: 'desc'
                 }
             });
+    
             return generateRes({
                 totalPages,
                 count,
@@ -866,9 +751,8 @@ class AssetsManagementDao {
         } catch (err) {
             console.log(err);
         }
-
     };
-
+    
 
     getRestructuredAssets = async (req: Request) => {
         const page = Number(req.query.page) || 1;
@@ -897,6 +781,7 @@ class AssetsManagementDao {
                         OR: [
                             { assets_category_type: { equals: filter, mode: "insensitive" } },
                             { type_of_assets: { equals: filter, mode: "insensitive" } },
+                            
                         ],
                     } : undefined,
                 },

@@ -484,10 +484,11 @@ const ViewByIdList = () => {
         )}
       </div>
 
-
-      <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">
-        <ImageUploader />
-      </div>
+      {viewData?.status === 0 && (
+  <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">
+    <ImageUploader />
+  </div>
+)}
 
 
     </div>
