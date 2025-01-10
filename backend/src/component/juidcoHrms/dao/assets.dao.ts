@@ -1718,7 +1718,7 @@ class AssetsManagementDao {
                 select: {
                     location_id: true,
                     location:true,
-                    id:true,
+                    id:true, //added building id 
                     building_name: true,
                     address: true,
                     ulb_id: true,
