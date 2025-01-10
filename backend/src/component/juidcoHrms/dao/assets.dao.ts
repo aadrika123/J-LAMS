@@ -1707,26 +1707,29 @@ class AssetsManagementDao {
         const locationId = req.query.location_id ? Number(req.query.location_id) : undefined;
     
         try {
-            // if (!locationId) {
-            //     throw new Error("Location ID is required");
-            // }
-    
-            const asset = await prisma.assets_list.findMany({
+            const assets = await prisma.assets_list.findMany({
                 where: {
                     location_id: locationId,
                 },
                 select: {
                     location_id: true,
-                    location:true,
-                    id:true, //added building id 
+                    location: true,
+                    id: true, 
                     building_name: true,
                     address: true,
                     ulb_id: true,
                 },
             });
     
+            // Transform the assets to rename 'id' to 'building_id'
+            const transformedAssets = assets.map(asset => ({
+                ...asset,
+                building_id: asset.id,
+                id: undefined, // Optionally remove the original 'id' field
+            }));
+    
             return generateRes({
-                data: asset || [],
+                data: transformedAssets || [],
             });
     
         } catch (err) {
@@ -2134,7 +2137,13 @@ class AssetsManagementDao {
                                     id: true,
                                     location_id: true,
                                     building_name: true,
+                                    area:true,
+                                    from_whom_acquired:true,
+                                    no_of_floors:true,
                                     location: true,
+                                    plot_no:true,
+                                    khata_no:true,
+                                    ward_no:true,
                                     address: true,
                                 }
                             }
@@ -2153,7 +2162,13 @@ class AssetsManagementDao {
                 building_id: shop.floorData.assetsList.id,
                 location_id: shop.floorData.assetsList.location_id,
                 building_name: shop.floorData.assetsList.building_name,
+                building_area: shop.floorData.assetsList.area,
+                from_whom_acquired: shop.floorData.assetsList.from_whom_acquired,
+                no_of_floors: shop.floorData.assetsList.no_of_floors,
                 location: shop.floorData.assetsList.location,
+                plot_no: shop.floorData.assetsList.plot_no,
+                khata_no: shop.floorData.assetsList.khata_no,
+                ward_no: shop.floorData.assetsList.ward_no,
                 address: shop.floorData.assetsList.address,
                 floorData: undefined // Remove the nested floorData object
             };
