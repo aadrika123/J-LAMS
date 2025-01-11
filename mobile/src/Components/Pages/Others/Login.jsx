@@ -60,7 +60,7 @@ function Login() {
     let requestBody = {
       email: formik.values.username,
       password: formik.values.password,
-      type:""
+      type:"mobile"
     };
 
     await axios.post(api_login, requestBody, header)
