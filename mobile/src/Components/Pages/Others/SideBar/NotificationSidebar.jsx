@@ -17,7 +17,7 @@ const NotificationSidebar = () => {
   // Fetch Notifications
   const getNotification = async () => {
     try {
-      const token = localStorage.getItem('token');; 
+      const token = localStorage.getItem('token');;
       const response = await axios.get(API_FETCH_NOTIFICATION, {
         headers: {
           Authorization: `Bearer ${token}`, // Set Authorization Header
@@ -67,7 +67,7 @@ const NotificationSidebar = () => {
         sx={{
           width: 350,
           backgroundColor: "white",
-          height: "100%",
+          height: "300%",
           padding: "5px",
         }}
         spacing={1}
@@ -90,14 +90,29 @@ const NotificationSidebar = () => {
               className="p-3 cursor-pointer"
             >
               <div>
-                <div className="text-blue-700 flex space-x-1 pb-1">
-                  <p className="text-xs pr-1">Notification</p>
-                  <p className="text-[10px] text-black pt-[1px] pl-1">
-                    {new Date(data.created_at).toLocaleDateString()}
-                  </p>
+                <div className="text-blue-700 flex flex-col space-x-1 pb-1">
+                  <div className="pb-2">
+                    <p className="text-xs pr-1">Notification</p>
+                  </div>
+
+                  <div className="">
+                    <p className="text-[10px] text-black pt-[1px] pl-1">
+                      {(data.asset_id)}
+                    </p>
+
+
+                    <p className="text-[10px] text-black pt-[1px] pl-1">
+                      {(data.message)}
+                    </p>
+
+                    <p className="text-[10px] text-black pt-[1px] pl-1">
+                      {new Date(data.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+
                 </div>
-                <h1 className="text-black">{data.asset_id}</h1>
-                <p className="text-xMidYMid pt-2 text-black">{data.message}</p>
+                {/* <h1 className="text-black">{data.asset_id}</h1> */}
+                {/* <p className="text-xMidYMid pt-2 text-black">{data.message}</p> */}
               </div>
             </Card>
           ))
