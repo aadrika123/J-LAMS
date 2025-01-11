@@ -64,7 +64,11 @@ const Approved = () => {
     const [ulbID, setUlbID] = useState<number | null >();
 
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
-
+    
+    const [wardNo, setWardNo] = useState('');
+    const handleFilterChange2 = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setWardNo(e.target.value);
+    };
     
     const [modalClose, setModalClose] = useState(false);
     const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });
@@ -92,6 +96,7 @@ const Approved = () => {
 
     const COLUMN = [
         { name: "#" },
+        { name: "ASSET ID" },
         { name: "ASSET NAME" },
         { name: "ASSET TYPE" },
         { name: "LAND TYPE" },
@@ -104,11 +109,11 @@ const Approved = () => {
         { name: "APPROVER STATUS" },
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number) => {
+    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number, wardNo: string) => {
         console.log("ulbIDulbID",ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&ward_no=${wardNo}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -162,9 +167,9 @@ const Approved = () => {
     
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter,itemsPerPage,ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID as number) ,
-        enabled: !!ulbID ,
+        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID, wardNo],
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number, wardNo),
+        enabled: !!ulbID,
         staleTime: 1000,
     });
 
@@ -430,7 +435,7 @@ const Approved = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application 
+                        Approval Application
                     </InnerHeading>
                 </div>
             </div>
@@ -464,8 +469,8 @@ const Approved = () => {
                         </div>
 
                         <select 
-                            onChange={handleFilterChange}
-                            value={filter}
+                            onChange={handleFilterChange2}
+                            value={wardNo}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (
@@ -621,6 +626,7 @@ const Approved = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
+                                    <td className="px-6 py-4">{item?.id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
