@@ -644,7 +644,7 @@ const AdminApproved = () => {
                                         }
                                     </td>
   
-                                    {role == 'Municipal' || 'Admin'? (
+                                    {(role === 'Municipal' || role === 'Admin')? (
                                         <td>
                                             {item.status === 0 || item.status === 3 ? <div className='text-orange-500 font-semibold text-xs ml-4'>Waiting for Approval</div> :
                                                 item.status === 2 ? <div className='text-green-500 font-semibold text-xs ml-4'>Approved by Admin</div> :
