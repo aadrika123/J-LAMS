@@ -93,6 +93,7 @@ const Fieldofficer = () => {
 
     const COLUMN = [
         { name: "#" },
+        { name: "ASSET ID" },
         { name: "ASSET NAME" },
         { name: "ASSET TYPE" },
         { name: "LAND TYPE" },
@@ -622,6 +623,7 @@ const Fieldofficer = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
+                                    <td className="px-6 py-4">{item?.id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
