@@ -130,7 +130,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
           </Link>
 
 
-          {userDetails?.role.includes("Municipal") && (
+          {userDetails?.user_type == "Municipal" && (
             <Link href="/hold/marketmaster" className="text-xl text-white">
               <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
                 <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
