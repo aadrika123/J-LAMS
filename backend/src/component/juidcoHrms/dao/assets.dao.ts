@@ -113,7 +113,8 @@ class AssetsManagementDao {
             no_of_floors,
             building_name,
             ulb_id,
-            location
+            location,
+            is_drafted
         } = req.body;
 
         const notificationsDao = new NotificationsDao();
@@ -176,6 +177,7 @@ class AssetsManagementDao {
                         role,
                         no_of_floors,
                         status: 0,
+                        is_drafted,
                         floorData: {
                             create: floorData.map((floor: any) => ({
                                 floor: floor.floor,
