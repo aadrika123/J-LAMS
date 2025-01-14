@@ -981,6 +981,7 @@ class AssetsManagementDao {
                         from_whom_acquired,
                         mode_of_acquisition,
                         status: Number(status),
+                        is_drafted:false
                     }
                 });
 
