@@ -2161,9 +2161,9 @@ export const DashboardMain = () => {
     type_of_land: "",
     area: "",
     order_no: "",
-    order_date: "",
+    order_date: '',
     acquisition: "",
-    from_whom_acquired: "",
+    from_whom_acquired: '',
     mode_of_acquisition: "",
     role: "Municipal",
     building_approval_plan: "",
@@ -2182,6 +2182,14 @@ export const DashboardMain = () => {
     area: Yup.string().required("Area. is Required"),
     type_of_land: Yup.string().required("Type of Land"),
     // order_date: Yup.string().required("Enter order date"),
+    acquisition: Yup.date()
+    .max(new Date(), "Date of Acquisition cannot be in the future")
+    .required("Date of Acquisition is required"),
+  
+  // Validate Order Date
+  order_date: Yup.date()
+    .max(new Date(), "Order Date cannot be in the future")
+    .required("Order Date is required")
   });
 
   const handleUpload = async () => {
@@ -3239,76 +3247,9 @@ export const DashboardMain = () => {
                                     }
                                   }}
                                 />
-
-                                {/* <button
-                                  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-3 text-sm rounded-xl ${currentType === "Commercial" ? "bg-[#28b145]" : ""}`}
-                                  onClick={() => handleTypeSelect("Commercial")}
-                                >
-                                  Commercial
-                                </button> */}
-
-                                {/* <button
-                                  className={`bg-[#4338CA] w-30 text-white mt-2 p-3 ml-4 text-sm rounded-xl ${currentType === "Residential" ? "bg-[#28b145]" : ""}`}
-                                  onClick={() => handleTypeSelect("Residential")}
-                                >
-                                  Residential
-                                </button> */}
                               </div>
                             )}
-                            {/* old */}
-                            {/* {plotNo > 0 && (
-  <div>
-    <input
-      key={`type-Commercial`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Commercial units`}
-      onChange={(e) => {
-        const commercialUnits = parseInt(e.target.value) || 0;
-
-        if (commercialUnits + residentialCount > plotNo) {
-          alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
-          e.target.value = "";
-        } else {
-          setCommercialCount(commercialUnits);
-        }
-      }}
-      value={commercialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Commercial</label>
-
-    <input
-      key={`type-Residential`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Residential units`}
-      onChange={(e) => {
-        const residentialUnits = parseInt(e.target.value) || 0;
-
-        if (commercialCount + residentialUnits > plotNo) {
-          alert("The total number of Commercial and Residential units cannot exceed the available shops.");
-          e.target.value = ""; // Clear the input if it exceeds the limit
-        } else {
-          setResidentialCount(residentialUnits);
-        }
-      }}
-      value={residentialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Residential</label>
-  </div>
-)} */}
+                            
                             {/* new */}
 
                             {plotNo > 0 && (
@@ -3902,8 +3843,8 @@ export const DashboardMain = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.order_no}
-                      // error={errors.order_no}
-                      // touched={touched.order_no}
+                      error={errors.order_no}
+                      touched={touched.order_no}
                       label="Order No."
                       name="order_no"
                       type="text"
@@ -3920,6 +3861,8 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
+
+                    
                     <InputBox
                       // onChange={handleChange}
                       onChange={(e) => {

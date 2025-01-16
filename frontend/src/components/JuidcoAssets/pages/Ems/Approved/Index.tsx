@@ -461,25 +461,25 @@ const Approved = () => {
 
                         </select>
                     </div>
-                    
+
                     <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
                             {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
                             <SubHeading>Ward No.</SubHeading>
                         </div>
 
-                        <select 
+                        <select
                             onChange={handleFilterChange2}
                             value={wardNo}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
+                            <option value="">All</option>
                             {Array.from({ length: 55 }, (_, index) => (
                                 <option key={index + 1} value={index + 1}>
                                     {index + 1}
                                 </option>
                             ))}
                         </select>
-
                     </div>
 
                     {role == 'Admin' ?
