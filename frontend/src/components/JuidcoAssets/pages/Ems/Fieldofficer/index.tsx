@@ -677,7 +677,7 @@ const Fieldofficer = () => {
                        item.status === 3 ? (
                         <Link
             href={`/apply/approve-application/${item?.id}?status=clicked`}
-            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
+            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
         >
 
             <svg
