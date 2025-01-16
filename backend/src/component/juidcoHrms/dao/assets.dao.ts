@@ -116,40 +116,30 @@ class AssetsManagementDao {
             location,
             is_drafted
         } = req.body;
-
+    
         const notificationsDao = new NotificationsDao();
-
+    
         try {
             const result = await prisma.$transaction(async (tx) => {
-                const lastAsset = await tx.assets_list.findFirst({
-                    orderBy: {
-                        created_at: 'desc',
-                    },
-                    select: {
-                        id: true,
-                    },
-                });
-
-                const numericMatch = String(lastAsset?.id)?.match(/(\d{3})$/);
-                const lastId = numericMatch ? Number(numericMatch[0]) : 0;
-                const newIncrementId = lastId + 1;
+                const assetCount = await tx.assets_list.count();
+                const newIncrementId = assetCount + 1;
                 const formattedIds = newIncrementId.toString().padStart(3, '0');
-
+    
                 const validUlbId = ulb_id ? String(ulb_id).trim() : '';
-                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim() : '';
-
+                const validAssetType = type_of_assets ? type_of_assets.toLowerCase().trim().replace(/\s+/g, '') : '';
+    
                 const formattedId = validUlbId && validAssetType
                     ? `${validUlbId}${validAssetType}${formattedIds}`
                     : 'invalid-id';
-
+    
                 const existingAsset = await tx.assets_list.findUnique({
                     where: { id: formattedId },
                 });
-
+    
                 if (existingAsset) {
                     throw new Error(`Asset with ID ${formattedId} already exists`);
                 }
-
+    
                 const assetReq = await tx.assets_list.create({
                     data: {
                         id: formattedId,
@@ -160,8 +150,8 @@ class AssetsManagementDao {
                         plot_no,
                         ward_no,
                         address,
-                        building_name: building_name,
-                        ulb_id: ulb_id,
+                        building_name,
+                        ulb_id,
                         depreciation_method,
                         location,
                         apreciation_method,
@@ -192,70 +182,68 @@ class AssetsManagementDao {
                                         height: detail.height ? String(detail.height) : null,
                                         name: detail.name,
                                         property_name: detail.property_name,
-                                        type_of_plot: detail.type_of_plot
-                                    }))
-                                }
-                            }))
-                        }
-                    }
+                                        type_of_plot: detail.type_of_plot,
+                                    })),
+                                },
+                            })),
+                        },
+                    },
                 });
-
+    
                 await tx.asset_fieldOfficer_req.create({
                     data: {
-                        assetId: assetReq?.id,
+                        assetId: assetReq.id,
                     },
                 });
-
+    
                 await tx.asset_checker_req.create({
                     data: {
-                        assetId: assetReq?.id,
+                        assetId: assetReq.id,
                     },
                 });
-
+    
                 const existingLocation = await tx.location.findFirst({
-                    where: { location: location },
+                    where: { location },
                 });
-
+    
                 if (existingLocation) {
                     if (!existingLocation.building_name || !existingLocation.address) {
-                        const updatedLocation = await tx.location.update({
+                        await tx.location.update({
                             where: { id: existingLocation.id },
                             data: {
-                                building_name: existingLocation.building_name || req.body.building_name || "",
-                                address: existingLocation.address || req.body.address || "",
+                                building_name: existingLocation.building_name || building_name || '',
+                                address: existingLocation.address || address || '',
                                 updated_at: new Date(),
                             },
                         });
                     }
                 } else {
-                    // If location doesn't exist, create a new entry
-                    const newLocation = await tx.location.create({
+                    await tx.location.create({
                         data: {
                             location: location || '',
-                            ulb_id: ulb_id,
-                            building_name: req.body.building_name || '',
-                            address: req.body.address || '',
+                            ulb_id,
+                            building_name: building_name || '',
+                            address: address || '',
                             is_active: true,
                             created_at: new Date(),
                             updated_at: new Date(),
                         },
                     });
                 }
-                // Create a notification for the newly created asset
+    
                 await notificationsDao.createNotification(assetReq.id, 0, role);
-
+    
                 return assetReq;
             });
-
-
-
+    
             return generateRes(result);
-
-        } catch (error) {
+    
+        } catch (error:any) {
             console.error('Error processing request:', error);
-            throw { error: 400, msg: "duplicate" }
+            throw { error: 400, msg: error.message || 'An unexpected error occurred' };
         }
     };
+    
 
     postWithModifiedId =  async (req: Request) => {
         const {
