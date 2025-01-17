@@ -2460,18 +2460,32 @@ export const DashboardMain = () => {
   };
 
 
+  // const handleSaveFloorData = () => {
+  //   const floorData = processFloorData();
+  //   setSavedFloors((prevFloors) => [...prevFloors, ...floorData]);
+
+  //   console.log("Saved Floors: ", savedFloors); // For debugging
+
+
+  //   // Optionally, you can reset or do other operations here
+  //   // If you need to clear out the previous floor data, you can call: setSavedFloors([]) at the right time
+  // };
+
   const handleSaveFloorData = () => {
     const floorData = processFloorData();
-    setSavedFloors((prevFloors) => [...prevFloors, ...floorData]);
-
+  
+    // Avoid duplicate entries by checking for existing floor names
+    setSavedFloors((prevFloors) => {
+      const existingFloorNames = prevFloors.map((floor) => floor.floor);
+      const newFloorData = floorData.filter((floor) => !existingFloorNames.includes(floor.floor));
+      return [...prevFloors, ...newFloorData];
+    });
+  
     console.log("Saved Floors: ", savedFloors); // For debugging
-
-
-    // Optionally, you can reset or do other operations here
-    // If you need to clear out the previous floor data, you can call: setSavedFloors([]) at the right time
   };
 
-
+  
+  
   const handleEditFloor = (floor: any, index: any) => {
     setEditedFloor(floor.floor); // Store the floor number of the edited floor
     setEditedDetails(floor.details.map((detail: any) => ({ ...detail }))); // Copy the floor details
@@ -3030,6 +3044,27 @@ export const DashboardMain = () => {
   }
 
 
+
+  const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits, type: string) => {
+    if (newCount + existingCount > maxCount) {
+        alert(`The total number of Commercial and Residential units cannot exceed ${maxCount}.`);
+        setCount(0);
+    } else {
+        setCount(newCount);
+        const emptyUnits = Array.from({ length: newCount }, (_, i) => ({
+            length: 0,
+            breadth: 0,
+            height: 0,
+            name: "",
+            property_name: "",
+            index: i,
+            type: type
+        }));
+        setUnits(emptyUnits);
+    }
+};
+
+
   // console.log("commercialUnits",commercialUnits)
   // console.log("residentialUnits",residentialUnits)
 
@@ -3258,84 +3293,61 @@ export const DashboardMain = () => {
                             {/* new */}
 
                             {plotNo > 0 && (
-                              <div>
-                                <input
-                                  key={`type-Commercial`}
-                                  type="text"
-                                  className="border p-2 m-2"
-                                  placeholder={`Number of Commercial units`}
-                                  onChange={(e) => {
-                                    const commercialUnitsCount = parseInt(e.target.value) || 0;
+  <div>
+    <input
+      key={`type-Commercial`}
+      type="text"
+      className="border p-2 m-2"
+      placeholder={`Number of Commercial units`}
+      onChange={(e) => {
+        const commercialUnitsCount = parseInt(e.target.value) || 0;
+        validateUnitCount(
+          commercialUnitsCount,
+          residentialCount,
+          plotNo,
+          setCommercialCount,
+          setCommercialUnits,
+          "Commercial"
+        );
+      }}
+      value={commercialCount}
+      maxLength={2}
+      onKeyPress={(e) => {
+        if (!(e.key >= "0" && e.key <= "9")) {
+          e.preventDefault();
+        }
+      }}
+    />
+    <label htmlFor="">Commercial</label>
 
-                                    if (commercialUnitsCount + residentialCount > plotNo) {
-                                      alert("The total number of Commercial and Residential units cannot exceed the available plot number.");
-                                      e.target.value = "";
-                                    } else {
-                                      setCommercialCount(commercialUnitsCount);
+    <input
+      key={`type-Residential`}
+      type="text"
+      className="border p-2 m-2"
+      placeholder={`Number of Residential units`}
+      onChange={(e) => {
+        const residentialUnitsCount = parseInt(e.target.value) || 0;
+        validateUnitCount(
+          residentialUnitsCount,
+          commercialCount,
+          plotNo,
+          setResidentialCount,
+          setResidentialUnits,
+          "Residential"
+        );
+      }}
+      value={residentialCount}
+      maxLength={2}
+      onKeyPress={(e) => {
+        if (!(e.key >= "0" && e.key <= "9")) {
+          e.preventDefault();
+        }
+      }}
+    />
+    <label htmlFor="">Residential</label>
+  </div>
+)}
 
-                                      // Initialize empty commercial units
-                                      const emptyCommercialUnits = Array.from({ length: commercialUnitsCount }, (_, i) => ({
-                                        length: 0,  // Initialize as number
-                                        breadth: 0, // Initialize as number
-                                        height: 0,  // Initialize as number
-                                        name: "",
-                                        property_name: "",
-                                        index: i,
-                                        type: "Commercial" as const // Ensure type is "Commercial"
-                                      }));
-
-                                      setCommercialUnits(emptyCommercialUnits);
-                                    }
-                                  }}
-                                  value={commercialCount}
-                                  maxLength={2}
-                                  onKeyPress={(e) => {
-                                    if (!(e.key >= "0" && e.key <= "9")) {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                />
-                                <label htmlFor="">Commercial</label>
-
-                                <input
-                                  key={`type-Residential`}
-                                  type="text"
-                                  className="border p-2 m-2"
-                                  placeholder={`Number of Residential units`}
-                                  onChange={(e) => {
-                                    const residentialUnitsCount = parseInt(e.target.value) || 0;
-
-                                    if (commercialCount + residentialUnitsCount > plotNo) {
-                                      alert("The total number of Commercial and Residential units cannot exceed the available shops.");
-                                      e.target.value = ""; // Clear the input if it exceeds the limit
-                                    } else {
-                                      setResidentialCount(residentialUnitsCount);
-
-                                      // Initialize empty residential units
-                                      const emptyCommercialUnits = Array.from({ length: residentialUnitsCount }, (_, i) => ({
-                                        length: 0,
-                                        breadth: 0,
-                                        height: 0,
-                                        name: "",
-                                        property_name: "",
-                                        index: i,
-                                        type: "Residential" as const
-                                      }));
-
-                                      setCommercialUnits(emptyCommercialUnits);
-                                    }
-                                  }}
-                                  value={residentialCount}
-                                  maxLength={2}
-                                  onKeyPress={(e) => {
-                                    if (!(e.key >= "0" && e.key <= "9")) {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                />
-                                <label htmlFor="">Residential</label>
-                              </div>
-                            )}
 
 
                             <div className="count-display">
