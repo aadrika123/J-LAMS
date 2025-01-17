@@ -438,6 +438,43 @@ class AssetManagementController {
             })
         }
     };
+
+    getBuildingNameByLocation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+    
+        try {
+            const data = await this.assetsManagementDao.getBuildingNameByLocation(req);
+    
+            return res.json({
+                status: true,
+                message: "Building name fetched successfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: data,
+            });
+    
+        } catch (error) {
+            console.error("Error occurred while fetching building name:", error);
+            return res.json({
+                status: false,
+                message: "Error occurred while fetching building name",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+    
     
     marketcircle = async (
         req: Request,
@@ -488,7 +525,7 @@ class AssetManagementController {
             // if (!data?.error) {
                 return res.json({
                 // "status": true,
-                status: 201,
+                status: true,
                 "message": "Location Added Succesfully",
                 "meta-data": {
                     apiId,
@@ -525,6 +562,70 @@ class AssetManagementController {
         }
     };
 
+    locationEdit = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<object> => {
+        try {
+            const data = await this.assetsManagementDao.locationEdit(req);
+    
+            return res.json({
+                status: true,
+                message: "Location updated successfully",
+                "meta-data": {
+                    apiId,
+                    action: "PUT",
+                    version: "1.0",
+                },
+                data: data,
+            });
+        } catch (error) {
+            return res.json({
+                status: false,
+                message: "Error occurred while updating location",
+                "meta-data": {
+                    apiId,
+                    action: "PUT",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
+    locationDelete = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+      ): Promise<object> => {
+        try {
+          const data = await this.assetsManagementDao.locationDelete(req);
+      
+          return res.json({
+            status: true,
+            message: "Location deleted successfully",
+            "meta-data": {
+              apiId,
+              action: "DELETE",
+              version: "1.0",
+            },
+            data: data,
+          });
+        } catch (error) {
+          return res.json({
+            status: 400,
+            message: "Error occurred while deleting location",
+            "meta-data": {
+              apiId,
+              action: "DELETE",
+              version: "1.0",
+            },
+          });
+        }
+      };
+
     getFilteredAssets = async (
         req: Request,
         res: Response,
@@ -533,12 +634,12 @@ class AssetManagementController {
     ): Promise<Response<any, Record<string, any>>> => {
         try {
             // Extract filters from query parameters
-            const location = req.query.location as string;
+            const location_id = parseInt(req.query.location_id as string); // Parse location_id as number
             const building_name = req.query.building_name as string;
             const id = req.query.id as string | undefined; // Parse id as string
     
             // Call the DAO to fetch filtered assets
-            const data = await this.assetsManagementDao.getFilteredAssets(location, building_name, id);
+            const data = await this.assetsManagementDao.getFilteredAssets(location_id, building_name, id);
     
             return res.json({
                 status: true,
@@ -553,7 +654,7 @@ class AssetManagementController {
         } catch (error) {
             return res.json({
                 status: false,
-                message: "Error occurred while fetching assets",
+                message: "Error occurred while fetching assets provide correct fillters",
                 "meta-data": {
                     apiId,
                     action: "GET",
@@ -562,6 +663,43 @@ class AssetManagementController {
             });
         }
     };
+    
+
+    getShopById = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        apiId: string
+    ): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const shopId = parseInt(req.query.id as string, 10); // Parse shop ID from query parameter
+    
+            // Call the DAO to fetch shop details by ID
+            const shopDetails = await this.assetsManagementDao.getShopById(shopId);
+    
+            return res.json({
+                status: true,
+                message: "Shop details fetched successfully",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+                data: shopDetails,
+            });
+        } catch (error) {
+            return res.json({
+                status: false,
+                message: "Error fetching shop details",
+                "meta-data": {
+                    apiId,
+                    action: "GET",
+                    version: "1.0",
+                },
+            });
+        }
+    };
+    
     
 }
 

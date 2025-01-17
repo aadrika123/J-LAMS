@@ -126,6 +126,8 @@ class AssetManagementRoute {
           this.assetManagementController.locationselect(req, res, next, "0114"),
       ); //0114
 
+
+
     // Define the route for the filtered assets
     app
       .route(`${baseUrl}/assets/filtered-by-location`)
@@ -139,6 +141,32 @@ class AssetManagementRoute {
         (req: Request, res: Response, next: NextFunction) =>
           this.assetManagementController.getRestructuredAssets(req, res, next, "0117")
       );
+
+    app
+      .route(`${baseUrl}/asset/get-circle-by-location`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getBuildingNameByLocation(req, res, next, "0118"),
+      ); //0118
+
+      app
+      .route(`${baseUrl}/asset/location-edit`)
+      .post(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.locationEdit(req, res, next, "0119"),
+      ); //0119
+      app
+      .route(`${baseUrl}/asset/location-delete`)
+      .post(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.locationDelete(req, res, next, "0121"),
+      ); //0121
+      app
+      .route(`${baseUrl}/asset/shop`)
+      .get(
+        (req: Request, res: Response, next: NextFunction) =>
+          this.assetManagementController.getShopById(req, res, next, "0120"),
+      ); //0120
 
   }
 }
