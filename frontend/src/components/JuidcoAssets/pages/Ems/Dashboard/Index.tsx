@@ -2189,8 +2189,13 @@ export const DashboardMain = () => {
   // Validate Order Date
   order_date: Yup.date()
     .max(new Date(), "Order Date cannot be in the future")
-    .required("Order Date is required")
-  });
+    .required("Order Date is required"),
+  // });
+
+  location: Yup.date()
+  // .max(new Date(), "Order Date cannot be in the future")
+  .required("Location is required")
+});
 
   const handleUpload = async () => {
     if (file1) {
@@ -3970,26 +3975,32 @@ export const DashboardMain = () => {
                       type="text"
                       maxLength={50}
                     />
-                    <div className="marketSelection">
-                      <label htmlFor="location" className={'selectLabel'}>
-                        Select Location:
-                      </label>
-                      <select
-                        name="location"
-                        id="location"
-                        value={selectedMarket}
-                        onChange={handleMarketChange}
-                        className={'selectInput'}
-                        required
-                      >
-                        <option value="" disabled>-- Choose a Location --</option>
-                        {circleData?.map((item: any) => (
-                          <option key={item.id} value={item.location} >
-                            {item.location}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <div className="marketSelection mt-4">
+  <label htmlFor="location" className="selectLabel text-gray-700 font-medium">
+    Select Location:
+  </label>
+  <select
+    name="location"
+    id="location"
+    value={selectedMarket}
+    onChange={handleMarketChange}
+    className="selectInput w-full p-2 mt-2 border border-gray-300 rounded bg-gray-50"
+  >
+    <option value="" disabled>
+      -- Choose a Location --
+    </option>
+    {circleData?.map((item: any) => (
+      <option key={item.id} value={item.location}>
+        {item.location}
+      </option>
+    ))}
+  </select>
+  {touched.location && errors.location && (
+    <div className="error-message text-red-500 text-sm mt-1">
+      {errors.location}
+    </div>
+  )}
+</div>
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
