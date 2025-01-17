@@ -3417,14 +3417,26 @@ export const DashboardMain = () => {
                                 />
 
                                 {/* Save Button */}
-                                <div className="flex justify-center mt-4">
-                                  <button
-                                    onClick={handleSaveFloorData} // Save the floor data
-                                    className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-                                  >
-                                    Save & Move to Next Step
-                                  </button>
-                                </div>
+                               <div className="flex justify-center mt-4">
+  <button
+    onClick={() => {
+      setSavedFloors((prevFloors) => {
+        const floorData = processFloorData();
+
+        // Filter out duplicates
+        const newData = floorData.filter(
+          (newUnit) =>
+            !prevFloors.some((savedUnit) => savedUnit.details[0].id === newUnit.details[0].id)
+        );
+
+        return [...prevFloors, ...newData];
+      });
+    }}
+    className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
+  >
+    Save & Move to Next Step
+  </button>
+</div>
 
                               </div>
                             )}
