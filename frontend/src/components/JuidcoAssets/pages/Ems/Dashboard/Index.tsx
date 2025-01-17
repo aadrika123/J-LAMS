@@ -3185,7 +3185,7 @@ export const DashboardMain = () => {
                                 }
                               }}
                               placeholder="Number of Floors"
-                              className="border p-2 m-2"
+                              className="border p-2 m-2 w-40"
                               disabled={floorDisable}
                               min={1}
                               max={10}
@@ -3194,7 +3194,7 @@ export const DashboardMain = () => {
 
 
 
-                            <button onClick={() => { handleSave(false) }} className="bg-[#4338CA] text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
+                            <button onClick={() => { handleSave(false) }} className="bg-[#4338CA] mx-2 text-white p-2 ml-[-1rem]" disabled={floorDisable}>Add Floor</button>
 
                             {floorDisable ? (
                               <div className="flex flex-row">
