@@ -3657,22 +3657,25 @@ export const DashboardMain = () => {
 
                                         {/* Edit Button */}
                                         {isEditMode ? (
-                                          <div className="mt-4">
-                                            <button
-                                              onClick={() => handleSaves()}
-                                              className="bg-blue-600 text-white-500 hover:text-white-700 transition duration-200"
-                                            >
-                                              Save
-                                            </button>
-                                          </div>
-                                        ) : (
-                                          <button
-                                            onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
-                                            className="mt-4 bg-green-600 text-white-500 hover:text-white-700 transition duration-200"
-                                          >
-                                            Edit
-                                          </button>
-                                        )}
+  <div className="mt-4 flex justify-end">
+    <button
+      onClick={() => handleSaves()}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
+    >
+      Save
+    </button>
+  </div>
+) : (
+  <div className="mt-4 flex justify-end">
+    <button
+      onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
+      className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
+    >
+      Edit
+    </button>
+  </div>
+)}
+
                                       </div>
                                     );
                                   })}
