@@ -3045,7 +3045,7 @@ export const DashboardMain = () => {
 
 
 
-  const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits, type: string) => {
+  const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits:any, type: string) => {
     if (newCount + existingCount > maxCount) {
         alert(`The total number of Commercial and Residential units cannot exceed ${maxCount}.`);
         setCount(0);
