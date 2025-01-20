@@ -9,6 +9,7 @@ type UrlKeys =
 
 type Urls = {
   [key in UrlKeys]: {
+    getmoduleId: any;
     get?: string;
     getRestructuredAssets?: string;
     create?: string;
@@ -62,3 +63,11 @@ export const ASSETS: Urls = {
     
   },
 };
+
+
+export const module: Urls = {
+  LIST: {
+    getmoduleId: "menu/by-module",
+
+  }
+}
