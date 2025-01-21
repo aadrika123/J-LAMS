@@ -28,6 +28,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+  const [errrrr, setErrrrr] = useState<boolean>();
 
   const LoginSchema = Yup.object().shape({
     user_id: Yup.string().required("User Id is required"),
@@ -61,6 +62,22 @@ const Login = () => {
   
         // Store token in localStorage
         localStorage.setItem("accesstoken", data?.token); // Add this line
+
+
+
+        const requestBody = {
+          moduleId: 21,
+        };
+    
+      
+          // Make API request
+          const res = await axios.post(
+            "https://aadrikainfomedia.com/auth/api/menu/by-module",
+            requestBody,
+           
+          );
+          console.log("datataa",res)
+
   
         // Dispatch login and redirect user based on user type
         if (typeof window !== "undefined") {
@@ -68,15 +85,23 @@ const Login = () => {
           const userData = storedData && JSON.parse(storedData);
   
           if (userData?.user_type === "Municipal") {
+            setErrrrr(false)
             dispatch(login(userData));
             window.location.replace("/lams/apply/approve-application");
           } else if (userData?.user_type === "Admin") {
+            setErrrrr(false)
             dispatch(login(userData));
             window.location.replace("/lams/apply/approve-application");
-          } else {
-            dispatch(login(userData));
-            window.location.replace("/hrms/ems/dashboard");
+          } else{
+            hideWorkingAnimation();
+            setErrrrr(true)
+            // window.location.href =
+            //   "/lams/auth/login";
           }
+          // else {
+          //   dispatch(login(userData));
+          //   window.location.replace("/hrms/ems/dashboard");
+          // }
         }
       } else {
         hideWorkingAnimation();
@@ -92,6 +117,18 @@ const Login = () => {
   return (
     <>
       {workingAnimation}
+      {errrrr && (
+  <p className="bg-red-600 text-white pt-2 p-2 rounded mb-4 fixed top-14 left-0 right-0 z-50 text-center flex items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="mr-2">
+      <polygon points="12,2 22,22 2,22" fill="yellow" stroke="black" strokeWidth="2" />
+      <text x="12" y="17" fontSize="12" textAnchor="middle" fill="black" fontFamily="Arial">!</text>
+    </svg>
+    <span>
+      Permission Denied. You are not authorized to access this page. Please contact your administrator for more information.
+    </span>
+  </p>
+)}
+
       <div className="max-w-full w-full px-2 sm:px-12 lg:pr-20 mb-12 lg:mb-0">
         <div className="relative">
           <div className="p-6 sm:py-8 sm:px-12 rounded-lg bg-white darks:bg-gray-800 shadow-xl">
@@ -113,8 +150,11 @@ const Login = () => {
                 handleBlur,
                 handleSubmit,
               }) => (
+                <>
+              
                 <form onSubmit={handleSubmit}>
                   <div className="text-center">
+                   
                     <h1 className="text-2xl leading-normal mb-3 font-bold text-gray-800 darks:text-gray-300 text-center">
                       Welcome Back
                     </h1>
@@ -176,7 +216,8 @@ const Login = () => {
                       Log in
                     </Button>
                   </div>
-                </form>
+                </form> 
+                </>
               )}
             </Formik>
             {/* <div className="my-2">
