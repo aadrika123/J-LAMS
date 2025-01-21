@@ -64,7 +64,11 @@ const Approved = () => {
     const [ulbID, setUlbID] = useState<number | null >();
 
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
-
+    
+    const [wardNo, setWardNo] = useState('');
+    const handleFilterChange2 = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setWardNo(e.target.value);
+    };
     
     const [modalClose, setModalClose] = useState(false);
     const [modalContent, setModalContent] = useState<ModalContent>({ type: 'pdf', src: '' });
@@ -92,6 +96,7 @@ const Approved = () => {
 
     const COLUMN = [
         { name: "#" },
+        { name: "ASSET ID" },
         { name: "ASSET NAME" },
         { name: "ASSET TYPE" },
         { name: "LAND TYPE" },
@@ -104,11 +109,11 @@ const Approved = () => {
         { name: "APPROVER STATUS" },
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number) => {
+    const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number, wardNo: string) => {
         console.log("ulbIDulbID",ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&ward_no=${wardNo}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -162,9 +167,9 @@ const Approved = () => {
     
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter,itemsPerPage,ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter,itemsPerPage,ulbID as number) ,
-        enabled: !!ulbID ,
+        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID, wardNo],
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number, wardNo),
+        enabled: !!ulbID,
         staleTime: 1000,
     });
 
@@ -430,7 +435,7 @@ const Approved = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application 
+                        Approval Application
                     </InnerHeading>
                 </div>
             </div>
@@ -456,25 +461,25 @@ const Approved = () => {
 
                         </select>
                     </div>
-                    
+
                     <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
                             {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
                             <SubHeading>Ward No.</SubHeading>
                         </div>
 
-                        <select 
-                            onChange={handleFilterChange}
-                            value={filter}
+                        <select
+                            onChange={handleFilterChange2}
+                            value={wardNo}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
+                            <option value="">All</option>
                             {Array.from({ length: 55 }, (_, index) => (
                                 <option key={index + 1} value={index + 1}>
                                     {index + 1}
                                 </option>
                             ))}
                         </select>
-
                     </div>
 
                     {role == 'Admin' ?
@@ -621,6 +626,7 @@ const Approved = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
+                                    <td className="px-6 py-4">{item?.id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
@@ -670,89 +676,89 @@ const Approved = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className='flex'>
-                                        {role === 'Admin' ? null : (
-                       item.status === 3 ? (
-                        <Link
-            href={`/apply/approve-application/${item?.id}?status=clicked`}
-            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
-        >
+                                            {role === 'Admin' || item.is_drafted != true ? null : (
+                                                item.status === 3 ? (
+                                                    <Link
+                                                        href={`/apply/approve-application/${item?.id}?status=clicked`}
+                                                        className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
+                                                    >
 
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="23"
-                height="20"
-                viewBox="0 0 23 20"
-                fill="none"
-            >
-                <g clipPath="url(#clip0_1440_7941)">
-                    <rect
-                        x="1.63591"
-                        y="0.63591"
-                        width="18.7282"
-                        height="18.7282"
-                        rx="4.36409"
-                        stroke="#726E6E"
-                        strokeWidth="1.27182"
-                    />
-                    <path
-                        d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                        fill="black"
-                        fillOpacity="0.41"
-                    />
-                </g>
-                <defs>
-                    <clipPath id="clip0_1440_7941">
-                        <rect
-                            width="22.7692"
-                            height="19.7333"
-                            fill="white"
-                        />
-                    </clipPath>
-                </defs>
-            </svg>
-          
-            </Link>
-    ) : (
-        <Link
-            href={`/apply/approve-application/${item?.id}?status=clicked`}
-            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="23"
-                height="20"
-                viewBox="0 0 23 20"
-                fill="none"
-            >
-                <g clipPath="url(#clip0_1440_7941)">
-                    <rect
-                        x="1.63591"
-                        y="0.63591"
-                        width="18.7282"
-                        height="18.7282"
-                        rx="4.36409"
-                        stroke="#726E6E"
-                        strokeWidth="1.27182"
-                    />
-                    <path
-                        d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
-                        fill="black"
-                        fillOpacity="0.41"
-                    />
-                </g>
-                <defs>
-                    <clipPath id="clip0_1440_7941">
-                        <rect
-                            width="22.7692"
-                            height="19.7333"
-                            fill="white"
-                        />
-                    </clipPath>
-                </defs>
-            </svg>
-        </Link>
-    )
-)}
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="23"
+                                                            height="20"
+                                                            viewBox="0 0 23 20"
+                                                            fill="none"
+                                                        >
+                                                            <g clipPath="url(#clip0_1440_7941)">
+                                                                <rect
+                                                                    x="1.63591"
+                                                                    y="0.63591"
+                                                                    width="18.7282"
+                                                                    height="18.7282"
+                                                                    rx="4.36409"
+                                                                    stroke="#726E6E"
+                                                                    strokeWidth="1.27182"
+                                                                />
+                                                                <path
+                                                                    d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                                    fill="black"
+                                                                    fillOpacity="0.41"
+                                                                />
+                                                            </g>
+                                                            <defs>
+                                                                <clipPath id="clip0_1440_7941">
+                                                                    <rect
+                                                                        width="22.7692"
+                                                                        height="19.7333"
+                                                                        fill="white"
+                                                                    />
+                                                                </clipPath>
+                                                            </defs>
+                                                        </svg>
+
+                                                    </Link>
+                                                ) : (
+                                                    <Link
+                                                        href={`/apply/approve-application/${item?.id}?status=clicked`}
+                                                        className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="23"
+                                                            height="20"
+                                                            viewBox="0 0 23 20"
+                                                            fill="none"
+                                                        >
+                                                            <g clipPath="url(#clip0_1440_7941)">
+                                                                <rect
+                                                                    x="1.63591"
+                                                                    y="0.63591"
+                                                                    width="18.7282"
+                                                                    height="18.7282"
+                                                                    rx="4.36409"
+                                                                    stroke="#726E6E"
+                                                                    strokeWidth="1.27182"
+                                                                />
+                                                                <path
+                                                                    d="M15.5263 8.02097C15.3434 8.19095 15.1659 8.35592 15.1605 8.5209C15.1444 8.68088 15.3273 8.84585 15.4994 9.00083C15.7576 9.2508 16.0104 9.47577 15.9997 9.72073C15.9889 9.9657 15.7146 10.2207 15.4402 10.4706L13.2187 12.5403L12.4549 11.8304L14.741 9.71073L14.2246 9.2308L13.4608 9.9357L11.4436 8.06096L13.5092 6.14623C13.7189 5.95126 14.0686 5.95126 14.2676 6.14623L15.5263 7.31607C15.7361 7.50104 15.7361 7.826 15.5263 8.02097ZM6 13.1253L11.1424 8.34092L13.1595 10.2157L8.01715 15H6V13.1253Z"
+                                                                    fill="black"
+                                                                    fillOpacity="0.41"
+                                                                />
+                                                            </g>
+                                                            <defs>
+                                                                <clipPath id="clip0_1440_7941">
+                                                                    <rect
+                                                                        width="22.7692"
+                                                                        height="19.7333"
+                                                                        fill="white"
+                                                                    />
+                                                                </clipPath>
+                                                            </defs>
+                                                        </svg>
+                                                    </Link>
+                                                )
+                                            )}
 
                                             {/* <Link
                                                 href={`/apply/approve-application/${item?.id}?status=clicked`}
@@ -821,9 +827,9 @@ const Approved = () => {
                                                 </svg>
                                             </Link>
 
-                                            {role == 'Admin' ? null : (
+                                            {role == 'Admin' || item.is_drafted != true ? null : (
                                                 <>
-                                                    <button onClick={() => handleDelete(item?.id)}  className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed" disabled >
+                                                    <button onClick={() => handleDelete(item?.id)} className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                             <rect x="0.563881" y="0.563881" width="18.362" height="18.1851" rx="5.07493" stroke="#726E6E" strokeWidth="1.12776" />
                                                             <path d="M13 6.5H11.25L10.75 6H8.25L7.75 6.5H6V7.5H13M6.5 14C6.5 14.2652 6.60536 14.5196 6.79289 14.7071C6.98043 14.8946 7.23478 15 7.5 15H11.5C11.7652 15 12.0196 14.8946 12.2071 14.7071C12.3946 14.5196 12.5 14.2652 12.5 14V8H6.5V14Z" fill="black" fillOpacity="0.41" />

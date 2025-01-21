@@ -9,6 +9,7 @@ type UrlKeys =
 
 type Urls = {
   [key in UrlKeys]: {
+    getmoduleId: any;
     get?: string;
     getRestructuredAssets?: string;
     create?: string;
@@ -27,8 +28,11 @@ type Urls = {
     getcsvdata?:string;
     marketcircle?:string;
     locationadd?: string;
+    locationEdit?:string;
+    locationDelete?:string;
     locationselect?: string;
     notifications?: string;
+    buildingName?: string;
   };
 };
 
@@ -50,8 +54,20 @@ export const ASSETS: Urls = {
     getcsvdata: "/asset/getcsvdata?",
     marketcircle: "/asset/marketcircle?",
     locationadd: "/asset/locationadd",
+    locationEdit: "/asset/location-edit",
+    locationDelete: "/asset/location-delete",
     locationselect: "asset/locationselect?",
-    notifications: "/notifications/get"
+    notifications: "/notifications/get",
+    buildingName: "/asset/get-circle-by-location"
+
     
   },
 };
+
+
+export const module: Urls = {
+  LIST: {
+    getmoduleId: "menu/by-module",
+
+  }
+}

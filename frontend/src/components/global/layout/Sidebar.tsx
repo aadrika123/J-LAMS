@@ -320,9 +320,164 @@ const SideBar: React.FC<SideBarProps> = (props) => {
               </div>
             </nav>
           </div>
+<<<<<<< HEAD
         }
       </header>
     </>
+=======
+
+          <Link href="/apply/approve-application" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Home</InnerHeading>
+            </div>
+          </Link>
+
+
+          <Link href="/hold/fieldofficer" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={FieldOfficerHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Hold by Field Officer</InnerHeading>
+            </div>
+
+
+          </Link>
+
+
+
+
+
+
+          <Link href="/assets/assets-approved" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Admin Approved Assets</InnerHeading>
+            </div>
+          </Link>
+
+
+
+
+
+
+          <Link href="/hold/admin" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Hold by Admin </InnerHeading>
+            </div>
+          </Link>
+
+
+          {userDetails?.user_type == "Municipal" && (
+            <Link href="/hold/marketmaster" className="text-xl text-white">
+              <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+                <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+                <InnerHeading className="text-xl text-white">Location Master</InnerHeading>
+              </div>
+            </Link>
+          )}
+          <Link href="/assets/restructured-assets" className="text-xl text-white">
+
+            <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+              <Image src={MunicipalHoldIcon} alt="finance" width={30} height={30} className="text-white" />
+              <InnerHeading className="text-xl text-white">Restructured Assets </InnerHeading>
+            </div>
+          </Link>
+
+
+          {/* 
+          <div>
+            {sidebarLink?.modules?.map(() => {
+              return (
+                <>
+                  <Link href="/apply/approve-application" className="text-xl text-white">
+
+                  <div className="flex gap-3 m-3 bg-[#4338CA] hover:bg-[#4338CA] p-3 rounded-lg">
+                    <Image src={DashboardIcon} alt="finance" width={30} height={30} className="text-white"/>
+                  <InnerHeading  className="text-xl text-white">Home</InnerHeading>
+                    </div>
+                    </Link>
+                  
+                </>
+                // <div key={index}>
+                //   <ul className="w-full menu menu-xs p-0 overflow-y-scroll">
+                //     <ul className="h-lvh">
+                //       <li>
+                //         <details open className="w-full ">
+                //           <summary className="text-[1.125rem] p-2 px-6  whitespace-nowrap bg-[#4338CA] hover:bg-[#4338CA] rounded-none font-semibold text-white">
+                //             <i className="w-8 bg-white rounded-md p-1">
+                //               {link.icon}
+                //             </i>
+                //             {link.moduleName}
+                //           </summary>
+                //           <ul>
+                //             {link.subModules?.map((sub: any, index: number) => (
+                //               <li key={index} className="mt-5 w-[90%] ">
+                //                 {sub.dropdown === true ? (
+                //                   <details open={data === sub?.moduleName}>
+                //                     <summary
+                //                       className={`${data === sub?.moduleName
+                //                         ? "bg-[#4338CA] text-white"
+                //                         : "bg-[#4338CA] text-white "
+                //                         } text-[0.9375rem] hover:bg-[#4338CA] hover:text-white font-semibold`}
+                //                     >
+                //                       <i className="w-8 rounded-md p-1.5 bg-[#4338CA] ">
+                //                         {sub.icon}
+                //                       </i>
+                //                       {sub.moduleName}
+                //                     </summary>
+                //                     <div className="bg-[#E2DFFD] p-1 ">
+                //                       <ul>
+                //                         {sub.subModules?.map(
+                //                           (link: any, i: number) => (
+                //                             <li
+                //                               onClick={() =>
+                //                                 handleClick(sub.moduleName)
+                //                               }
+                //                               key={i}
+                //                               className={`mt-3 ml-5`}
+                //                             >
+                //                               <Link
+                //                                 className={`text-[0.9375rem] p-2 ${pathName === link.path
+                //                                   ? "text-black font-medium bg-black bg-opacity-20 bg-transparent"
+                //                                   : "text-primary"
+                //                                   } `}
+                //                                 href={link.path}
+                //                               >
+                //                                 <i className="w-8 rounded-md p-1.5 bg-[#4338CA] ">
+                //                                   {link.icon}
+                //                                 </i>
+                //                                 {link.moduleName}
+                //                               </Link>
+                //                             </li>
+                //                           )
+                //                         )}
+                //                       </ul>
+                //                     </div>
+                //                   </details>
+                //                 ) : (
+                //                     null
+                //                 )}
+                //               </li>
+                //             ))}
+
+                //           </ul>
+                //         </details>
+                //       </li>
+                //     </ul>
+                //   </ul>
+                // </div>
+              );
+            })}
+          </div> */}
+        </section>
+      </div>
+    </div>
+>>>>>>> 136e0330bd698384f991699f31308b8455a76586
   );
 };
 export default SideBar;

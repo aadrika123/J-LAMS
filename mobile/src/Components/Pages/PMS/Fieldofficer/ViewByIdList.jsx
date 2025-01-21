@@ -273,7 +273,32 @@ const ViewByIdList = () => {
           </p>
           {/* <p className='text-[#4338CA] mt-4 font-bold text-xl'>{data?.data?.type_of_land === null ? <>No data found</> : <>{data?.data?.type_of_land}</>}</p> */}
         </div>
-        <div></div>
+
+        <div>
+          <InnerHeading>Date of Acquisition</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.acquisition === null ? 'No data found' : viewData.acquisition}
+          </p>
+        </div>
+        <div>
+          <InnerHeading>Mode of Acquisition</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.mode_of_acquisition === null ? 'No data found' : viewData.mode_of_acquisition}
+          </p>
+        </div>
+        <div>
+          <InnerHeading>From Whom Acquired</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.from_whom_acquired === null ? 'No data found' : viewData.from_whom_acquired}
+          </p>
+        </div>
+        <div>
+          <InnerHeading>location</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.location === null ? 'No data found' : viewData.location}
+          </p>
+        </div>
+       
 
         <div>
           <InnerHeading>Plot Count</InnerHeading>
@@ -392,46 +417,47 @@ const ViewByIdList = () => {
 
           {/* Modal */}
           {isModalOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white p-4 rounded-lg w-[40rem] h-[50rem]  flex flex-col">
-                <button
-                  className="self-end text-red-600 font-bold mb-2"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-4 rounded-lg w-full max-w-4xl h-full max-h-[90vh] md:w-[40rem] md:h-[50rem] flex flex-col">
+      <button
+        className="self-end text-red-600 font-bold mb-2"
+        onClick={closeModal}
+      >
+        Close
+      </button>
 
-                {/* Scrollable Modal Content */}
-                <div className="flex-grow overflow-auto border w-full h-56 border-gray-300">
-                  {modalContent?.endsWith('.pdf') ? (
-                    <iframe
-                      src={modalContent}
-                      title="document"
-                      className="w-full h-full"
-                    ></iframe>
-                  ) : (
-                    <img
-                      src={modalContent}
-                      alt="document"
-                      className="w-full h-full object-contain"
-                    />
-                  )}
-                </div>
+      {/* Scrollable Modal Content */}
+      <div className="flex-grow overflow-auto border w-full h-56 border-gray-300">
+        {modalContent?.endsWith('.pdf') ? (
+          <iframe
+            src={modalContent}
+            title="document"
+            className="w-full h-full"
+          ></iframe>
+        ) : (
+          <img
+            src={modalContent}
+            alt="document"
+            className="w-full h-full object-contain"
+          />
+        )}
+      </div>
 
-                {/* Download Button */}
-                <div className="mt-4" >
-                  <a
-                    href={modalContent} // Link to the document for download
-                    download // Enables download functionality
-                    className="text-indigo-600 font-bold"
-                    target="_blank"
-                  >
-                    Download Document
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
+      {/* Download Button */}
+      <div className="mt-4">
+        <a
+          href={modalContent} // Link to the document for download
+          download // Enables download functionality
+          className="text-indigo-600 font-bold"
+          target="_blank"
+        >
+          Download Document
+        </a>
+      </div>
+    </div>
+  </div>
+)}
+
         </div>
 
         <div></div>
@@ -484,10 +510,11 @@ const ViewByIdList = () => {
         )}
       </div>
 
-
-      <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">
-        <ImageUploader />
-      </div>
+      {viewData?.status === 0 && (
+  <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">
+    <ImageUploader />
+  </div>
+)}
 
 
     </div>

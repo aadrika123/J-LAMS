@@ -12,16 +12,28 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   ulbID: any
+  editData?: any;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
   // const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [marketInput, setMarketInput] = useState<string>('');
+  const [addressInput, setAddressInput] = useState<string>('');
   const [isMarketValid, setIsMarketValid] = useState<boolean>(true); // Validation state
   const values = {
     location: marketInput,
+    address: addressInput,
     id: ulbID
   };
+  useEffect(() => {
+    if (editData) {
+      setMarketInput(editData.location || '');
+      setAddressInput(editData.address || '');
+    } else {
+      setMarketInput('');
+      setAddressInput('');
+    }
+  }, [editData]);
 
   useEffect(() => {
     if (isOpen) {
@@ -49,7 +61,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
     setMarketInput(event.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleAddressInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddressInput(event.target.value);
+  };
+
+  const handleSubmit = async() => {
     if (
       // !selectedMarket ||
       !marketInput) {
@@ -61,10 +77,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
 
       values.location = marketInput;
       values.id = ulbID;
-
+      if (editData) {
+        await fetchLocationEdit(); // Call the edit API
+      } else {
+        await fetchLocationAdd(); // Call the add API
+      }
       // setSelectedMarket('');
       setMarketInput('');
-      fetchLocationAdd()
+      setAddressInput('');
 
       handleClose()
     }
@@ -90,6 +110,24 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
+    }
+  };
+
+  const fetchLocationEdit = async () => {
+    try {
+      const res = await axios({
+        url: `${ASSETS.LIST.locationEdit}`, // Assuming this is the URL for the edit endpoint
+        method: "POST",
+        data: { ...values, id: editData.id }, // Use the ID from editData for the update
+      });
+
+      if (res?.data?.status === true) {
+        toast.success("Location Updated Successfully");
+      } else {
+        toast.error("Failed to update location");
+      }
+    } catch (error) {
+      console.error("Error updating location:", error);
     }
   };
 
@@ -132,6 +170,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID }) => {
             value={marketInput}
             onChange={handleMarketInputChange}
             placeholder="Enter Location"
+            required
+          />
+          <label htmlFor="addressInput">Address:</label>
+          <input
+            type="text"
+            id="addressInput"
+            value={addressInput}
+            onChange={handleAddressInputChange}
+            placeholder="Enter Address"
             required
           />
           {!isMarketValid && <span className={"error"}>Both fields are required!</span>}
