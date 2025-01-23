@@ -2194,7 +2194,7 @@ export const DashboardMain = () => {
 
   location: Yup.date()
   // .max(new Date(), "Order Date cannot be in the future")
-  .required("Location is required")
+  // .required("Location is required")
 });
 
   const handleUpload = async () => {

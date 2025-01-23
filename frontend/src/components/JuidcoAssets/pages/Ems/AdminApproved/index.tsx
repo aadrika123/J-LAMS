@@ -85,7 +85,7 @@ const AdminApproved = () => {
     }, [ulbID]);
 
 
-    console.log("userDetails?.ulb_id", ulbID)
+    // console.log("userDetails?.ulb_id", ulbID)
 
 
     const COLUMN = [

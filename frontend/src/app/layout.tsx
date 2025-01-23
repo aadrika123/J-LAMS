@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // Correctly using the hook inside the client-side component
-  useModulePermission();
+  // useModulePermission();
 
   return (
     <StoreProvider>

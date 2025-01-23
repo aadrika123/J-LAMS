@@ -6,7 +6,7 @@ import { ASSETS } from "../../utils/api/urls"; // Correct import of ASSETS
 
 const useModulePermission = () => {
   // Get the URL for api_getFreeMenuList from the ASSETS object
-  const api_getFreeMenuList = ASSETS.LIST.get;
+  // const api_getFreeMenuList = ASSETS.LIST.get;
 
   const token = typeof window !== "undefined" ? window.localStorage.getItem("token") : null;
 

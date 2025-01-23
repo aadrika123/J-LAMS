@@ -33,7 +33,7 @@ const Header: React.FC<SideBarProps> = (props) => {
       }
     }
   }, [ulbId]);
-  console.log("to prevent lintin error", userStorage);
+  // console.log("to prevent lintin error", userStorage);
 
   useEffect(() => {
     const fetchData = async (ulbId: any) => {
