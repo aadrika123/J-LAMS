@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 'use client'; // Marking the component as client-side
 
 import { Inter } from "next/font/google";
@@ -5,7 +6,7 @@ import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import StoreProvider from "./storeProvider";
 import { usePathname, useRouter } from "next/navigation"; // Correct import for useRouter
-import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
+// import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
 
@@ -78,6 +79,7 @@ export default function RootLayout({
   // }
 
   return (
+    // eslint-disable-next-line react/react-in-jsx-scope
     <StoreProvider>
       <ReactQueryClientProvider>
         <html lang="en">

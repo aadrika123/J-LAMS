@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useEffect } from "react";
-import { ASSETS } from "../../utils/api/urls"; // Correct import of ASSETS
+// import { ASSETS } from "../../utils/api/urls"; // Correct import of ASSETS
 
 const useModulePermission = () => {
   // Get the URL for api_getFreeMenuList from the ASSETS object

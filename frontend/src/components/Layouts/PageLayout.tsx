@@ -81,10 +81,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import Header from "../global/layout/Header";
 import Sidebar from "../global/layout/Sidebar";
-import ServiceRestrictionLayout from "../JuidcoAssets/servicerestriction";
+// import ServiceRestrictionLayout from "../JuidcoAssets/servicerestriction";
 // import ServiceRestrictionLayout from "@/app/ServiceRestrictionLayout";
 
 interface PageLayoutProps {
@@ -93,7 +93,6 @@ interface PageLayoutProps {
 
 const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const pathname = usePathname();
 
   const handleToggleSidebar = () => {
     setSidebarCollapsed(!isSidebarCollapsed);

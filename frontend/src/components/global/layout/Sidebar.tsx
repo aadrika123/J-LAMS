@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // "use client";
 
 // import React, { useEffect, useState } from "react";
@@ -193,22 +194,24 @@ interface MenuItem {
 }
 
 interface SideBarProps {
-  menu: MenuItem[];
+  // menu: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   className?: String;
 }
 
-const SideBar: React.FC<SideBarProps> = (props) => {
+const SideBar: React.FC<SideBarProps> = () => {
 
   // 👉 State constants 👈
   const [dropDown, setdropDown] = useState<boolean>(false);
   const [toggleBar, settoggleBar] = useState<boolean>(false);
   const [dropName, setdropName] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userdetails, setUserDetails] = useState<any>();
-  const [userPermission, setuserPermission] = useState<any>();
+  const [userPermission, setuserPermission] = useState<unknown>();
 
-  let bg = "slate"; // background color
-  let mcolor = "blue"; // menu color
-  let tcolor = "gray"; // text color
+  const bg = "slate"; // background color
+  const mcolor = "blue"; // menu color
+  const tcolor = "gray"; // text color
 
   // 👉 CSS constants 👈
   const dropMenuBtn = `block w-full pl-7 py-3 px-6 clear-both whitespace-nowrap text-sm hover:bg-${mcolor}-700 hover:text-${tcolor}-100 rounded-md text-sm animate__animated animate__fadeIn animate__faster `;
@@ -226,7 +229,7 @@ const SideBar: React.FC<SideBarProps> = (props) => {
   };
 
   const fetchMenuList = async () => {
-    let requestBody = {
+    const requestBody = {
       moduleId: 21,
     };
 
@@ -242,10 +245,10 @@ const SideBar: React.FC<SideBarProps> = (props) => {
         }
       );
 
-      let data = res?.data;
+      const data = res?.data;
 
       if (data?.data?.userDetails && data?.data?.permission) {
-        let newdata = JSON.stringify(data?.data?.userDetails);
+        const newdata = JSON.stringify(data?.data?.userDetails);
         if (newdata != undefined) {
           localStorage.setItem("userDetail", newdata);
         }
