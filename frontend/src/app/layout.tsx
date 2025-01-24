@@ -67,15 +67,15 @@ export default function RootLayout({
   }, [pathname]); // Add pathname as a dependency
 
   // Example: Conditional rendering based on the route
-  if (pathname === "/loginsssss") {
-    return (
-      <html lang="en">
-        <body className={inter.className}>
-          <ServiceRestrictionLayout />
-        </body>
-      </html>
-    );
-  }
+  // if (pathname === "/loginsssss") {
+  //   return (
+  //     <html lang="en">
+  //       <body className={inter.className}>
+  //         <ServiceRestrictionLayout />
+  //       </body>
+  //     </html>
+  //   );
+  // }
 
   return (
     <StoreProvider>
