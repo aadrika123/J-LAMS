@@ -42,6 +42,12 @@ const View = ({ id }: { id: number }) => {
     const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
 
 
+
+    const [isModalVisibleData, setIsModalVisibleData] = useState(false)
+      const [savedFloors, setSavedFloors] = useState<any[]>([]);
+        const [editedFloorIndex, setEditedFloorIndex] = useState<any>(null); // To store the index of the floor being edited
+    //   const [selectedFloor, setSelectedFloor] = useState<any>(null);
+
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
         pageStyle: `
@@ -84,9 +90,6 @@ const View = ({ id }: { id: number }) => {
     });
 
 
-
-
-
     const togglePopup = () => {
         setIsOpen(!isOpen);
     };
@@ -97,6 +100,8 @@ const View = ({ id }: { id: number }) => {
                 url: `${ASSETS.LIST.getById}?id=${id}`,
                 method: "GET",
             });
+            setSavedFloors(res.data?.data?.data?.floorData
+            )
             return res.data?.data;
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -109,6 +114,7 @@ const View = ({ id }: { id: number }) => {
                 url: `${ASSETS.LIST.getAllData}&id=${id}`,
                 method: "GET",
             });
+           
             setData(res.data?.data)
             return res.data?.data;
         } catch (error) {
@@ -118,7 +124,10 @@ const View = ({ id }: { id: number }) => {
 
     useEffect(() => {
         fetchFieldOfficerData()
-    }, [])
+    }, []);
+
+
+    console.log("savedFloorssavedFloors",savedFloors)
 
     const fetchAdminData = async () => {
         try {
@@ -823,7 +832,7 @@ const View = ({ id }: { id: number }) => {
                                             />
                                         </div>
 
-                                        <div className='overflow-y-auto h-60 mt-10 '>
+                                        <div className='overflow-y-auto h-100 mt-10 '>
                                             {values.type_of_assets === 'Building' && (
                                                 <FieldArray name="floorData">
                                                     {({ push }) => (
@@ -946,6 +955,13 @@ const View = ({ id }: { id: number }) => {
                                                                     className="bg-blue-500 text-white p-2 rounded-md mt-4 mx-2"
                                                                 >
                                                                     Add Floor +
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {setIsModalVisibleData(true)}}
+                                                                    className="bg-blue-500 text-white p-2 rounded-md mt-4 mx-2"
+                                                                >
+                                                                   View
                                                                 </button>
                                                             </div>
 
@@ -1453,6 +1469,177 @@ const View = ({ id }: { id: number }) => {
                 <div>
                 </div>
             </div>
+
+
+
+            {isModalVisibleData && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                        <div className="bg-white rounded-lg p-8 max-w-4xl w-full shadow-xl transform transition-all ease-in-out duration-300">
+                          <div className="flex justify-between items-center border-b pb-4 mb-6">
+                            <h3 className="text-2xl font-semibold text-[#4338CA]">
+                              {/* {selectedFloor === 0 ? "Basement" : `Floor Details`} */}
+                              Floor Details
+                            </h3>
+                            <button
+                            //   onClick={handleCloseDataModal}
+                              className="text-gray-500 hover:text-gray-800 transition ease-in-out duration-150"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* Group Floors and Separate Cards */}
+                          <div className="max-h-[80vh] overflow-y-auto">
+                            {Object.values(savedFloors?.reduce((acc, floor) => {
+                              const floorNumber = floor.floor;
+                              if (!acc[floorNumber]) {
+                                acc[floorNumber] = [];
+                              }
+                              acc[floorNumber].push(floor);
+                              return acc;
+                            }, {})).map((floorGroup: any, idx) => (
+                              <div key={idx} className="mb-6">
+                                <h3 className="text-2xl font-semibold text-[#4338CA] mb-4">
+                                  {floorGroup[0]?.floor === 0 ? "Basement" : `Floor ${floorGroup[0]?.floor}`}
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                  {floorGroup.map((floor: any, index: any) => {
+                                    const isOccupied = floor.plotCount > 0;
+                                    const floorColorClass = isOccupied ? 'bg-green-100' : 'bg-yellow-100'; // Light Green for occupied, Light Yellow for vacant
+
+                                    const isEditMode = editedFloorIndex === index; // Check if the current floor is in edit mode
+
+                                    return (
+                                      <div
+                                        key={index}
+                                        className={`rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out ${floorColorClass}`}
+                                      >
+                                        <h4 className="text-xl font-semibold text-[#4338CA]">{`Floor ${floor.floor}`}</h4>
+                                        <p className="mt-2"><strong>Plot Count:</strong> {floor.plotCount}</p>
+
+                                        <h5 className="font-semibold mt-4 text-lg">Floor Details:</h5>
+                                        <ul className="list-disc pl-6 space-y-3">
+                                          {floor.details.map((detail: any, idx: any) => (
+                                            <li key={idx}>
+                                              <div className="space-y-2">
+                                                {isEditMode ? (
+                                                  <div className="space-y-2">
+                                                    <label className="block text-sm">Type:</label>
+                                                    <input
+                                                      type="text"
+                                                    //   value={editedDetails[idx]?.type}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "type")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Length:</label>
+                                                    <input
+                                                      type="number"
+                                                    //   value={editedDetails[idx]?.length}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "length")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Breadth:</label>
+                                                    <input
+                                                      type="number"
+                                                    //   value={editedDetails[idx]?.breadth}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "breadth")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Height:</label>
+                                                    <input
+                                                      type="number"
+                                                    //   value={editedDetails[idx]?.height}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "height")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Name:</label>
+                                                    <input
+                                                      type="text"
+                                                    //   value={editedDetails[idx]?.name}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "name")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+
+                                                    <label className="block text-sm">Property Name:</label>
+                                                    <input
+                                                      type="text"
+                                                    //   value={editedDetails[idx]?.property_name}
+                                                    //   onChange={(e) => handleInputChange(e, idx, "property_name")}
+                                                      className="border p-2 rounded w-full"
+                                                    />
+                                                  </div>
+                                                ) : (
+                                                  <div className="space-y-2">
+                                                    <p><strong>Type:</strong> {detail.type}</p>
+                                                    <p><strong>Length:</strong> {detail.length} meters</p>
+                                                    <p><strong>Breadth:</strong> {detail.breadth} meters</p>
+                                                    <p><strong>Height:</strong> {detail.height} meters</p>
+                                                    <p><strong>Name:</strong> {detail.name}</p>
+                                                    <p><strong>Property Name:</strong> {detail.property_name}</p>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </li>
+                                          ))}
+                                        </ul>
+
+                                        {/* Edit Button */}
+                                        {isEditMode ? (
+  <div className="mt-4 flex justify-end">
+    <button
+    //   onClick={() => handleSaves()}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
+    >
+      Save
+    </button>
+  </div>
+) : (
+  <div className="mt-4 flex justify-end">
+    <button
+    //   onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
+      className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
+    >
+      Edit
+    </button>
+  </div>
+)}
+
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+
+
+
+
+
+
+
         </div>
     )
 }
