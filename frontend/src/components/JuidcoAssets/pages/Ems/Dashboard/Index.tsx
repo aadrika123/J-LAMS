@@ -2765,12 +2765,7 @@ export const DashboardMain = () => {
       return updatedData;
     });
   };
-  // const handleCommercial = (val: any) => {
-  //   setCommercialCount(parseInt(val) || 0);
-  // }
-  // const handleresidential = (val: any) => {
-  //   setResidentialCount(parseInt(val) || 0);
-  // }
+
   const handleTypeBox = (e: any, type: string, index: number | null) => {
     const count = parseInt(e?.target?.value) || e || 0;
     if (isNaN(count)) return;
@@ -2803,19 +2798,10 @@ export const DashboardMain = () => {
   };
 
 
-
-
-
-
-  // Generate boxes for the given count
   const generateBoxes = (count: any) => {
     return Array.from({ length: count }, (_, index) => index + 1);
   };
 
-  // Handle click on unit number to show input fields
-  // const handleUnitClick = (unitType: string, unitIndex: number) => {
-  //   setSelectedUnit({ type: unitType, index: unitIndex });
-  // };
 
   const handleUnitClick = (type: string, index: number) => {
     if (type === "Commercial") {
@@ -2860,174 +2846,7 @@ export const DashboardMain = () => {
     }
   };
 
-  // const handleInnerFloor = (floorIndex: any, type: any, unitIndex: any) => {
-  //   const sessionData = JSON.parse(sessionStorage.getItem('unitData') as any) || [];
-  //   const floorData = sessionData.find((floor: any) => floor?.floor === floorIndex);
-  //   const unitData = floorData?.units[type]?.[unitIndex] || {};
-
-  //   const innerBoxes = (
-  //     <>
-  //       <div>  <h4 className='text-sm text-[#4338CA] font-semibold mx-4'> Unit Number :-  <span className="font-normal">{unitIndex + 1}</span></h4></div>
-  //       <div key={`${floorIndex}-${type}-${unitIndex}`}>
-
-  //         <input
-  //           type="text"
-  //           className="border p-2 m-2"
-  //           placeholder="Length in meter"
-  //           defaultValue={unitData.length || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "length")}
-  //           maxLength={10}
-  //           onKeyPress={(e: any) => {
-  //             if (!(e.key >= "0" && e.key <= "9")) {
-  //               e.preventDefault();
-  //             }
-  //           }}
-  //         />
-  //         <input
-  //           type="text"
-  //           className="border p-2 m-2"
-  //           placeholder="Breadth in meter"
-  //           defaultValue={unitData.breadth || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "breadth")}
-  //           maxLength={10}
-  //           onKeyPress={(e: any) => {
-  //             if (!(e.key >= "0" && e.key <= "9")) {
-  //               e.preventDefault();
-  //             }
-  //           }}
-  //         />
-  //         <input
-  //           type="text"
-  //           className="border p-2 m-2"
-  //           placeholder="Height in meter"
-  //           defaultValue={unitData.height || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "height")}
-  //           maxLength={10}
-  //           onKeyPress={(e: any) => {
-  //             if (!(e.key >= "0" && e.key <= "9")) {
-  //               e.preventDefault();
-  //             }
-  //           }}
-  //         />
-  //         <input
-  //           type="text"
-  //           className="border p-2 m-2"
-  //           placeholder="Name"
-  //           defaultValue={unitData.name || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "name")}
-  //           maxLength={30}
-  //           onKeyPress={(e: any) => {
-  //             if (
-  //               !(
-  //                 (e.key >= "a" || e.key >= "z") ||
-  //                 (e.key <= "A" || e.key <= "Z") ||
-  //                 e.key === " "
-  //               )
-  //             ) {
-  //               e.preventDefault();
-  //             }
-  //           }}
-  //         />
-  //         <input
-  //           type="text"
-  //           className="border p-2 m-2"
-  //           placeholder="Property Name"
-  //           defaultValue={unitData.property_name || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "property_name")}
-  //           maxLength={10}
-  //           onKeyPress={(e: any) => {
-  //             if (
-  //               !(
-  //                 (e.key >= "a" || e.key >= "z") ||
-  //                 (e.key <= "A" || e.key <= "Z") ||
-  //                 (e.key <= "0" || e.key <= "9") ||
-  //                 e.key === " "
-  //               )
-  //             ) {
-  //               e.preventDefault();
-  //             }
-  //           }}
-  //         />
-
-  //         <select className="border p-2 m-2"
-  //           value={unitData.type_of_plot}
-  //           defaultValue={unitData.type_of_plot || ""}
-  //           onChange={(e) => handleUnitDetails(e, floorIndex, type, unitIndex, "type_of_plot")}>
-  //           <option>Choose the below options</option>
-  //           <option value="Enclosed">Enclosed</option>
-  //           <option value="Non-Enclosed">Non-Enclosed</option>
-  //         </select>
-
-  //         <br></br>
-  //         <div className="flex justify-center mt-4">
-  //           <button
-  //             onClick={() => {
-  //               handleSave(true);
-  //               setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
-  //             }}
-  //             className="bg-[#4338CA] text-white p-3 text-sm rounded-xl w-[15rem] items-center justify-center"
-  //           >
-  //             Save & Move to Floor Part
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </>
-  //   );
-
-  //   setNavigationStack((prevStack) => [...prevStack, [innerBoxes]] as any);
-  // };
-
-  // const handleUnitDetails = (e: any, floorIndex: any, type: any, unitIndex: any, field: any) => {
-  //   const value = e.target.value;
-  //   setData((prevData: any) => {
-  //     // Get existing data from sessionStorage
-  //     const storedData = sessionStorage.getItem('unitData');
-  //     const initialData = storedData ? JSON.parse(storedData) : [];
-
-  //     // Create a copy of the initial data
-  //     const updatedData = Array.isArray(prevData) ? [...prevData] : [...initialData];
-
-  //     // Find or create floor object
-  //     let floorObj = updatedData.find((floor) => floor?.floor === floorIndex);
-  //     if (!floorObj) {
-  //       floorObj = { floor: floorIndex, units: {}, plotCount: 0 };
-  //       updatedData.push(floorObj); // Use push instead of setting at an index
-  //     }
-
-  //     // Ensure the units object for the specific type exists
-  //     if (!floorObj.units[type]) {
-  //       floorObj.units[type] = [];
-  //     }
-
-  //     // Check if unit already exists for the specified unitIndex
-  //     let unit = floorObj.units[type].find((u: any) => u.index === unitIndex);
-  //     if (!unit) {
-  //       // If not, create a new unit
-  //       unit = { index: unitIndex, type, length: "", breadth: "", height: "", name: "", property_name: "", type_of_plot: "" };
-  //       floorObj.units[type].push(unit);
-  //     }
-
-  //     // Update the field value for the specific unit
-  //     unit[field] = value;
-
-  //     // Save updated data to sessionStorage
-  //     sessionStorage.setItem('unitData', JSON.stringify(updatedData));
-
-  //     // Return the updated data for the state
-  //     return updatedData;
-  //   });
-  // };
-
-  // const handleBackss = () => {
-  //   setNavigationStack((prevStack) => {
-  //     if (prevStack.length > 1) {
-  //       const newStack = prevStack.slice(0, -1);
-  //       return newStack;
-  //     }
-  //     return prevStack;
-  //   });
-  // };
-
+  
   const handleClose = () => {
     setIsModalVisible(false)
   }
@@ -3042,8 +2861,6 @@ export const DashboardMain = () => {
     setIsModalOpen(false);
     window.location.replace("/lams/apply/approve-application");
   }
-
-
 
   const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits:any, type: string) => {
     if (newCount + existingCount > maxCount) {
@@ -3064,9 +2881,6 @@ export const DashboardMain = () => {
     }
 };
 
-
-  // console.log("commercialUnits",commercialUnits)
-  // console.log("residentialUnits",residentialUnits)
 
   console.log("savedFloors", savedFloors)
 
