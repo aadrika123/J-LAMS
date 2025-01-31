@@ -171,6 +171,14 @@ const ViewByIdList = () => {
               : viewData.type_of_assets}
           </p>
         </div>
+        <div>
+          <InnerHeading>Asset ID</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.id === null
+              ? 'No data found'
+              : viewData?.id}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto mb-3 shadow-md">
