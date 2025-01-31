@@ -108,7 +108,7 @@ class AssetManagementController {
         } catch (error) {
               return res.json({
                 "status": false,
-                "message": "Error occured while fetching Assets",
+                "message": "Error occured while fetching Assets-2",
                 "meta-data": {
                     apiId,
                     action: "GET",

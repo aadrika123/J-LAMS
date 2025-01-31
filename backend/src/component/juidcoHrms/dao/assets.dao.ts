@@ -672,7 +672,8 @@ class AssetsManagementDao {
                         { khata_no: { contains: search, mode: "insensitive" } },
                         { ward_no: { contains: search, mode: "insensitive" } },
                         { assets_category_type: { contains: search, mode: "insensitive" } },
-                        { area: { contains: search, mode: "insensitive" } }
+                        { area: { contains: search, mode: "insensitive" } },
+                        { id: { contains: search, mode: "insensitive" } }
                     ] : undefined,
                     ulb_id: ulb_id,
                     AND: [
