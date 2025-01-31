@@ -91,6 +91,7 @@ const View = ({ id }: { id: number }) => {
 
 
     const togglePopup = () => {
+        setEditedFloorIndex(null)
         setIsOpen(!isOpen);
     };
 
