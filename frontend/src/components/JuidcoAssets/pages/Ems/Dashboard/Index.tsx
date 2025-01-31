@@ -3385,7 +3385,7 @@ export const DashboardMain = () => {
 
                                 {/* Length Input */}
                                 <input
-                                  type="text"
+                                  type="number"
                                   className="border p-2 m-2"
                                   placeholder="Length in meters"
                                   value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.length || "" : residentialUnits[selectedUnit.index]?.length || ""}
@@ -3394,7 +3394,7 @@ export const DashboardMain = () => {
 
                                 {/* Breadth Input */}
                                 <input
-                                  type="text"
+                                  type="number"
                                   className="border p-2 m-2"
                                   placeholder="Breadth in meters"
                                   value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.breadth || "" : residentialUnits[selectedUnit.index]?.breadth || ""}
@@ -3403,7 +3403,7 @@ export const DashboardMain = () => {
 
                                 {/* Height Input */}
                                 <input
-                                  type="text"
+                                  type="number"
                                   className="border p-2 m-2"
                                   placeholder="Height in meters"
                                   value={selectedUnit.type === "Commercial" ? commercialUnits[selectedUnit.index]?.height || "" : residentialUnits[selectedUnit.index]?.height || ""}
