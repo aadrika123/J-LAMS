@@ -172,7 +172,7 @@ const ViewByIdList = () => {
           </p>
         </div>
         <div>
-          <InnerHeading>Asset ID</InnerHeading>
+          <InnerHeading>Asset Type</InnerHeading>
           <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
             {viewData?.id === null
               ? 'No data found'

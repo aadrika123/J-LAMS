@@ -2480,7 +2480,7 @@ export const DashboardMain = () => {
       const newFloorData = floorData.filter((floor) => !existingFloorNames.includes(floor.floor));
       return [...prevFloors, ...newFloorData];
     });
-  
+  toast.success("Floor Details Saved Successfully")
     console.log("Saved Floors: ", savedFloors); // For debugging
   };
 
@@ -3018,15 +3018,15 @@ export const DashboardMain = () => {
   //   });
   // };
 
-  const handleBackss = () => {
-    setNavigationStack((prevStack) => {
-      if (prevStack.length > 1) {
-        const newStack = prevStack.slice(0, -1);
-        return newStack;
-      }
-      return prevStack;
-    });
-  };
+  // const handleBackss = () => {
+  //   setNavigationStack((prevStack) => {
+  //     if (prevStack.length > 1) {
+  //       const newStack = prevStack.slice(0, -1);
+  //       return newStack;
+  //     }
+  //     return prevStack;
+  //   });
+  // };
 
   const handleClose = () => {
     setIsModalVisible(false)
@@ -3198,7 +3198,7 @@ export const DashboardMain = () => {
                         <div className="bg-slate-100 p-6 rounded shadow-md w-[70rem] max-h-[80vh] overflow-auto z-20">
                           <div className='mb-[3rem]'>
                             <button onClick={handleClose} className='bg-red-600 text-white float-right ml-4 w-[3rem] p-2 rounded-xl'>X</button>
-                            <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button>
+                            {/* <button onClick={handleBackss} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">Save & Back</button> */}
                             <button onClick={handleDataModal} className="bg-[#4338CA] text-white float-right ml-4 w-50 p-2 rounded-xl">View Data</button>
                           </div>
 
