@@ -2192,7 +2192,7 @@ export const DashboardMain = () => {
     .required("Order Date is required"),
   // });
 
-  location: Yup.date()
+  // location: Yup.date()
   // .max(new Date(), "Order Date cannot be in the future")
   // .required("Location is required")
 });
@@ -2518,6 +2518,7 @@ export const DashboardMain = () => {
 
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
+    console.log("sddfsd26")
     try {
       // Merging commercial and residential units
 
@@ -3696,6 +3697,12 @@ export const DashboardMain = () => {
                       }}
                     />
 
+<div className="flex flex-col w-full">
+                   <label className="flex items-center">
+   Order Date
+    <span className="text-red-500 ml-1">*</span>
+  </label>
+
                     
                     <InputBox
                       // onChange={handleChange}
@@ -3708,7 +3715,7 @@ export const DashboardMain = () => {
                       error={errors.order_date}
                       touched={touched.order_date}
                       value={values.order_date}
-                      label="Order Date"
+                      // label="Order Date"
                       name="order_date"
                       type="date"
                       placeholder={"Enter order date"}
@@ -3725,6 +3732,7 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
+                    </div>
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -3747,11 +3755,17 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
+                   <div className="flex flex-col w-full">
+                   <label className="flex items-center">
+    Date of Acquisition
+    <span className="text-red-500 ml-1">*</span>
+  </label>
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      error={errors.acquisition}
                       value={values.acquisition}
-                      label="Date of Acquisition"
+                      // label="Date of Acquisition"
                       placeholder={"Enter Your Acquisition"}
                       name="acquisition"
                       type="date"
@@ -3768,6 +3782,9 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
+
+                    </div>
+                   
                     <SelectForNoApi
                       onChange={handleChange}
                       onBlur={handleBlur}
