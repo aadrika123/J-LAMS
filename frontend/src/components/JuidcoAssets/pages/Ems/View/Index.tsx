@@ -836,12 +836,12 @@ const View = ({ id }: { id: number }) => {
                                             />
                                         </div>
 
-                                        <div className='overflow-y-auto h-100 mt-10 '>
-                                            {values.type_of_assets === 'Building' && (
-                                                <FieldArray name="floorData" >
-                                                    {({ push }) => (
-                                                        <>
-                                                            <div className="flex">
+                                        <div className="container mx-auto p-4">
+      {values.type_of_assets === "Building" && (
+        <FieldArray name="floorData">
+          {({ push }) => (
+            <>
+              <div className="flex flex-wrap gap-6">
                                                             
                                                                 {values.floorData.map((floor: any, floorIndex: any) => (
                                                                     <div key={floorIndex} className="m-2   gap-3">
