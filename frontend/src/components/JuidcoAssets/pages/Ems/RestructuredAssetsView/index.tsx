@@ -202,9 +202,20 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
             values.status = 0
 // const res:any = '';
 
-console.log("valuesvalues",values)
+
 console.log("floordata floordata",floordata)
-values.floordata =floordata;
+// Ensure floordata is assigned only once
+ // Remove the empty floorData if exists
+ if (values.floorData) {
+    delete values.floorData;
+}
+
+// Assign floordata only once
+values.floordata = floordata;
+
+console.log("Updated Values:", values);
+
+
             const res = await axios({
                 url: `${ASSETS.LIST.update}?id=${id}`,
                 method: "POST",
