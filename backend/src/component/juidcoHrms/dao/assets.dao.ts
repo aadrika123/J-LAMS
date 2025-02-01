@@ -1249,7 +1249,7 @@ class AssetsManagementDao {
                     } else {
                         await tx.floorData.create({
                             data: {
-                                floor: floor.floor,
+                                floor: String(floor.floor), 
                                 plotCount: floor.plotCount,
                                 type: floor.type,
                                 assetsListId: id,
