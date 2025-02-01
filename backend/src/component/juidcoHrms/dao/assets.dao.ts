@@ -1204,8 +1204,11 @@ class AssetsManagementDao {
                 });
     
                 const existingFloorData = existingAsset.floorData;
+                console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
+                console.log("existingFloorIds",existingFloorIds)
                 const incomingFloorIds = floorData?.map((floor: any) => floor.id);
+                console.log("incomingFloorIds",incomingFloorIds)
     
                 await tx.floorData.deleteMany({
                     where: {
@@ -1215,6 +1218,7 @@ class AssetsManagementDao {
                     }
                 });
     
+                console.log("floorData",floorData)
                 for (const floor of floorData) {
                     if (existingFloorIds?.includes(floor.id)) {
                         await tx.floorData?.update({
@@ -1265,7 +1269,6 @@ class AssetsManagementDao {
                         });
                     }
                 }
-    
                 if (req.body.status === 1) {
                     await tx.asset_fieldOfficer_req.update({
                         where: {
