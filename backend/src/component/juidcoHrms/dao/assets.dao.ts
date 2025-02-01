@@ -1129,7 +1129,7 @@ class AssetsManagementDao {
                         id
                     },
                     include: {
-                        floorData: {
+                        floordata: {
                             include: {
                                 details: true
                             }
@@ -1203,14 +1203,14 @@ class AssetsManagementDao {
                     }
                 });
     
-                const existingFloorData = existingAsset.floorData;
+                const existingFloorData = existingAsset.floordata;
                 console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
                 console.log("existingFloorIds",existingFloorIds)
-                const incomingFloorIds = floorData?.map((floor: any) => floor.id);
+                const incomingFloorIds = floordata?.map((floor: any) => floor.id);
                 console.log("incomingFloorIds",incomingFloorIds)
     
-                await tx.floorData.deleteMany({
+                await tx.floordata.deleteMany({
                     where: {
                         id: {
                             in: existingFloorIds.filter((id: any) => !incomingFloorIds?.includes(id))
@@ -1218,8 +1218,8 @@ class AssetsManagementDao {
                     }
                 });
     
-                console.log("floorData",floorData)
-                for (const floor of floorData) {
+                console.log("floorData",floordata)
+                for (const floor of floordata) {
                     if (existingFloorIds?.includes(floor.id)) {
                         await tx.floorData?.update({
                             where: {
@@ -1247,7 +1247,7 @@ class AssetsManagementDao {
                             }
                         });
                     } else {
-                        await tx.floorData.create({
+                        await tx.floordata.create({
                             data: {
                                 floor: floor.floor,
                                 plotCount: floor.plotCount,
