@@ -1135,7 +1135,7 @@ class AssetsManagementDao {
                 // ✅ Log previous asset state
                 await tx.assets_list_change_log.create({
                     data: {
-                        assetId: id,
+                        // assetId: id,
                         ...existingAsset,
                         status: Number(existingAsset.status),
                     }
