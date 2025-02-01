@@ -1111,7 +1111,7 @@ class AssetsManagementDao {
             from_whom_acquired,
             mode_of_acquisition,
             role,
-            floorData,
+            floordata,
             no_of_floors,
             building_name,
             ulb_id,
