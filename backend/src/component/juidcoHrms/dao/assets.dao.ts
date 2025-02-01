@@ -373,31 +373,31 @@ class AssetsManagementDao {
                         assetId: assetReq.id,
                     },
                 });
-                await tx.assets_list_change_log.create({
-                    data: {
-                        assetId: newAssetsId,
-                        type_of_assets: type_of_assets,
-                        asset_sub_category_name: asset_sub_category_name,
-                        assets_category_type: assets_category_type,
-                        khata_no: khata_no,
-                        plot_no: plot_no,
-                        ward_no: ward_no,
-                        address: address,
-                        depreciation_method: depreciation_method,
-                        apreciation_method: apreciation_method,
-                        blue_print: blue_print,
-                        ownership_doc: ownership_doc,
-                        type_of_land: type_of_land,
-                        area: area,
-                        order_no: order_no,
-                        order_date: order_date,
-                        acquisition: acquisition,
-                        from_whom_acquired: from_whom_acquired,
-                        mode_of_acquisition: mode_of_acquisition,
-                        status:  0,
-                        role: role,
-                    }
-                });
+                // await tx.assets_list_change_log.create({
+                //     data: {
+                //         assetId: newAssetsId,
+                //         type_of_assets: type_of_assets,
+                //         asset_sub_category_name: asset_sub_category_name,
+                //         assets_category_type: assets_category_type,
+                //         khata_no: khata_no,
+                //         plot_no: plot_no,
+                //         ward_no: ward_no,
+                //         address: address,
+                //         depreciation_method: depreciation_method,
+                //         apreciation_method: apreciation_method,
+                //         blue_print: blue_print,
+                //         ownership_doc: ownership_doc,
+                //         type_of_land: type_of_land,
+                //         area: area,
+                //         order_no: order_no,
+                //         order_date: order_date,
+                //         acquisition: acquisition,
+                //         from_whom_acquired: from_whom_acquired,
+                //         mode_of_acquisition: mode_of_acquisition,
+                //         status:  0,
+                //         role: role,
+                //     }
+                // });
     
                 const existingLocation = await tx.location.findFirst({
                     where: { location },
@@ -1133,13 +1133,13 @@ class AssetsManagementDao {
                 }
     
                 // ✅ Log previous asset state
-                await tx.assets_list_change_log.create({
-                    data: {
-                        // assetId: id,
-                        ...existingAsset,
-                        status: Number(existingAsset.status),
-                    }
-                });
+                // await tx.assets_list_change_log.create({
+                //     data: {
+                //         // assetId: id,
+                //         ...existingAsset,
+                //         status: Number(existingAsset.status),
+                //     }
+                // });
     
                 // ✅ Update the asset
                 const updatedAsset = await tx.assets_list.update({
