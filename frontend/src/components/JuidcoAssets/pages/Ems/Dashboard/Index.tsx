@@ -3705,33 +3705,30 @@ export const DashboardMain = () => {
 
                     
                     <InputBox
-                      // onChange={handleChange}
-                      onChange={(e) => {
-                        if (handleDateChange(e as any)) {
-                          handleChange(e);
-                        }
-                      }}
-                      onBlur={handleBlur}
-                      error={errors.order_date}
-                      touched={touched.order_date}
-                      value={values.order_date}
-                      // label="Order Date"
-                      name="order_date"
-                      type="date"
-                      placeholder={"Enter order date"}
-                      onKeyPress={(e: any) => {
-                        if (
-                          (
+                        // onChange={handleChange}
+                        onChange={(e) => {
+                          if (handleDateChange(e as any)) {
+                            handleChange(e);
+                          }
+                        } }
+                        onBlur={handleBlur}
+                        error={errors.order_date}
+                        touched={touched.order_date}
+                        value={values.order_date}
+                        // label="Order Date"
+                        name="order_date"
+                        type="date"
+                        placeholder={"Enter order date"}
+                        onKeyPress={(e: any) => {
+                          if ((
                             (e.key >= "a" || e.key >= "z") ||
                             (e.key <= "A" || e.key <= "Z") ||
                             (e.key <= "0" || e.key <= "9") ||
                             e.key === " "
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
+                          )) {
+                            e.preventDefault();
+                          }
+                        } } label={undefined}                    />
                     </div>
                     <InputBox
                       onChange={handleChange}
@@ -3761,27 +3758,24 @@ export const DashboardMain = () => {
     <span className="text-red-500 ml-1">*</span>
   </label>
                     <InputBox
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={errors.acquisition}
-                      value={values.acquisition}
-                      // label="Date of Acquisition"
-                      placeholder={"Enter Your Acquisition"}
-                      name="acquisition"
-                      type="date"
-                      onKeyPress={(e: any) => {
-                        if (
-                          (
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={errors.acquisition}
+                        value={values.acquisition}
+                        // label="Date of Acquisition"
+                        placeholder={"Enter Your Acquisition"}
+                        name="acquisition"
+                        type="date"
+                        onKeyPress={(e: any) => {
+                          if ((
                             (e.key >= "a" || e.key >= "z") ||
                             (e.key <= "A" || e.key <= "Z") ||
                             (e.key <= "0" || e.key <= "9") ||
                             e.key === " "
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
+                          )) {
+                            e.preventDefault();
+                          }
+                        } } label={undefined}                    />
 
                     </div>
                    
