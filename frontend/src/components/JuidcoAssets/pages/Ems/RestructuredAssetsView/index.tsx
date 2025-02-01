@@ -24,6 +24,7 @@ import { Field, FieldArray, Formik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation'
 import { useReactToPrint } from "react-to-print";
+import BuildingModal from './building-modal';
 
 
 const RestructuredAssetsView = ({ id }: { id: number }) => {
@@ -40,7 +41,12 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
     const [datass, setDatas] = useState<any>()
 
     const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
-    
+    const [floordata, setFloorData] = useState()
+
+
+    const [isModalVisible, setIsModalVisible] = useState(false)
+    const [isDataModalVisible, setIsDataModalVisible] = useState(false)
+    console.log(isDataModalVisible)
     
         const handlePrint = useReactToPrint({
                 content: () => componentRef.current,
@@ -93,11 +99,14 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                 url: `${ASSETS.LIST.getById}?id=${id}`,
                 method: "GET",
             });
-            return res.data?.data;
+            console.log("Fetched Data:", res.data); // Debugging
+            return res.data?.data || {}; // Ensure a valid return
         } catch (error) {
             console.error("Error fetching data:", error);
+            return {}; // Prevent undefined errors
         }
     };
+    
 
     const fetchFieldOfficerData = async () => {
         try {
@@ -191,6 +200,20 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                 values.blue_print = fileUploadData2.blue_print;
             }
             values.status = 0
+// const res:any = '';
+
+
+console.log("floordata floordata",floordata)
+// Ensure floordata is assigned only once
+ // Remove the empty floorData if exists
+ if (values.floorData) {
+    delete values.floorData;
+}
+
+// Assign floordata only once
+values.floordata = floordata;
+
+console.log("Updated Values:", values);
 
 
             const res = await axios({
@@ -204,8 +227,8 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
 
             if (res?.data?.status === 201) {
                 toast.success("Assets successfully send for approval.");
-                setIsOpen(false);
-                window.location.reload()
+                // setIsOpen(false);
+                // window.location.reload()
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
                 toast.error("Duplicate asset data found. Please check and try again.");
             } else if (res?.data?.status === 400) {
@@ -264,7 +287,7 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
         }
     }, []);
 
-    const { isLoading, error, data } = useQuery({
+    const { isLoading, error, data = {} } = useQuery({
         queryKey: ['assets'],
         queryFn: fetchData,
         staleTime: 1000,
@@ -382,6 +405,13 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
         setFile2(file);
     };
 
+
+    const handleDataModal = () => {
+        setIsDataModalVisible(true)
+        setIsModalVisible(false)
+      }
+
+
     return (
         <div>
             <Toaster />
@@ -474,7 +504,12 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                                             {/* ------------------------------------------------------- */}
 
                                             <SelectForNoApi
-                                                onChange={handleChange}
+                                               onChange={(e) => {
+                                                handleChange(e)
+                                                if (e.target.value === "Building") {
+                                                  setIsModalVisible(true)
+                                                }
+                                              }}
                                                 onBlur={handleBlur}
                                                 value={values.type_of_assets}
                                                 label="Asset Category Name"
@@ -817,13 +852,13 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                                             />
                                         </div>
 
-                                        <div className='overflow-y-auto h-60 mt-10 '>
-                                            {values.type_of_assets === 'Building' && (
+                                        {/* <div className='overflow-y-auto h-60 mt-10 '>
+                                            {values?.type_of_assets === 'Building' && (
                                                 <FieldArray name="floorData">
                                                     {({ push }) => (
                                                         <>
                                                             <div className="">
-                                                                {values.floorData.map((floor: any, floorIndex: any) => (
+                                                                {values?.floorData?.map((floor: any, floorIndex: any) => (
                                                                     <div key={floorIndex} className="m-2 grid grid-cols-3 gap-3">
                                                                         {floor?.details?.map((detail: any, detailIndex: any) => (
                                                                             <div key={detailIndex} className="bg-white shadow-md rounded-lg p-8 border border-gray-200">
@@ -947,13 +982,27 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                                                     )}
                                                 </FieldArray>
                                             )}
-                                        </div>
+                                        </div> */}
 
                                         <div className="flex items-center justify-end mt-5 gap-5">
                                             <PrimaryButton buttonType="submit" variant="primary">
                                                 Save
                                             </PrimaryButton>
                                         </div>
+
+
+                                        
+                                         {/* Building Modal */}
+             <BuildingModal
+                isModalVisible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                Home3="/placeholder.svg"
+                values={values}
+                handleDataModal={handleDataModal}
+                setFloorData={setFloorData}
+              />
+
+               
                                     </form>
                                 )}
                             </Formik>
@@ -1146,14 +1195,13 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
 
                 </div>
 
-            <div className="border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
+            {/* <div className="border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
                 {data?.data?.type_of_assets === "Building" ? (
                     <div>
                         <SubHeading>
                             <Image src={Home3} alt="employee" width={40} height={20} />
                             <span className="ml-3">Floor Details</span>
                         </SubHeading>
-                        {/* <InnerHeading></InnerHeading> */}
                         <div className="mt-5 w-full">
                             <div className="grid grid-cols-5 gap-5 w-full">
                                 {data?.data?.floorData?.map((floor: any) =>
@@ -1174,8 +1222,79 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
                         </div>
                     </div>
                 ) : <></>}
-            </div>
+            </div> */}
 
+
+
+<div className="border-b-2 pb-4 p-10 h-auto mb-4 shadow-md">
+      {data?.data?.type_of_assets === "Building" ? (
+        <div>
+          <SubHeading>
+            <Image src={Home3 || "/placeholder.svg"} alt="employee" width={40} height={20} />
+            <span className="ml-3">Floor Details</span>
+          </SubHeading>
+          <div className="mt-5 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {data?.data?.floorData?.map((floor: any) =>
+                floor.details?.map((detail: any) => (
+                  <div
+                    key={detail.id}
+                    className="bg-gradient-to-r from-[#D1E8E2] to-[#E4D1E8] shadow-lg rounded-xl p-6 hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
+                        <span className="text-lg font-bold text-[#4338CA]">Floor</span>
+                        <span className="text-lg font-bold">{floor.floor}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
+                        <span className="text-lg font-semibold text-[#4338CA]">Type</span>
+                        <span className="text-lg font-semibold">{detail?.type}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
+                        <span className="text-lg font-semibold text-[#4338CA]">Plot Type</span>
+                        <span className="text-lg font-semibold">{detail?.type_of_plot}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
+                        <span className="text-lg font-semibold text-[#4338CA]">Plot</span>
+                        <span className="text-lg font-semibold">{detail.index}</span>
+                      </div>
+
+                      <div className="bg-white/50 rounded-lg p-3 space-y-2 border-2 border-[#4338CA]/10">
+                        <p className="text-lg font-semibold text-[#4338CA] border-b-2 border-[#4338CA]/30 pb-1">
+                          Dimensions
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="text-sm text-[#4338CA]">Length</p>
+                            <p className="font-semibold">{detail.length}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-[#4338CA]">Breadth</p>
+                            <p className="font-semibold">{detail.breadth}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-[#4338CA]">Height</p>
+                            <p className="font-semibold">{detail.height}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        <span className="text-lg font-semibold text-[#4338CA]">Name</span>
+                        <span className="text-lg font-semibold">{detail.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                )),
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
             <br></br>
 
             {role === 'Municipal' ? (
@@ -1444,6 +1563,9 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
             <div>
             </div>
             </div>
+
+
+            
         </div>
     )
 }
