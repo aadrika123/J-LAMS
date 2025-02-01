@@ -866,6 +866,7 @@ class AssetsManagementDao {
         }
     };
 
+    // sahil
     update = async (req: Request) => {
         const {
             type_of_assets,
@@ -1084,6 +1085,7 @@ class AssetsManagementDao {
         }
     };
 
+    // sahil
 
     // update = async (req: Request) => {
     //     const {
