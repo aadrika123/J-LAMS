@@ -241,6 +241,9 @@ const View = ({ id }: { id: number }) => {
         }
     }, [ulbId]);
 
+
+
+
     useEffect(() => {
         const fetchData = async (ulbId: any) => {
             try {
@@ -835,12 +838,14 @@ const View = ({ id }: { id: number }) => {
 
                                         <div className='overflow-y-auto h-100 mt-10 '>
                                             {values.type_of_assets === 'Building' && (
-                                                <FieldArray name="floorData">
+                                                <FieldArray name="floorData" >
                                                     {({ push }) => (
                                                         <>
-                                                            <div className="">
+                                                            <div className="flex">
+                                                            
                                                                 {values.floorData.map((floor: any, floorIndex: any) => (
-                                                                    <div key={floorIndex} className="m-2 grid grid-cols-3 gap-3">
+                                                                    <div key={floorIndex} className="m-2   gap-3">
+                                                                          Floor  {floor?.floor}
                                                                         {floor?.details?.map((detail: any, detailIndex: any) => (
                                                                             <div key={detailIndex} className="bg-white shadow-md rounded-lg p-8 border border-gray-200">
 
@@ -947,7 +952,13 @@ const View = ({ id }: { id: number }) => {
                                                                         ))}
                                                                     </div>
                                                                 ))}
-                                                                <button
+                                                                <div>
+                                                              
+
+                                                                </div>
+                                                               
+                                                            </div>
+                                                            <button
                                                                     type="button"
                                                                     onClick={() => push({
                                                                         // floor: '',
@@ -964,7 +975,6 @@ const View = ({ id }: { id: number }) => {
                                                                 >
                                                                    View
                                                                 </button>
-                                                            </div>
 
                                                         </>
                                                     )}
