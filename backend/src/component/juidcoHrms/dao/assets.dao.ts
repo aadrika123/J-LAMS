@@ -1123,13 +1123,13 @@ class AssetsManagementDao {
         const notificationsDao = new NotificationsDao();
     
         try {
-            const result = await prisma.$transaction(async (tx) => {
+            const result = await prisma.$transaction(async (tx:any) => {
                 const existingAsset: any = await tx.assets_list.findUnique({
                     where: {
                         id
                     },
                     include: {
-                        floordata: {
+                        floorData: {
                             include: {
                                 details: true
                             }
@@ -1203,14 +1203,14 @@ class AssetsManagementDao {
                     }
                 });
     
-                const existingFloorData = existingAsset.floordata;
+                const existingFloorData = existingAsset.floorData;
                 console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
                 console.log("existingFloorIds",existingFloorIds)
                 const incomingFloorIds = floordata?.map((floor: any) => floor.id);
                 console.log("incomingFloorIds",incomingFloorIds)
     
-                await tx.floordata.deleteMany({
+                await tx.floorData.deleteMany({
                     where: {
                         id: {
                             in: existingFloorIds.filter((id: any) => !incomingFloorIds?.includes(id))
@@ -1247,7 +1247,7 @@ class AssetsManagementDao {
                             }
                         });
                     } else {
-                        await tx.floordata.create({
+                        await tx.floorData.create({
                             data: {
                                 floor: floor.floor,
                                 plotCount: floor.plotCount,
