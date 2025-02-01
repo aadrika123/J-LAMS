@@ -244,7 +244,8 @@ console.log("Updated Values:", values);
             });
 
             if (res?.data?.status === 201) {
-                toast.success("Assets successfully send for approval.");
+                // toast.success("Assets successfully send for approval.");
+                
                 // setIsOpen(false);
                 // window.location.reload()
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
