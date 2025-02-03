@@ -2532,7 +2532,7 @@ export const DashboardMain = () => {
 
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
-    console.log("sddfsd26")
+    // console.log("sddfsd26")
     try {
       // Merging commercial and residential units
 

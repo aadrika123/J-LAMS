@@ -515,6 +515,8 @@ const View = ({ id }: { id: number }) => {
                                                         name: "Others",
                                                     }
                                                 ]}
+
+                                                readonly
                                             />
 
                                             <SelectForNoApi
