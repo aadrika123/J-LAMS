@@ -37,9 +37,9 @@ export default function BuildingModal({
   isModalVisible,
   onClose,
   values,
-  handleDataModal,
+  // handleDataModal,
   onSave,
-  onSaveEdit,
+  // onSaveEdit,
   setFloorData
 }: BuildingModalProps) {
   // Basic building info
@@ -62,7 +62,7 @@ export default function BuildingModal({
   // Saved data
   const [savedFloors, setSavedFloors] = useState<FloorData[]>([])
   const [data, setData] = useState<any[]>([])
-
+console.log('data',data)
   // Add with other state declarations at the top
   const [isDataModalVisible, setIsDataModalVisible] = useState(false)
 
@@ -172,9 +172,9 @@ export default function BuildingModal({
     }
   }
 
-  const validateUnitDetails = (units: UnitDetail[]) => {
-    return units.every((unit) => unit.length && unit.breadth && unit.height && unit.name && unit.property_name)
-  }
+  // const validateUnitDetails = (units: UnitDetail[]) => {
+  //   return units.every((unit) => unit.length && unit.breadth && unit.height && unit.name && unit.property_name)
+  // }
 
   const handleSaveFloorData = () => {
     if (selectedFloor === null) return

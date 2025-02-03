@@ -2,11 +2,11 @@
 "use client"
 
 import { useState } from "react"
-import { X, Edit } from "lucide-react"
+import { X,  } from "lucide-react"
 import Image from "next/image"
 import Input from "@/components/global/atoms/Input"
 import Card from "@mui/material/Card/Card"
-import CardHeader from "@mui/material/CardHeader/CardHeader"
+// import CardHeader from "@mui/material/CardHeader/CardHeader"
 // import { Button } from "/components/ui/button"
 // import { Card, CardHeader, CardTitle } from "/components/ui/card"
 
@@ -40,7 +40,7 @@ export default function DataModal({
   isVisible,
   onClose,
   savedFloors,
-  selectedFloor,
+  // selectedFloor,
   onSaveEdit,
   Home3,
 }: DataModalProps) {

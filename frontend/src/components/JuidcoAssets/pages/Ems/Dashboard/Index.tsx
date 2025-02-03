@@ -2522,7 +2522,7 @@ export const DashboardMain = () => {
       updatedFloors[editedFloorIndex] = {
         ...updatedFloors[editedFloorIndex],
         details: editedDetails,
-        plotCount: editedDetails.filter(detail => detail.type).length, // Recalculate plotCount
+        plotCount: editedDetails.filter((detail: { type: any; }) => detail.type).length, // Recalculate plotCount
       };
     }
     setSavedFloors(updatedFloors);
