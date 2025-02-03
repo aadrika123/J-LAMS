@@ -46,7 +46,7 @@ const Fieldofficer = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
-    const [filterWard, setFilterWard] = useState('');
+    // const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -292,10 +292,10 @@ const Fieldofficer = () => {
         setFilter(e.target.value);
     };
 
-    const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilterWard(e.target.value);
-        console.log("filterWard",filterWard)
-    };
+    // const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setFilterWard(e.target.value);
+    //     console.log("filterWard",filterWard)
+    // };
 
     const handleItemsPerPageChange = (e:any) => {
         setItemsPerPage(Number(e.target.value));

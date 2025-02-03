@@ -46,6 +46,7 @@ const RestructuredAsstes = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
+    const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [count, setCount] = useState<any>([])
     // const [remarks, setRemarks] = useState<any>('')
@@ -103,11 +104,11 @@ const RestructuredAsstes = () => {
         { name: "APPROVER STATUS" },
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string, itemsPerPage: number, ulbID: number) => {
+    const fetchData = async (page: number, searchQuery: string, filter: string, itemsPerPage: number, ulbID: number, filterWard: string) => {
         console.log("ulbIDulbID", ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&ward_no=${filterWard}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -120,8 +121,8 @@ const RestructuredAsstes = () => {
     };
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number),
+        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID,filterWard],
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number,filterWard),
         enabled: !!ulbID,
         staleTime: 1000,
     });
@@ -214,6 +215,11 @@ const RestructuredAsstes = () => {
         setFilter(e.target.value);
     };
 
+        const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setFilterWard(e.target.value);
+            console.log("filterWard",filterWard)
+        };
+
     const handleItemsPerPageChange = (e: any) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1);
@@ -284,7 +290,7 @@ const RestructuredAsstes = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application
+                    Restructured  Application
                     </InnerHeading>
                 </div>
             </div>
@@ -318,8 +324,8 @@ const RestructuredAsstes = () => {
                         </div>
 
                         <select
-                            onChange={handleFilterChange}
-                            value={filter}
+                            onChange={handleFilterWardChange}
+                            value={filterWard}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (
