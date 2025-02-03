@@ -26,6 +26,24 @@ import { useSearchParams } from 'next/navigation'
 import { useReactToPrint } from "react-to-print";
 import BuildingModal from './building-modal';
 
+// Define the interfaces
+interface UnitDetail {
+    type: string;
+    length?: string;
+    breadth?: string;
+    height?: string;
+    name?: string;
+    property_name?: string;
+    index?: number;
+  }
+  
+  interface FloorData {
+    floor: string | number;
+    plotCount: number;
+    details: UnitDetail[];
+  }
+
+
 
 const RestructuredAssetsView = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
@@ -41,7 +59,7 @@ const RestructuredAssetsView = ({ id }: { id: number }) => {
     const [datass, setDatas] = useState<any>()
 
     const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
-    const [floordata, setFloorData] = useState()
+    const [floordata, setFloorData] = useState<FloorData>()
 
 
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -226,7 +244,8 @@ console.log("Updated Values:", values);
             });
 
             if (res?.data?.status === 201) {
-                toast.success("Assets successfully send for approval.");
+                // toast.success("Assets successfully send for approval.");
+                
                 // setIsOpen(false);
                 // window.location.reload()
             } else if (res?.data?.['meta-data']?.type === "DUPLICATE") {
