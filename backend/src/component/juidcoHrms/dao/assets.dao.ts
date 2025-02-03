@@ -1091,7 +1091,7 @@ class AssetsManagementDao {
 
     update = async (req: Request) => {
         const {
-            id,
+            // id,
             type_of_assets,
             asset_sub_category_name,
             assets_category_type,
@@ -1120,7 +1120,7 @@ class AssetsManagementDao {
         } = req.body;
         console.log("resssss",req.body)
     
-        // const id = String(req.query.id);
+        const id = String(req.query.id);
         const notificationsDao = new NotificationsDao();
     
         try {
