@@ -1220,58 +1220,57 @@ class AssetsManagementDao {
                 });
     
                 // console.log("floorData",floordata)
-                if(type_of_assets == 'Building'){
-                for (const floor of floordata) {
-                    if (existingFloorIds?.includes(floor.id)) {
-                        await tx.floorData?.update({
-                            where: {
-                                id: floor?.id
-                            },
-                            data: {
-                                floor: floor?.floor,
-                                plotCount: floor?.plotCount,
-                                type: floor?.type,
-                                details: {
-                                    deleteMany: {
-                                        floorDataId: floor?.id
-                                    },
-                                    create: floor.details.map((detail: any) => ({
-                                        index: detail?.index,
-                                        type: detail?.type,
-                                        length: detail?.length,
-                                        breadth: detail?.breadth,
-                                        height: detail?.height,
-                                        name: detail?.name,
-                                        property_name: detail?.property_name,
-                                        type_of_plot: detail?.type_of_plot
-                                    }))
-                                }
-                            }
-                        });
-                    } else {
-                        await tx.floorData.create({
-                            data: {
-                                floor: String(floor.floor), 
-                                plotCount: floor.plotCount,
-                                type: floor.type,
-                                assetsListId: id,
-                                details: {
-                                    create: floor.details.map((detail: any) => ({
-                                        index: detail.index,
-                                        type: detail.type,
-                                        length: detail.length,
-                                        breadth: detail.breadth,
-                                        height: detail.height,
-                                        name: detail.name,
-                                        property_name: detail.property_name,
-                                        type_of_plot: detail.type_of_plot
-                                    }))
-                                }
-                            }
-                        });
+                // Check if type_of_assets is 'Building' and floordata is a valid array
+if (type_of_assets === 'Building' && Array.isArray(floordata)) {
+    for (const floor of floordata) {
+        if (existingFloorIds?.includes(floor.id)) {
+            await tx.floorData.update({
+                where: { id: floor.id },
+                data: {
+                    floor: floor.floor,
+                    plotCount: floor.plotCount,
+                    type: floor.type,
+                    details: {
+                        deleteMany: { floorDataId: floor.id },
+                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                            index: detail.index,
+                            type: detail.type,
+                            length: detail.length,
+                            breadth: detail.breadth,
+                            height: detail.height,
+                            name: detail.name,
+                            property_name: detail.property_name,
+                            type_of_plot: detail.type_of_plot
+                        })) : []
                     }
                 }
-            }
+            });
+        } else {
+            await tx.floorData.create({
+                data: {
+                    floor: String(floor.floor),
+                    plotCount: floor.plotCount,
+                    type: floor.type,
+                    assetsListId: id,
+                    details: {
+                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                            index: detail.index,
+                            type: detail.type,
+                            length: detail.length,
+                            breadth: detail.breadth,
+                            height: detail.height,
+                            name: detail.name,
+                            property_name: detail.property_name,
+                            type_of_plot: detail.type_of_plot
+                        })) : []
+                    }
+                }
+            });
+        }
+    }
+}
+
+
                 if (req.body.status === 1) {
                     await tx.asset_fieldOfficer_req.update({
                         where: {
