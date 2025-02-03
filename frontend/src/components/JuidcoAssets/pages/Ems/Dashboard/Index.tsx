@@ -2499,22 +2499,36 @@ export const DashboardMain = () => {
     setEditedDetails(updatedDetails); // Save the updated details to state
   };
 
+  // const handleSaves = () => {
+  //   const updatedFloors = [...savedFloors];
+  //   updatedFloors[editedFloorIndex] = {
+  //     ...updatedFloors[editedFloorIndex],
+  //     details: editedDetails,
+  //   };
+  //   setSavedFloors(updatedFloors);
+
+  //   console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
+
+  //   // Clear the state after saving
+  //   setEditedFloor(null);
+  //   setEditedFloorIndex(null);
+  //   setEditedDetails([]);
+  // };
+
+
   const handleSaves = () => {
     const updatedFloors = [...savedFloors];
-    updatedFloors[editedFloorIndex] = {
-      ...updatedFloors[editedFloorIndex],
-      details: editedDetails,
-    };
+    if (editedFloorIndex !== null) {
+      updatedFloors[editedFloorIndex] = {
+        ...updatedFloors[editedFloorIndex],
+        details: editedDetails,
+        plotCount: editedDetails.filter(detail => detail.type).length, // Recalculate plotCount
+      };
+    }
     setSavedFloors(updatedFloors);
-
-    console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
-
-    // Clear the state after saving
-    setEditedFloor(null);
-    setEditedFloorIndex(null);
-    setEditedDetails([]);
+    setEditedFloorIndex(null); // Exit edit mode
   };
-
+  
 
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
@@ -3471,24 +3485,24 @@ export const DashboardMain = () => {
 
                                         {/* Edit Button */}
                                         {isEditMode ? (
-  <div className="mt-4 flex justify-end">
-    <button
-      onClick={() => handleSaves()}
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
-    >
-      Save
-    </button>
-  </div>
-) : (
-  <div className="mt-4 flex justify-end">
-    <button
-      onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
-      className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
-    >
-      Edit
-    </button>
-  </div>
-)}
+                                          <div className="mt-4 flex justify-end">
+                                            <button
+                                              onClick={() => handleSaves()}
+                                              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
+                                            >
+                                              Save
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <div className="mt-4 flex justify-end">
+                                            <button
+                                              onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
+                                              className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
+                                            >
+                                              Edit
+                                            </button>
+                                          </div>
+                                        )}
 
                                       </div>
                                     );
