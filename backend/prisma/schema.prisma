@@ -72,6 +72,11 @@ model assets_list {
   // details                 details[]
 
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+  is_restructured Boolean @default(false)
+  is_drafted              Boolean @default(false) 
+  location_id             Int     @default(2)    // Foreign key to location model
+
+  locationRelation        location   @relation(fields: [location_id], references: [id])
 
 
   created_at DateTime @default(now()) @map("created_at")
@@ -80,7 +85,7 @@ model assets_list {
 
 model floorData {
   id           Int         @id @default(autoincrement())
-  floor        Int?
+  floor        String?
   plotCount    Int?
   type         String?
   assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)
@@ -195,6 +200,7 @@ model location {
   building_name String? // Added building_name field
   address      String?  // Added address field
   is_active    Boolean?
+  assets       assets_list[] // Back-reference to assets_list
   created_at   DateTime @db.Timestamp
   updated_at   DateTime @db.Timestamp
 }

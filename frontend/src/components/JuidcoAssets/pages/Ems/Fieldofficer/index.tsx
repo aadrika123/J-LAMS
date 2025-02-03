@@ -46,7 +46,7 @@ const Fieldofficer = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
-    const [filterWard, setFilterWard] = useState('');
+    // const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -88,11 +88,12 @@ const Fieldofficer = () => {
     }, [ulbID]);
 
 
-    console.log("userDetails?.ulb_id",ulbID)
+    // console.log("userDetails?.ulb_id",ulbID)
   
 
     const COLUMN = [
         { name: "#" },
+        { name: "ASSET ID" },
         { name: "ASSET NAME" },
         { name: "ASSET TYPE" },
         { name: "LAND TYPE" },
@@ -291,10 +292,10 @@ const Fieldofficer = () => {
         setFilter(e.target.value);
     };
 
-    const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilterWard(e.target.value);
-        console.log("filterWard",filterWard)
-    };
+    // const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setFilterWard(e.target.value);
+    //     console.log("filterWard",filterWard)
+    // };
 
     const handleItemsPerPageChange = (e:any) => {
         setItemsPerPage(Number(e.target.value));
@@ -410,7 +411,7 @@ const Fieldofficer = () => {
         }
     }
 
-    console.log("audit", audit)
+    // console.log("audit", audit)
 
  
     const handleOpenModal = (url:string) => {
@@ -462,15 +463,14 @@ const Fieldofficer = () => {
                         </select>
                     </div>
                     
-                    <div className="max-w-md">
+                    {/* <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
-                            {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
                             <SubHeading>Ward No.</SubHeading>
                         </div>
 
                         <select 
-                            onChange={handleFilterWardChange}
-                            // value={filterWard}
+                            onChange={handleFilterChange}
+                            value={filter}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (
@@ -480,7 +480,7 @@ const Fieldofficer = () => {
                             ))}
                         </select>
 
-                    </div>
+                    </div> */}
 
                     {role == 'Admin' ?
                         <div className='flex gap-4'>
@@ -622,6 +622,7 @@ const Fieldofficer = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
+                                    <td className="px-6 py-4">{item?.id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
@@ -675,7 +676,7 @@ const Fieldofficer = () => {
                        item.status === 3 ? (
                         <Link
             href={`/apply/approve-application/${item?.id}?status=clicked`}
-            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
+            className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
         >
 
             <svg

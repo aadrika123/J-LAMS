@@ -27,13 +27,14 @@ import Jhar from "../../../../assets/Images/jhar.png";
 
 const COLUMN = [
   { name: "#" },
+  { name: "ASSET ID" },
   { name: "ASSET NAME" },
   { name: "ASSET TYPE" },
   { name: "LAND TYPE" },
   { name: "KHATA NO." },
   { name: "WARD NO." },
   { name: "AREA (sqFt.)" },
-  { name: "DOCUMENTS" },
+  // { name: "DOCUMENTS" },
   { name: "ACTIONS" },
   { name: "FIELD OFFICER STATUS" },
   { name: "APPROVER STATUS" },
@@ -192,13 +193,14 @@ const FieldOfficer = () => {
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   <td className="px-4 py-3">{index + 1}</td>
+                  <td className="px-4 py-3">{item?.id}</td>
                   <td className="px-4 py-3">{item?.type_of_assets}</td>
                   <td className="px-4 py-3">{item?.assets_category_type}</td>
                   <td className="px-4 py-3">{item?.type_of_land}</td>
                   <td className="px-4 py-3">{item?.khata_no}</td>
                   <td className="px-4 py-3">{item?.ward_no}</td>
                   <td className="px-4 py-3">{item?.area}</td>
-                  <td className="px-4 py-3" onClick={() => alert("To see documents, go to the view page")}>
+                  {/* <td className="px-4 py-3" onClick={() => alert("To see documents, go to the view page")}>
                     {item?.blue_print?.length && item?.ownership_doc?.length ? (
                       <div className="flex gap-3">
                         <Image src={docs} alt="docs" />
@@ -214,7 +216,7 @@ const FieldOfficer = () => {
                         />
                       </div>
                     )}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">
                     <div className="flex">
                       {/* <Link
