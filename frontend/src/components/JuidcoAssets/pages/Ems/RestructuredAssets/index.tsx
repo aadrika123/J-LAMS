@@ -46,7 +46,7 @@ const RestructuredAsstes = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
-    const [filterWard, setFilterWard] = useState('');
+    // const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [count, setCount] = useState<any>([])
     // const [remarks, setRemarks] = useState<any>('')
@@ -104,11 +104,11 @@ const RestructuredAsstes = () => {
         { name: "APPROVER STATUS" },
     ]
 
-    const fetchData = async (page: number, searchQuery: string, filter: string, itemsPerPage: number, ulbID: number, filterWard: string) => {
+    const fetchData = async (page: number, searchQuery: string, filter: string, itemsPerPage: number, ulbID: number) => {
         console.log("ulbIDulbID", ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&ward_no=${filterWard}`,
+                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -121,8 +121,8 @@ const RestructuredAsstes = () => {
     };
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID,filterWard],
-        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number,filterWard),
+        queryKey: ['assets', currentPage, debouncedSearch, filter, itemsPerPage, ulbID],
+        queryFn: () => fetchData(currentPage, debouncedSearch, filter, itemsPerPage, ulbID as number),
         enabled: !!ulbID,
         staleTime: 1000,
     });
@@ -215,10 +215,10 @@ const RestructuredAsstes = () => {
         setFilter(e.target.value);
     };
 
-        const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-            setFilterWard(e.target.value);
-            console.log("filterWard",filterWard)
-        };
+        // const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        //     setFilterWard(e.target.value);
+        //     console.log("filterWard",filterWard)
+        // };
 
     const handleItemsPerPageChange = (e: any) => {
         setItemsPerPage(Number(e.target.value));
@@ -317,9 +317,9 @@ const RestructuredAsstes = () => {
                         </select>
                     </div>
 
-                    <div className="max-w-md">
+                    {/* <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
-                            {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
+
                             <SubHeading>Ward No.</SubHeading>
                         </div>
 
@@ -335,7 +335,7 @@ const RestructuredAsstes = () => {
                             ))}
                         </select>
 
-                    </div>
+                    </div> */}
 
                     {role == 'Admin' ?
                         <div className='flex gap-4'>
