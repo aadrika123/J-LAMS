@@ -1091,6 +1091,7 @@ class AssetsManagementDao {
 
     update = async (req: Request) => {
         const {
+            id,
             type_of_assets,
             asset_sub_category_name,
             assets_category_type,
@@ -1117,8 +1118,9 @@ class AssetsManagementDao {
             location,
             is_drafted
         } = req.body;
+        console.log("resssss",req.body)
     
-        const id = String(req.query.id);
+        // const id = String(req.query.id);
         const notificationsDao = new NotificationsDao();
     
         try {
@@ -1203,11 +1205,11 @@ class AssetsManagementDao {
                 });
     
                 const existingFloorData = existingAsset.floorData;
-                console.log("existingFloorData",existingFloorData)
+                // console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
-                console.log("existingFloorIds",existingFloorIds)
+                // console.log("existingFloorIds",existingFloorIds)
                 const incomingFloorIds = floordata?.map((floor: any) => floor.id);
-                console.log("incomingFloorIds",incomingFloorIds)
+                // console.log("incomingFloorIds",incomingFloorIds)
     
                 await tx.floorData.deleteMany({
                     where: {
@@ -1217,7 +1219,8 @@ class AssetsManagementDao {
                     }
                 });
     
-                console.log("floorData",floordata)
+                // console.log("floorData",floordata)
+                if(type_of_assets == 'Building'){
                 for (const floor of floordata) {
                     if (existingFloorIds?.includes(floor.id)) {
                         await tx.floorData?.update({
@@ -1268,6 +1271,7 @@ class AssetsManagementDao {
                         });
                     }
                 }
+            }
                 if (req.body.status === 1) {
                     await tx.asset_fieldOfficer_req.update({
                         where: {
