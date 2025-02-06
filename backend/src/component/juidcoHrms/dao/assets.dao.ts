@@ -829,7 +829,7 @@ class AssetsManagementDao {
     
     
     getAllbyId = async (req: Request) => {
-        const id = String(req.query.id)
+        const id = String(req.query.id);
         try {
             const assetGetbyId = await prisma.assets_list.findFirst({
                 where: {
@@ -841,6 +841,7 @@ class AssetsManagementDao {
                             details: true,
                         },
                     },
+                    asset_fieldOfficer: true, 
                 },
             });
             return generateRes({
@@ -849,7 +850,7 @@ class AssetsManagementDao {
         } catch (err) {
             console.log(err);
         }
-    };
+    };    
 
     deletebyId = async (req: Request) => {
         const id = String(req.query.id)
