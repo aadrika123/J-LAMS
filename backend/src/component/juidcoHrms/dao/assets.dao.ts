@@ -745,7 +745,6 @@ class AssetsManagementDao {
         }
     };
     
-
     getRestructuredAssets = async (req: Request) => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
@@ -866,8 +865,233 @@ class AssetsManagementDao {
         }
     };
 
+    // sahil
+    // update = async (req: Request) => {
+    //     const {
+    //         type_of_assets,
+    //         asset_sub_category_name,
+    //         assets_category_type,
+    //         khata_no,
+    //         plot_no,
+    //         ward_no,
+    //         address,
+    //         depreciation_method,
+    //         apreciation_method,
+    //         blue_print,
+    //         ownership_doc,
+    //         type_of_land,
+    //         area,
+    //         order_no,
+    //         order_date,
+    //         acquisition,
+    //         from_whom_acquired,
+    //         mode_of_acquisition,
+    //         status,
+    //         // floorData
+    //         floorData
+    //     } = req.body;
+
+    //     const id = String(req.query.id);
+    //     const notificationsDao = new NotificationsDao();
+
+    //     try {
+    //         const result = await prisma.$transaction(async (tx) => {
+    //             const existingAsset: any = await tx.assets_list.findUnique({
+    //                 where: {
+    //                     id
+    //                 },
+    //                 include: {
+    //                     floorData: {
+    //                         include: {
+    //                             details: true
+    //                         }
+    //                     }
+    //                 }
+    //             });
+
+    //             console.log("existingAsset", existingAsset)
+
+    //             if (!existingAsset) {
+    //                 console.log("Asset not found");
+    //                 throw new Error("Asset not found");
+    //             }
+
+    //             // Log change in status to notifications
+    //             if (existingAsset.status !== status) {
+    //                 await notificationsDao.createNotification(id, status, existingAsset.role);
+    //             }
+
+    //             await tx.assets_list_change_log.create({
+    //                 data: {
+    //                     assetId: id,
+    //                     type_of_assets: existingAsset.type_of_assets,
+    //                     asset_sub_category_name: existingAsset.asset_sub_category_name,
+    //                     assets_category_type: existingAsset.assets_category_type,
+    //                     khata_no: existingAsset.khata_no,
+    //                     plot_no: existingAsset.plot_no,
+    //                     ward_no: existingAsset.ward_no,
+    //                     address: existingAsset.address,
+    //                     depreciation_method: existingAsset.depreciation_method,
+    //                     apreciation_method: existingAsset.apreciation_method,
+    //                     blue_print: existingAsset.blue_print,
+    //                     ownership_doc: existingAsset.ownership_doc,
+    //                     type_of_land: existingAsset.type_of_land,
+    //                     area: existingAsset.area,
+    //                     order_no: existingAsset.order_no,
+    //                     order_date: existingAsset.order_date,
+    //                     acquisition: existingAsset.acquisition,
+    //                     from_whom_acquired: existingAsset.from_whom_acquired,
+    //                     mode_of_acquisition: existingAsset.mode_of_acquisition,
+    //                     status: Number(existingAsset.status),
+    //                     role: existingAsset.role,
+    //                 }
+    //             });
+
+    //             const updatedAsset = await tx.assets_list.update({
+    //                 where: {
+    //                     id
+    //                 },
+    //                 data: {
+    //                     type_of_assets,
+    //                     asset_sub_category_name,
+    //                     assets_category_type,
+    //                     khata_no,
+    //                     plot_no,
+    //                     ward_no,
+    //                     address,
+    //                     depreciation_method,
+    //                     apreciation_method,
+    //                     ownership_doc,
+    //                     blue_print,
+    //                     type_of_land,
+    //                     area,
+    //                     order_no,
+    //                     order_date,
+    //                     acquisition,
+    //                     from_whom_acquired,
+    //                     mode_of_acquisition,
+    //                     status: Number(status),
+    //                     is_drafted:false
+    //                 }
+    //             });
+
+    //             const existingFloorData = existingAsset.floorData;
+    //             const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
+    //             const incomingFloorIds = floorData?.map((floor: any) => floor.id);
+
+    //             await tx.floorData.deleteMany({
+    //                 where: {
+    //                     id: {
+    //                         in: existingFloorIds.filter((id: any) => !incomingFloorIds?.includes(id))
+    //                     }
+    //                 }
+    //             });
+
+    //             for (const floor of floorData) {
+    //                 if (existingFloorIds?.includes(floor.id)) {
+    //                     await tx.floorData?.update({
+    //                         where: {
+    //                             id: floor?.id
+    //                         },
+    //                         data: {
+    //                             floor: floor?.floor,
+    //                             plotCount: floor?.plotCount,
+    //                             type: floor?.type,
+    //                             details: {
+    //                                 deleteMany: {
+    //                                     floorDataId: floor?.id
+    //                                 },
+    //                                 create: floor.details.map((detail: any) => ({
+    //                                     index: detail?.index,
+    //                                     type: detail?.type,
+    //                                     length: detail?.length,
+    //                                     breadth: detail?.breadth,
+    //                                     height: detail?.height,
+    //                                     name: detail?.name,
+    //                                     property_name: detail?.property_name,
+    //                                     type_of_plot: detail?.type_of_plot
+    //                                 }))
+    //                             }
+    //                         }
+    //                     });
+    //                 } else {
+    //                     await tx.floorData.create({
+    //                         data: {
+    //                             floor: floor.floor,
+    //                             plotCount: floor.plotCount,
+    //                             type: floor.type,
+    //                             assetsListId: id,
+    //                             details: {
+    //                                 create: floor.details.map((detail: any) => ({
+    //                                     index: detail.index,
+    //                                     type: detail.type,
+    //                                     length: detail.length,
+    //                                     breadth: detail.breadth,
+    //                                     height: detail.height,
+    //                                     name: detail.name,
+    //                                     property_name: detail.property_name,
+    //                                     type_of_plot: detail.type_of_plot
+    //                                 }))
+    //                             }
+    //                         }
+    //                     });
+    //                 }
+    //             }
+
+    //             if (status === 1) {
+    //                 await tx.asset_fieldOfficer_req.update({
+    //                     where: {
+    //                         assetId: id
+    //                     },
+    //                     data: {
+    //                         long: req.body.long,
+    //                         lat: req.body.lat,
+    //                         remarks: req.body.remarks,
+    //                         image_one: req.body.image_one,
+    //                         image_two: req.body.image_two,
+    //                         image_three: req.body.image_three,
+    //                         image_four: req.body.image_four,
+    //                         image_five: req.body.image_five
+    //                     }
+    //                 });
+    //             }
+
+    //             const existence: number = await prisma.asset_checker_req.count({
+    //                 where: {
+    //                     assetId: id
+    //                 }
+    //             });
+
+    //             if (existence === 0 || status === 2 || status === -2) {
+    //                 await tx.asset_checker_req.update({
+    //                     where: {
+    //                         assetId: updatedAsset?.id
+    //                     },
+    //                     data: {
+    //                         checker_remarks: req.body.checker_remarks
+    //                     }
+    //                 });
+    //             }
+
+    //             return updatedAsset;
+    //         });
+
+    //         console.log("result", result);
+    //         return generateRes(result);
+    //     } catch (error: any) {
+    //         console.error("err", error);
+    //         return error;
+    //     }
+    // };
+
+    // sahil
+
+
+
+
     update = async (req: Request) => {
         const {
+            // id,
             type_of_assets,
             asset_sub_category_name,
             assets_category_type,
@@ -886,16 +1110,21 @@ class AssetsManagementDao {
             acquisition,
             from_whom_acquired,
             mode_of_acquisition,
-            status,
-            // floorData
-            floorData = []
+            role,
+            floordata,
+            no_of_floors,
+            building_name,
+            ulb_id,
+            location,
+            is_drafted
         } = req.body;
-
+        console.log("resssss",req.body)
+    
         const id = String(req.query.id);
         const notificationsDao = new NotificationsDao();
-
+    
         try {
-            const result = await prisma.$transaction(async (tx) => {
+            const result = await prisma.$transaction(async (tx:any) => {
                 const existingAsset: any = await tx.assets_list.findUnique({
                     where: {
                         id
@@ -908,19 +1137,19 @@ class AssetsManagementDao {
                         }
                     }
                 });
-
-                console.log("existingAsset", existingAsset)
-
+    
+                console.log("existingAsset", existingAsset);
+    
                 if (!existingAsset) {
                     console.log("Asset not found");
                     throw new Error("Asset not found");
                 }
-
+    
                 // Log change in status to notifications
-                if (existingAsset.status !== status) {
-                    await notificationsDao.createNotification(id, status, existingAsset.role);
+                if (existingAsset.status !== req.body.status) {
+                    await notificationsDao.createNotification(id, req.body.status, existingAsset.role);
                 }
-
+    
                 await tx.assets_list_change_log.create({
                     data: {
                         assetId: id,
@@ -946,7 +1175,7 @@ class AssetsManagementDao {
                         role: existingAsset.role,
                     }
                 });
-
+    
                 const updatedAsset = await tx.assets_list.update({
                     where: {
                         id
@@ -970,15 +1199,18 @@ class AssetsManagementDao {
                         acquisition,
                         from_whom_acquired,
                         mode_of_acquisition,
-                        status: Number(status),
-                        is_drafted:false
+                        status: Number(req.body.status),
+                        is_drafted
                     }
                 });
-
+    
                 const existingFloorData = existingAsset.floorData;
+                // console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
-                const incomingFloorIds = floorData?.map((floor: any) => floor.id);
-
+                // console.log("existingFloorIds",existingFloorIds)
+                const incomingFloorIds = floordata?.map((floor: any) => floor.id);
+                // console.log("incomingFloorIds",incomingFloorIds)
+    
                 await tx.floorData.deleteMany({
                     where: {
                         id: {
@@ -986,59 +1218,60 @@ class AssetsManagementDao {
                         }
                     }
                 });
-
-                for (const floor of floorData) {
-                    if (existingFloorIds?.includes(floor.id)) {
-                        await tx.floorData?.update({
-                            where: {
-                                id: floor?.id
-                            },
-                            data: {
-                                floor: floor?.floor,
-                                plotCount: floor?.plotCount,
-                                type: floor?.type,
-                                details: {
-                                    deleteMany: {
-                                        floorDataId: floor?.id
-                                    },
-                                    create: floor.details.map((detail: any) => ({
-                                        index: detail?.index,
-                                        type: detail?.type,
-                                        length: detail?.length,
-                                        breadth: detail?.breadth,
-                                        height: detail?.height,
-                                        name: detail?.name,
-                                        property_name: detail?.property_name,
-                                        type_of_plot: detail?.type_of_plot
-                                    }))
-                                }
-                            }
-                        });
-                    } else {
-                        await tx.floorData.create({
-                            data: {
-                                floor: floor.floor,
-                                plotCount: floor.plotCount,
-                                type: floor.type,
-                                assetsListId: id,
-                                details: {
-                                    create: floor.details.map((detail: any) => ({
-                                        index: detail.index,
-                                        type: detail.type,
-                                        length: detail.length,
-                                        breadth: detail.breadth,
-                                        height: detail.height,
-                                        name: detail.name,
-                                        property_name: detail.property_name,
-                                        type_of_plot: detail.type_of_plot
-                                    }))
-                                }
-                            }
-                        });
+    
+                // console.log("floorData",floordata)
+                // Check if type_of_assets is 'Building' and floordata is a valid array
+if (type_of_assets === 'Building' && Array.isArray(floordata)) {
+    for (const floor of floordata) {
+        if (existingFloorIds?.includes(floor.id)) {
+            await tx.floorData.update({
+                where: { id: floor.id },
+                data: {
+                    floor: floor.floor,
+                    plotCount: floor.plotCount,
+                    type: floor.type,
+                    details: {
+                        deleteMany: { floorDataId: floor.id },
+                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                            index: detail.index,
+                            type: detail.type,
+                            length: detail.length,
+                            breadth: detail.breadth,
+                            height: detail.height,
+                            name: detail.name,
+                            property_name: detail.property_name,
+                            type_of_plot: detail.type_of_plot
+                        })) : []
                     }
                 }
+            });
+        } else {
+            await tx.floorData.create({
+                data: {
+                    floor: String(floor.floor),
+                    plotCount: floor.plotCount,
+                    type: floor.type,
+                    assetsListId: id,
+                    details: {
+                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                            index: detail.index,
+                            type: detail.type,
+                            length: detail.length,
+                            breadth: detail.breadth,
+                            height: detail.height,
+                            name: detail.name,
+                            property_name: detail.property_name,
+                            type_of_plot: detail.type_of_plot
+                        })) : []
+                    }
+                }
+            });
+        }
+    }
+}
 
-                if (status === 1) {
+
+                if (req.body.status === 1) {
                     await tx.asset_fieldOfficer_req.update({
                         where: {
                             assetId: id
@@ -1055,14 +1288,14 @@ class AssetsManagementDao {
                         }
                     });
                 }
-
+    
                 const existence: number = await prisma.asset_checker_req.count({
                     where: {
                         assetId: id
                     }
                 });
-
-                if (existence === 0 || status === 2 || status === -2) {
+    
+                if (existence === 0 || req.body.status === 2 || req.body.status === -2) {
                     await tx.asset_checker_req.update({
                         where: {
                             assetId: updatedAsset?.id
@@ -1072,18 +1305,53 @@ class AssetsManagementDao {
                         }
                     });
                 }
-
+    
+                const existingLocation = await tx.location.findFirst({
+                    where: { location },
+                });
+    
+                if (existingLocation) {
+                    if (!existingLocation.building_name || !existingLocation.address) {
+                        await tx.location.update({
+                            where: { id: existingLocation.id },
+                            data: {
+                                building_name: existingLocation.building_name || building_name || '',
+                                address: existingLocation.address || address || '',
+                                updated_at: new Date(),
+                            },
+                        });
+                    }
+                } else {
+                    await tx.location.create({
+                        data: {
+                            location: location || '',
+                            ulb_id,
+                            building_name: building_name || '',
+                            address: address || '',
+                            is_active: true,
+                            created_at: new Date(),
+                            updated_at: new Date(),
+                        },
+                    });
+                }
+    
+                await notificationsDao.createNotification(updatedAsset.id, req.body.status, req.body.role);
+    
                 return updatedAsset;
             });
-
+    
             console.log("result", result);
             return generateRes(result);
+    
         } catch (error: any) {
             console.error("err", error);
             return error;
         }
     };
+    
 
+    
+    
 
     // update = async (req: Request) => {
     //     const {

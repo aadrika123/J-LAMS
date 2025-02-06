@@ -46,6 +46,7 @@ const RestructuredAsstes = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState(search);
     const [filter, setFilter] = useState('');
+    // const [filterWard, setFilterWard] = useState('');
     const [role, setRole] = useState('');
     const [count, setCount] = useState<any>([])
     // const [remarks, setRemarks] = useState<any>('')
@@ -107,7 +108,7 @@ const RestructuredAsstes = () => {
         console.log("ulbIDulbID", ulbID)
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}`,
+                url: `${ASSETS.LIST.getRestructuredAssets}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}}`,
                 method: "GET",
             });
             setCount(res?.data)
@@ -214,6 +215,11 @@ const RestructuredAsstes = () => {
         setFilter(e.target.value);
     };
 
+        // const handleFilterWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        //     setFilterWard(e.target.value);
+        //     console.log("filterWard",filterWard)
+        // };
+
     const handleItemsPerPageChange = (e: any) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1);
@@ -284,7 +290,7 @@ const RestructuredAsstes = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application
+                    Restructured  Application
                     </InnerHeading>
                 </div>
             </div>
@@ -311,15 +317,15 @@ const RestructuredAsstes = () => {
                         </select>
                     </div>
 
-                    <div className="max-w-md">
+                    {/* <div className="max-w-md">
                         <div className='flex gap-3 mb-9'>
-                            {/* <Image src={Customer} alt="employee" width={40} height={20} /> */}
+
                             <SubHeading>Ward No.</SubHeading>
                         </div>
 
                         <select
-                            onChange={handleFilterChange}
-                            value={filter}
+                            onChange={handleFilterWardChange}
+                            value={filterWard}
                             className="block p-2.5 mt-3 rounded-md w-[6rem] z-20 h-10 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                         >
                             {Array.from({ length: 55 }, (_, index) => (
@@ -329,7 +335,7 @@ const RestructuredAsstes = () => {
                             ))}
                         </select>
 
-                    </div>
+                    </div> */}
 
                     {role == 'Admin' ?
                         <div className='flex gap-4'>

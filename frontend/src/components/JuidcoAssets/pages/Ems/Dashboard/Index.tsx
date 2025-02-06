@@ -2192,7 +2192,7 @@ export const DashboardMain = () => {
     .required("Order Date is required"),
   // });
 
-  location: Yup.date()
+  // location: Yup.date()
   // .max(new Date(), "Order Date cannot be in the future")
   // .required("Location is required")
 });
@@ -2499,25 +2499,40 @@ export const DashboardMain = () => {
     setEditedDetails(updatedDetails); // Save the updated details to state
   };
 
+  // const handleSaves = () => {
+  //   const updatedFloors = [...savedFloors];
+  //   updatedFloors[editedFloorIndex] = {
+  //     ...updatedFloors[editedFloorIndex],
+  //     details: editedDetails,
+  //   };
+  //   setSavedFloors(updatedFloors);
+
+  //   console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
+
+  //   // Clear the state after saving
+  //   setEditedFloor(null);
+  //   setEditedFloorIndex(null);
+  //   setEditedDetails([]);
+  // };
+
+
   const handleSaves = () => {
     const updatedFloors = [...savedFloors];
-    updatedFloors[editedFloorIndex] = {
-      ...updatedFloors[editedFloorIndex],
-      details: editedDetails,
-    };
+    if (editedFloorIndex !== null) {
+      updatedFloors[editedFloorIndex] = {
+        ...updatedFloors[editedFloorIndex],
+        details: editedDetails,
+        plotCount: editedDetails.filter((detail: { type: any; }) => detail.type).length, // Recalculate plotCount
+      };
+    }
     setSavedFloors(updatedFloors);
-
-    console.log("Updated Floor Data:", updatedFloors[editedFloorIndex]);
-
-    // Clear the state after saving
-    setEditedFloor(null);
-    setEditedFloorIndex(null);
-    setEditedDetails([]);
+    setEditedFloorIndex(null); // Exit edit mode
   };
-
+  
 
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
+    // console.log("sddfsd26")
     try {
       // Merging commercial and residential units
 
@@ -3471,24 +3486,24 @@ export const DashboardMain = () => {
 
                                         {/* Edit Button */}
                                         {isEditMode ? (
-  <div className="mt-4 flex justify-end">
-    <button
-      onClick={() => handleSaves()}
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
-    >
-      Save
-    </button>
-  </div>
-) : (
-  <div className="mt-4 flex justify-end">
-    <button
-      onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
-      className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
-    >
-      Edit
-    </button>
-  </div>
-)}
+                                          <div className="mt-4 flex justify-end">
+                                            <button
+                                              onClick={() => handleSaves()}
+                                              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
+                                            >
+                                              Save
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <div className="mt-4 flex justify-end">
+                                            <button
+                                              onClick={() => handleEditFloor(floor, index)} // Pass the index along with the floor data
+                                              className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-200"
+                                            >
+                                              Edit
+                                            </button>
+                                          </div>
+                                        )}
 
                                       </div>
                                     );
@@ -3696,35 +3711,39 @@ export const DashboardMain = () => {
                       }}
                     />
 
+<div className="flex flex-col w-full">
+                   <label className="flex items-center">
+   Order Date
+    <span className="text-red-500 ml-1">*</span>
+  </label>
+
                     
                     <InputBox
-                      // onChange={handleChange}
-                      onChange={(e) => {
-                        if (handleDateChange(e as any)) {
-                          handleChange(e);
-                        }
-                      }}
-                      onBlur={handleBlur}
-                      error={errors.order_date}
-                      touched={touched.order_date}
-                      value={values.order_date}
-                      label="Order Date"
-                      name="order_date"
-                      type="date"
-                      placeholder={"Enter order date"}
-                      onKeyPress={(e: any) => {
-                        if (
-                          (
+                        // onChange={handleChange}
+                        onChange={(e) => {
+                          if (handleDateChange(e as any)) {
+                            handleChange(e);
+                          }
+                        } }
+                        onBlur={handleBlur}
+                        error={errors.order_date}
+                        touched={touched.order_date}
+                        value={values.order_date}
+                        // label="Order Date"
+                        name="order_date"
+                        type="date"
+                        placeholder={"Enter order date"}
+                        onKeyPress={(e: any) => {
+                          if ((
                             (e.key >= "a" || e.key >= "z") ||
                             (e.key <= "A" || e.key <= "Z") ||
                             (e.key <= "0" || e.key <= "9") ||
                             e.key === " "
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
+                          )) {
+                            e.preventDefault();
+                          }
+                        } } label={undefined}                    />
+                    </div>
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -3747,27 +3766,33 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
+                   <div className="flex flex-col w-full">
+                   <label className="flex items-center">
+    Date of Acquisition
+    <span className="text-red-500 ml-1">*</span>
+  </label>
                     <InputBox
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.acquisition}
-                      label="Date of Acquisition"
-                      placeholder={"Enter Your Acquisition"}
-                      name="acquisition"
-                      type="date"
-                      onKeyPress={(e: any) => {
-                        if (
-                          (
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={errors.acquisition}
+                        value={values.acquisition}
+                        // label="Date of Acquisition"
+                        placeholder={"Enter Your Acquisition"}
+                        name="acquisition"
+                        type="date"
+                        onKeyPress={(e: any) => {
+                          if ((
                             (e.key >= "a" || e.key >= "z") ||
                             (e.key <= "A" || e.key <= "Z") ||
                             (e.key <= "0" || e.key <= "9") ||
                             e.key === " "
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
+                          )) {
+                            e.preventDefault();
+                          }
+                        } } label={undefined}                    />
+
+                    </div>
+                   
                     <SelectForNoApi
                       onChange={handleChange}
                       onBlur={handleBlur}
