@@ -1119,13 +1119,14 @@ class AssetsManagementDao {
             location,
             is_drafted
         } = req.body;
-        console.log("resssss",req.body)
-    
+        // console.log("resssss",req.body)
+
         const id = String(req.query.id);
+        const isMobile = Boolean(req.query.isMobile) || false;
         const notificationsDao = new NotificationsDao();
-    
+
         try {
-            const result = await prisma.$transaction(async (tx:any) => {
+            const result = await prisma.$transaction(async (tx: any) => {
                 const existingAsset: any = await tx.assets_list.findUnique({
                     where: {
                         id
@@ -1138,19 +1139,18 @@ class AssetsManagementDao {
                         }
                     }
                 });
-    
-                console.log("existingAsset", existingAsset);
-    
+
+
                 if (!existingAsset) {
                     console.log("Asset not found");
                     throw new Error("Asset not found");
                 }
-    
+
                 // Log change in status to notifications
                 if (existingAsset.status !== req.body.status) {
                     await notificationsDao.createNotification(id, req.body.status, existingAsset.role);
                 }
-    
+
                 await tx.assets_list_change_log.create({
                     data: {
                         assetId: id,
@@ -1176,7 +1176,6 @@ class AssetsManagementDao {
                         role: existingAsset.role,
                     }
                 });
-    
                 const updatedAsset = await tx.assets_list.update({
                     where: {
                         id
@@ -1204,72 +1203,75 @@ class AssetsManagementDao {
                         is_drafted
                     }
                 });
-    
+
                 const existingFloorData = existingAsset.floorData;
                 // console.log("existingFloorData",existingFloorData)
                 const existingFloorIds = existingFloorData?.map((floor: any) => floor.id);
                 // console.log("existingFloorIds",existingFloorIds)
                 const incomingFloorIds = floordata?.map((floor: any) => floor.id);
                 // console.log("incomingFloorIds",incomingFloorIds)
-    
-                await tx.floorData.deleteMany({
-                    where: {
-                        id: {
-                            in: existingFloorIds.filter((id: any) => !incomingFloorIds?.includes(id))
+
+                if (isMobile === false) {
+                    await tx.floorData.deleteMany({
+                        where: {
+                            id: {
+                                in: existingFloorIds.filter((id: any) => !incomingFloorIds?.includes(id))
+                            }
                         }
-                    }
-                });
-    
+                    });
+                } 
+
+
                 // console.log("floorData",floordata)
                 // Check if type_of_assets is 'Building' and floordata is a valid array
-if (type_of_assets === 'Building' && Array.isArray(floordata)) {
-    for (const floor of floordata) {
-        if (existingFloorIds?.includes(floor.id)) {
-            await tx.floorData.update({
-                where: { id: floor.id },
-                data: {
-                    floor: floor.floor,
-                    plotCount: floor.plotCount,
-                    type: floor.type,
-                    details: {
-                        deleteMany: { floorDataId: floor.id },
-                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
-                            index: detail.index,
-                            type: detail.type,
-                            length: detail.length,
-                            breadth: detail.breadth,
-                            height: detail.height,
-                            name: detail.name,
-                            property_name: detail.property_name,
-                            type_of_plot: detail.type_of_plot
-                        })) : []
+                if (type_of_assets === 'Building' && Array.isArray(floordata)) {
+                    for (const floor of floordata) {
+                        if (existingFloorIds?.includes(floor.id)) {
+                            await tx.floorData.update({
+                                where: { id: floor.id },
+                                data: {
+                                    floor: floor.floor,
+                                    plotCount: floor.plotCount,
+                                    type: floor.type,
+                                    details: {
+                                        deleteMany: { floorDataId: floor.id },
+                                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                                            index: detail.index,
+                                            type: detail.type,
+                                            length: detail.length,
+                                            breadth: detail.breadth,
+                                            height: detail.height,
+                                            name: detail.name,
+                                            property_name: detail.property_name,
+                                            type_of_plot: detail.type_of_plot
+                                        })) : []
+                                    }
+                                }
+                            });
+                        } else {
+                            await tx.floorData.create({
+                                data: {
+                                    floor: String(floor.floor),
+                                    plotCount: floor.plotCount,
+                                    type: floor.type,
+                                    assetsListId: id,
+                                    details: {
+                                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
+                                            index: detail.index,
+                                            type: detail.type,
+                                            length: detail.length,
+                                            breadth: detail.breadth,
+                                            height: detail.height,
+                                            name: detail.name,
+                                            property_name: detail.property_name,
+                                            type_of_plot: detail.type_of_plot
+                                        })) : []
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
-            });
-        } else {
-            await tx.floorData.create({
-                data: {
-                    floor: String(floor.floor),
-                    plotCount: floor.plotCount,
-                    type: floor.type,
-                    assetsListId: id,
-                    details: {
-                        create: Array.isArray(floor.details) ? floor.details.map((detail: any) => ({
-                            index: detail.index,
-                            type: detail.type,
-                            length: detail.length,
-                            breadth: detail.breadth,
-                            height: detail.height,
-                            name: detail.name,
-                            property_name: detail.property_name,
-                            type_of_plot: detail.type_of_plot
-                        })) : []
-                    }
-                }
-            });
-        }
-    }
-}
 
 
                 if (req.body.status === 1) {
@@ -1289,13 +1291,13 @@ if (type_of_assets === 'Building' && Array.isArray(floordata)) {
                         }
                     });
                 }
-    
+
                 const existence: number = await prisma.asset_checker_req.count({
                     where: {
                         assetId: id
                     }
                 });
-    
+
                 if (existence === 0 || req.body.status === 2 || req.body.status === -2) {
                     await tx.asset_checker_req.update({
                         where: {
@@ -1306,11 +1308,11 @@ if (type_of_assets === 'Building' && Array.isArray(floordata)) {
                         }
                     });
                 }
-    
+
                 const existingLocation = await tx.location.findFirst({
                     where: { location },
                 });
-    
+
                 if (existingLocation) {
                     if (!existingLocation.building_name || !existingLocation.address) {
                         await tx.location.update({
@@ -1335,15 +1337,15 @@ if (type_of_assets === 'Building' && Array.isArray(floordata)) {
                         },
                     });
                 }
-    
+
                 await notificationsDao.createNotification(updatedAsset.id, req.body.status, req.body.role);
-    
+
                 return updatedAsset;
             });
-    
+
             console.log("result", result);
             return generateRes(result);
-    
+
         } catch (error: any) {
             console.error("err", error);
             return error;
