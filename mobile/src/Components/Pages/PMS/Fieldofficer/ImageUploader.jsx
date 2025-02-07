@@ -302,7 +302,7 @@ const ImageUploader = () => {
         };
 
         const response = await axios.post(
-          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}`,
+          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}&isMobile=${true}`,
           data,
           {
             headers: {
