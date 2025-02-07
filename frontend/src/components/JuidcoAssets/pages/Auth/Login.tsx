@@ -72,7 +72,7 @@ const Login = () => {
       
           // Make API request
           const res = await axios.post(
-            "https://aadrikainfomedia.com/auth/api/menu/by-module",
+            "http://localhost:8000/api/menu/by-module",
             requestBody,
            
           );
