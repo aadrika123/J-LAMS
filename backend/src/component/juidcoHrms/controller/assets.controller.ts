@@ -225,6 +225,7 @@ class AssetManagementController {
         apiId: string
     ): Promise<object> => {
 
+
         try {
             const data = await this.assetsManagementDao.update(req);
             // if (!data?.error) {
