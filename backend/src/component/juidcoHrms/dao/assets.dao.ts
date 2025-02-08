@@ -1274,7 +1274,7 @@ class AssetsManagementDao {
                 }
 
 
-                if (req.body.status === 1) {
+                if (req.body.status === 1 || 3) {
                     await tx.asset_fieldOfficer_req.update({
                         where: {
                             assetId: id
