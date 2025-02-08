@@ -19,7 +19,7 @@ const useModulePermission = () => {
 
     axios
       .post(
-        `${process.env.backend}/api/menu/by-module`,
+        `https://jharkhandegovernance.com/auth/api/menu/by-module`,
         requestBody,
         {
           headers: {
