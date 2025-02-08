@@ -1215,8 +1215,147 @@ const View = ({ id }: { id: number }) => {
                 </div>
 
                 <br></br>
+                
 
                 {role === 'Municipal' ? (
+                    <>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+                            <SubHeading>
+                                <Image src={Home3} alt="employee" width={40} height={20} />
+                                <span className="ml-3 text-[#4338CA] text-2xl font-bold">Field Officer Review</span>
+                            </SubHeading>
+
+                            <div></div>
+                            <div></div>
+
+                            <div>
+                                <InnerHeading>Latitude</InnerHeading>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.lat === null ? <>Pending for Verification</> : <> {datas?.data[0]?.lat} </>}</p>
+                            </div>
+
+                            <div>
+                                <InnerHeading>Longitude</InnerHeading>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.long === null ? <>Pending for Verification</> : <>{datas?.data[0]?.long}</>}</p>
+                            </div>
+
+                            <div>
+                                <InnerHeading>Remarks</InnerHeading>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
+                            </div>
+
+                            <div>
+                                <InnerHeading>File Uploaded</InnerHeading>
+
+                                <div className="grid grid-cols-5 gap-4 mt-4 w-[50rem]">
+
+                                    <div className='row'>
+                                        <span className='ml-2'>Image 1</span>
+                                        {datas?.data[0]?.image_one?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_one}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_one === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_one} alt="img1" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className='row '>
+                                        <span className='ml-2'>Image 2</span>
+                                        {datas?.data[0]?.image_two?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_two}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_two === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_two} alt="img2" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className='row '>
+                                        <span className='ml-2'>Image 3</span>
+                                        {datas?.data[0]?.image_three?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_three}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_three === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_three} alt="img3" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className='row '>
+                                        <span className='ml-2'>Image 4</span>
+                                        {datas?.data[0]?.image_four?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_four}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_four === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_four} alt="img4" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className='row '>
+                                        <span className='ml-2'>Image 5</span>
+                                        {datas?.data[0]?.image_five?.endsWith('.pdf') ? (
+                                            <>
+                                                {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p> :
+                                                    <iframe className='w-50 h-40 mt-2 overflow-x-hidden' src={datas?.data[0]?.image_five}></iframe>
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                {datas?.data[0]?.image_five === null ? <p className='text-[#4338CA] mt-4 font-bold'> Pending for Verification</p>
+                                                    : <img className='w-20 h-20 mt-2' src={datas?.data[0]?.image_five} alt="img5" width="100" height="30" />
+                                                }
+                                            </>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
+                            <SubHeading>
+                                <Image src={Home3} alt="employee" width={40} height={20} />
+                                <span className="ml-3 text-[#4338CA] text-2xl font-bold">Admin Review</span>
+                            </SubHeading>
+                            <div></div>
+                            <div></div>
+                            <div>
+                                <InnerHeading>Remarks</InnerHeading>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datass?.data[0]?.checker_remarks === null ? <>Pending for Verification</> : <>{datass?.data[0]?.checker_remarks}</>}</p>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <> </>
+                )}
+
+                 {role === 'Admin' ? (
                     <>
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 border-b-2 pb-4 p-10 h-auto  shadow-md">
                             <SubHeading>
