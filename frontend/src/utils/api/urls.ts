@@ -32,6 +32,10 @@ type Urls = {
     locationselect?: string;
     notifications?: string;
     buildingName?: string;
+    layout?: string;
+    sidebar?: string;
+    login?: string;
+    modulePermission?: string;
   };
 };
 
