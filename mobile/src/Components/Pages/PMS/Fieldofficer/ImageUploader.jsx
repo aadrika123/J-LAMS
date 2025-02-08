@@ -268,12 +268,21 @@ const ImageUploader = () => {
     }
   };
 
-  const handleOpenModal = (message, action) => {
-    console.log("message", message)
-    setModalMessage(message);
-    setActionHandler(() => action);
+  // const handleOpenModal = (message, action) => {
+  //   console.log("message", message)
+  //   setModalMessage(message);
+  //   setActionHandler(() => action);
 
+  // };
+
+  const handleOpenModal = (message, action) => {
+    setModalMessage(message);
+    setActionHandler(() => (finalRemarks) => action(finalRemarks)); // Pass final remarks
+    setIsModalOpen(true);
   };
+  
+  
+  
 
 
 
@@ -285,14 +294,16 @@ const ImageUploader = () => {
 
 
 
-  const handleApprove = async () => {
+  const handleApprove = async (finalRemarks) => {
+
+    console.log("Final remarks in handleApprove:", finalRemarks);
     try {
       const fileUrls = await handleUpload();
       if (fileUrls) {
         const data = {
           long: String(longitude) ?? null,
           lat: String(latitude) ?? null,
-          remarks,
+          remarks : finalRemarks,
           image_one: fileUrls[0] ?? null,
           image_two: fileUrls[1] ?? null,
           image_three: fileUrls[2] ?? null,
