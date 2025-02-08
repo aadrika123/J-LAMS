@@ -14,8 +14,10 @@ import { Request, Response } from "express";
 
 // console.log(process.env.DMS_URL_POST)
 
+// console.log(process.env.DMS_URL_POST)
+
 const dmsUrl = process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/upload";
-const DMS_GET =   process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
+const DMS_GET =   process.env.DMS_GET_URL || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
 
 
 // const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";
