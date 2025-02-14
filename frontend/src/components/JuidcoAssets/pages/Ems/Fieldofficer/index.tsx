@@ -380,7 +380,7 @@ const Fieldofficer = () => {
 
     const appApprover = async (assetId: any , asset_id:any) => {
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: 2,
@@ -399,7 +399,7 @@ const Fieldofficer = () => {
     const appReject = async (assetId: any , asset_id:any) => {
         console.log("remarks", remarks)
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: -2,

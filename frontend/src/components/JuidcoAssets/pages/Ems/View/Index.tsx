@@ -1194,7 +1194,7 @@ const View = ({ id }: { id: number }) => {
                             </SubHeading>
                             {/* <InnerHeading></InnerHeading> */}
                             <div className="mt-5 w-full">
-                                <div className="grid grid-cols-5 gap-5 w-full">
+                                <div className="grid grid-cols-4 gap-5 w-full">
                                     {data?.data?.floorData?.map((floor: any) =>
                                         floor.details?.map((detail: any) => (
                                             <div key={detail.id} className="bg-gradient-to-r from-[#D1E8E2] to-[#E4D1E8] shadow-lg rounded-lg p-6">
@@ -1205,7 +1205,8 @@ const View = ({ id }: { id: number }) => {
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
-                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
+                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Owner Name :</span> {detail.name}</p>
+                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Property Name :</span> {detail.property_name}</p>
                                             </div>
                                         ))
                                     )}
