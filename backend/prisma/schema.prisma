@@ -41,8 +41,52 @@ datasource db {
 //   updated_at DateTime @updatedAt @map("updated_at")
 // }
 
+// model assets_list {
+//   id                      String @id @default(cuid())
+//   type_of_assets          String?
+//   asset_sub_category_name String?
+//   assets_category_type    String?
+//   khata_no                String?
+//   plot_no                 String?
+//   ward_no                 String?
+//   building_name           String?
+//   address                 String?
+//   ulb_id                  Int?  
+//   depreciation_method     String?
+//   location                String?
+//   apreciation_method      String?
+//   blue_print              String?
+//   ownership_doc           String?
+//   type_of_land            String?
+//   area                    String?
+//   order_no                String?                  @unique
+//   order_date              String?
+//   acquisition             String?
+//   from_whom_acquired      String?
+//   mode_of_acquisition     String?
+//   role                    String?
+//   no_of_floors            Int?
+//   asset_list              assets_list_change_log[]
+//   asset_fieldOfficer      asset_fieldOfficer_req?
+//   floorData               floorData[]
+//   // details                 details[]
+
+//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+//   is_restructured Boolean @default(false)
+//   is_drafted              Boolean @default(false) 
+//   location_id             Int     @default(2)    // Foreign key to location model
+
+//   locationRelation        location   @relation(fields: [location_id], references: [id])
+
+
+//   created_at DateTime @default(now()) @map("created_at")
+//   updated_at DateTime @updatedAt @map("updated_at")
+// }
+
+
 model assets_list {
-  id                      String @id @default(cuid())
+  id                      Int     @id @default(autoincrement()) // Changed from String to Int with auto-increment
+  assets_id               String  @unique // New field to store the custom asset ID
   type_of_assets          String?
   asset_sub_category_name String?
   assets_category_type    String?
@@ -69,19 +113,18 @@ model assets_list {
   asset_list              assets_list_change_log[]
   asset_fieldOfficer      asset_fieldOfficer_req?
   floorData               floorData[]
-  // details                 details[]
 
-  status Int? @default(0) // 0: pending, 1: approved, -1: rejected
-  is_restructured Boolean @default(false)
+  status                  Int? @default(0) // 0: pending, 1: approved, -1: rejected
+  is_restructured         Boolean @default(false)
   is_drafted              Boolean @default(false) 
   location_id             Int     @default(2)    // Foreign key to location model
 
   locationRelation        location   @relation(fields: [location_id], references: [id])
 
-
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
 }
+
 
 model floorData {
   id           Int         @id @default(autoincrement())
@@ -89,7 +132,7 @@ model floorData {
   plotCount    Int?
   type         String?
   assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)
-  assetsListId String 
+  assetsListId Int 
 
   details details[]
 
@@ -140,7 +183,7 @@ model assets_list_change_log {
   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
 
   asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  assetId String 
+  assetId Int 
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
@@ -150,7 +193,7 @@ model asset_checker_req {
   id Int @id @default(autoincrement())
 
   fieldOfficer    asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId], onDelete: Cascade)
-  assetId         String                     @unique
+  assetId         Int                     @unique
   checker_remarks String?
 
   createdAt DateTime @default(now())
@@ -170,7 +213,7 @@ model asset_fieldOfficer_req {
   image_five  String?
 
   asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  assetId String          @unique
+  assetId Int          @unique
 
   asset_checker_req asset_checker_req[]
 

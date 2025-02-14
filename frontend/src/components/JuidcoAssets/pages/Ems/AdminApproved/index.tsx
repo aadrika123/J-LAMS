@@ -471,7 +471,7 @@ const AdminApproved = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
-                                    <td className="px-6 py-4">{item?.id || "---"}</td>
+                                    <td className="px-6 py-4">{item?.assets_id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
@@ -524,7 +524,7 @@ const AdminApproved = () => {
                                             {role === 'Admin' ? null : (
                                                 item.status === 3 ? (
                                                     <Link
-                                                        href={`/assets/assets-approved/${item?.id}?status=clicked`}
+                                                        href={`/assets/assets-approved/${item?.id}?status=clicked&asset_id=${item?.assets_id}`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
                                                     >
 
@@ -565,7 +565,7 @@ const AdminApproved = () => {
                                                     </Link>
                                                 ) : (
                                                     <Link
-                                                        href={`/assets/assets-approved/${item?.id}?status=clicked`}
+                                                        href={`/assets/assets-approved/${item?.id}?status=clicked&asset_id=${item?.assets_id}`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
                                                     >
                                                         <svg
@@ -606,7 +606,7 @@ const AdminApproved = () => {
                                             )}
 
                                             <Link
-                                                href={`/assets/assets-approved/${item?.id}`}
+                                                href={`/assets/assets-approved/${item?.id}?status=clicked&asset_id=${item?.assets_id}`}
 
                                                 className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
                                                 <svg

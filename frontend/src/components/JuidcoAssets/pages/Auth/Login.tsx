@@ -42,7 +42,7 @@ const Login = () => {
       activateWorkingAnimation();
   
       const res = await axios({
-        url: `https://jharkhandegovernance.com/auth/api/login`,
+        url: `${process.env.backend}/api/login`,
         method: "POST",
         data: {
           email: values.user_id,

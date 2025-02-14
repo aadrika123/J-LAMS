@@ -30,6 +30,7 @@ const View = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
     const params = new URLSearchParams(searchParams.toString());
     const status = params.get('status');
+    const asset_id = params.get('assets_id');
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
     const [ulbName, setUlbName] = useState<string>("");
@@ -208,7 +209,7 @@ const View = ({ id }: { id: number }) => {
 
 
             const res = await axios({
-                url: `${ASSETS.LIST.update}?id=${id}`,
+                url: `${ASSETS.LIST.update}?id=${id}&assets_id=${asset_id}`,
                 method: "POST",
                 data: {
                     id,

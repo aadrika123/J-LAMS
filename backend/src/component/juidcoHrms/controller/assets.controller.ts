@@ -637,7 +637,7 @@ class AssetManagementController {
             // Extract filters from query parameters
             const location_id = parseInt(req.query.location_id as string); // Parse location_id as number
             const building_name = req.query.building_name as string;
-            const id = req.query.id as string | undefined; // Parse id as string
+            const id = req.query.id as number | undefined; // Parse id as string
     
             // Call the DAO to fetch filtered assets
             const data = await this.assetsManagementDao.getFilteredAssets(location_id, building_name, id);

@@ -76,6 +76,7 @@ const ImageUploader = () => {
   };
 
   const { id } = useParams();
+  const{assets_id} = useParams();
 
   const handleUpload = async () => {
     if (files.length > 0) {
@@ -134,7 +135,7 @@ const ImageUploader = () => {
         };
 
         const response = await axios.post(
-          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}&isMobile=${true}`,
+          `${API_BASE_URL}/api/lams/v1/asset/update-single/?id=${id}&assets_id=${assets_id}&isMobile=${true}`,
           data,
           {
             headers: {

@@ -39,6 +39,7 @@ const Marketmaster = () => {
     const [box, setBox] = useState<any>(false)
     const [remarks, setRemarks] = useState<any>('')
     const [currentAssetId, setCurrentAssetId] = useState(null);
+    const [currentAssetIdValue, setCurrentAssetIdValue] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
     // const [audit, setAudit] = useState<any>();
     const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -256,22 +257,23 @@ const Marketmaster = () => {
 
     const handleConfirm = () => {
         if (actionType === 'approve') {
-            appApprover(currentAssetId);
+            appApprover(currentAssetId, currentAssetIdValue);
         } else if (actionType === 'reject') {
-            appReject(currentAssetId);
+            appReject(currentAssetId ,currentAssetIdValue);
         }
         setShowModal(false);
-        console.log(showModal)
     };
 
-    const handleApprove = (assetId: any) => {
+    const handleApprove = (assetId: any, asset_id:any) => {
         setCurrentAssetId(assetId);
+        setCurrentAssetIdValue(asset_id); 
         setActionType('approve');
         setBox(true);
     };
 
-    const handleReject = (assetId: any) => {
+    const handleReject = (assetId: any , asset_id:any) => {
         setCurrentAssetId(assetId);
+        setCurrentAssetIdValue(asset_id); 
         setActionType('reject');
         setBox(true);
     };
@@ -284,9 +286,9 @@ const Marketmaster = () => {
         setRemarks(e.target.value);
     };
 
-    const appApprover = async (assetId: any) => {
+    const appApprover = async (assetId: any , asset_id:any) => {
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
             method: "POST",
             data: {
                 status: 2,
@@ -302,10 +304,10 @@ const Marketmaster = () => {
         }
     }
 
-    const appReject = async (assetId: any) => {
+    const appReject = async (assetId: any , asset_id:any) => {
         console.log("remarks", remarks)
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
             method: "POST",
             data: {
                 status: -2,
@@ -539,8 +541,8 @@ const Marketmaster = () => {
                                             {item.status === 1 ? (
                                                 <td className="px-6 py-4">
                                                     <div className='flex justify-start gap-2'>
-                                                        <button onClick={() => { handleApprove(item?.id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
-                                                        <button onClick={() => { handleReject(item?.id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
+                                                        <button onClick={() => { handleApprove(item?.id ,item?.asset_id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
+                                                        <button onClick={() => { handleReject(item?.id ,item?.asset_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
                                                     </div>
                                                 </td>
 
