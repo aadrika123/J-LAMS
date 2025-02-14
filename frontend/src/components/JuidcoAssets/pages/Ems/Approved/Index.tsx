@@ -803,7 +803,7 @@ const Approved = () => {
                                             </Link> */}
 
                                             <Link
-                                                href={`/apply/approve-application/${item?.id}&assets_id=${item?.assets_id}`}
+                                                href={`/apply/approve-application/${item?.id}`}
 
                                                 className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline">
                                                 <svg
