@@ -373,7 +373,7 @@ const Adminhold = () => {
 
     const appApprover = async (assetId: any , asset_id: any) => {
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: 2,
@@ -392,7 +392,7 @@ const Adminhold = () => {
     const appReject = async (assetId: any , asset_id: any) => {
         console.log("remarks", remarks)
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}&asset_id=${asset_id}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: -2,
@@ -873,8 +873,8 @@ const Adminhold = () => {
                                             {item.status === 1 ? (
                                                 <td className="px-6 py-4">
                                                     <div className='flex justify-start gap-2'>
-                                                        <button onClick={() => { handleApprove(item?.id , item?.asset_id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
-                                                        <button onClick={() => { handleReject(item?.id, item?.asset_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
+                                                        <button onClick={() => { handleApprove(item?.id , item?.assets_id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
+                                                        <button onClick={() => { handleReject(item?.id, item?.assets_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
                                                     </div>
                                                 </td>
 
