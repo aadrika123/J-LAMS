@@ -61,7 +61,8 @@ export const ASSETS: Urls = {
     locationDelete: "/asset/location-delete",
     locationselect: "/asset/locationselect?",
     notifications: "/notifications/get",
-    buildingName: "/asset/get-circle-by-location"
+    buildingName: "/asset/get-circle-by-location",
+    getmoduleId: "/menu/by-module",
   },
 };
 

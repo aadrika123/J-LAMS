@@ -31,6 +31,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
     const params = new URLSearchParams(searchParams.toString());
     const status = params.get('status');
+    const asset_id = params.get('asset_id');
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
     const [ulbName, setUlbName] = useState<string>("");
@@ -44,6 +45,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
 
     const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
 
+    console.log("asset_id line 48" ,asset_id)
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -196,9 +198,10 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
             }
 
             values.status = 0;
+            console.log(values, "valuesssssssssssssssss")
 
             const res = await axios({
-                url: `${ASSETS.LIST.reCreate}?assets_id=${id}`,
+                url: `${ASSETS.LIST.reCreate}?assets_id=${asset_id}`,
                 method: "POST",
                 data: {
                     id,

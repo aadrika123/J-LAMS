@@ -191,7 +191,7 @@ const RestructuredAssetsView = () => {
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   <td className="px-4 py-3">{index + 1}</td>
-                  <td className="px-4 py-3">{item?.id}</td>
+                  <td className="px-4 py-3">{item?.assets_id}</td>
                   <td className="px-4 py-3">{item?.type_of_assets}</td>
                   <td className="px-4 py-3">{item?.assets_category_type}</td>
                   <td className="px-4 py-3">{item?.type_of_land}</td>
@@ -256,7 +256,7 @@ const RestructuredAssetsView = () => {
                                             </Link> */}
 
                       <Link
-                        to={`/View-application/${item?.id}`}
+                        to={`/View-application/${item?.id}&assets_id=${item?.assets_id}`}
                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
                       >
                         <svg

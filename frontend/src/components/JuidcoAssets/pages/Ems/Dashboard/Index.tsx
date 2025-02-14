@@ -2577,7 +2577,7 @@ export const DashboardMain = () => {
         toast.success(res?.data?.data?.is_drafted === true ? "Draft saved successfully" : "Assets successfully added");
         resetForm(); // Reset the form after submission
         setIsModalOpen(true);
-        setSucceessId(res?.data?.data?.id);
+        setSucceessId(res?.data?.data?.assets_id);
       } else if (res?.data?.type === "DUPLICATE") {
         toast.error("Duplicate asset data found. Please check and try again.");
       } else {

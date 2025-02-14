@@ -236,7 +236,7 @@ const SideBar: React.FC<SideBarProps> = () => {
     try {
       // Make API request
       const res = await axios.post(
-        `https://jharkhandegovernance.com/auth/api/menu/by-module`,
+        `${process.env.backend}/api/menu/by-module`,
         requestBody,
         {
           headers: {
