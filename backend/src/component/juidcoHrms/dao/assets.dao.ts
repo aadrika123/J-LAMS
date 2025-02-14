@@ -818,6 +818,105 @@ class AssetsManagementDao {
     // };
 
 
+    // getAll = async (req: Request) => {
+    //     const page = Number(req.query.page) || 1;
+    //     const limit = Number(req.query.limit) || 10;
+    //     const search = req.query.search as string || '';
+    //     const filter = req.query.filter as string || '';
+    //     const { ulb_id } = req.body.auth || { ulb_id: 2 };
+    //     const status = Number(req.query.status);
+    //     const land = req.query.land as string || '';
+    //     const ward_no = req.query.ward_no as string || ''; // Extract ward_no from query
+    //     const skip = (page - 1) * limit;
+    
+    //     // Status counts
+    //     const status1Items = await prisma.assets_list.count({ where: { status: 2 } });
+    //     const statusMinus1Items = await prisma.assets_list.count({ where: { status: -2 } });
+    //     const statusPendingAssets = await prisma.assets_list.count({ where: { status: 1 } });
+    
+    //     try {
+    //         // Count with filters
+    //         const count = await prisma.assets_list.count({
+    //             where: {
+    //                 OR: search ? [
+    //                     { type_of_assets: { contains: search, mode: "insensitive" } },
+    //                     { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+    //                     { khata_no: { contains: search, mode: "insensitive" } },
+    //                     { ward_no: { contains: search, mode: "insensitive" } },
+    //                     { assets_category_type: { contains: search, mode: "insensitive" } },
+    //                     { area: { contains: search, mode: "insensitive" } },
+    //                     { assets_id: { contains: search, mode: "insensitive" } }
+    //                 ] : undefined,
+    //                 ulb_id: ulb_id,
+    //                 AND: [
+    //                     filter ? {
+    //                         OR: [
+    //                             { assets_category_type: { equals: filter, mode: "insensitive" } },
+    //                             { type_of_assets: { equals: filter, mode: "insensitive" } }
+    //                         ]
+    //                     } : {},
+    //                     (status === 0 || status) ? { status: { equals: status } } : {},
+    //                     land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
+    //                     ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
+    //                 ]
+    //             }
+    //         });
+    
+    //         const totalPages = Math.ceil(count / limit);
+    
+    //         // Get assets with filters
+    //         const assetGet = await prisma.assets_list.findMany({
+    //             skip: skip,
+    //             take: limit,
+    //             where: {
+    //                 OR: search ? [
+    //                     { type_of_assets: { contains: search, mode: "insensitive" } },
+    //                     { asset_sub_category_name: { contains: search, mode: "insensitive" } },
+    //                     { khata_no: { contains: search, mode: "insensitive" } },
+    //                     { ward_no: { contains: search, mode: "insensitive" } },
+    //                     { assets_category_type: { contains: search, mode: "insensitive" } },
+    //                     { area: { contains: search, mode: "insensitive" } },
+    //                     { assets_id: { contains: search, mode: "insensitive" } }
+    //                 ] : undefined,
+    //                 ulb_id: ulb_id,
+    //                 AND: [
+    //                     filter ? {
+    //                         OR: [
+    //                             { assets_category_type: { equals: filter, mode: "insensitive" } },
+    //                             { type_of_assets: { equals: filter, mode: "insensitive" } }
+    //                         ]
+    //                     } : {},
+    //                     (status === 0 || status) ? { status: { equals: status } } : {},
+    //                     land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
+    //                     ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
+    //                 ]
+    //             },
+    //             include: {
+    //                 floorData: {
+    //                     include: {
+    //                         details: true,
+    //                     },
+    //                 },
+    //             },
+    //             orderBy: {
+    //                 created_at: 'desc'
+    //             }
+    //         });
+    
+    //         return generateRes({
+    //             totalPages,
+    //             count,
+    //             status1Items,
+    //             statusMinus1Items,
+    //             statusPendingAssets,
+    //             page,
+    //             data: assetGet,
+    //         });
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // };
+
     getAll = async (req: Request) => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
@@ -826,8 +925,9 @@ class AssetsManagementDao {
         const { ulb_id } = req.body.auth || { ulb_id: 2 };
         const status = Number(req.query.status);
         const land = req.query.land as string || '';
-        const ward_no = req.query.ward_no as string || ''; // Extract ward_no from query
+        const ward_no = req.query.ward_no as string || '';
         const skip = (page - 1) * limit;
+        const isFieldOfficer = req.query.is_fieldofficer === 'true'; // Ensure boolean conversion
     
         // Status counts
         const status1Items = await prisma.assets_list.count({ where: { status: 2 } });
@@ -857,7 +957,8 @@ class AssetsManagementDao {
                         } : {},
                         (status === 0 || status) ? { status: { equals: status } } : {},
                         land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
-                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
+                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {},
+                        isFieldOfficer ? { is_drafted: false } : {} // Only include is_drafted: false if isFieldOfficer is true
                     ]
                 }
             });
@@ -888,7 +989,8 @@ class AssetsManagementDao {
                         } : {},
                         (status === 0 || status) ? { status: { equals: status } } : {},
                         land ? { type_of_land: { equals: land, mode: "insensitive" } } : {},
-                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {} // Filter by ward_no
+                        ward_no ? { ward_no: { equals: ward_no, mode: "insensitive" } } : {},
+                        isFieldOfficer ? { is_drafted: false } : {} // Only include is_drafted: false if isFieldOfficer is true
                     ]
                 },
                 include: {

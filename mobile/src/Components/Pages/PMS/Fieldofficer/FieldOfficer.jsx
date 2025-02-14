@@ -74,7 +74,7 @@ const FieldOfficer = () => {
 
     try {
       const res = await axios({
-        url: `${API_BASE_URL}/api/lams/v1/asset/get?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}&status=0`,
+        url: `${API_BASE_URL}/api/lams/v1/asset/get?limit=7&page=${page}&search=${debouncedSearch}&filter=${filter}&status=0&is_fieldofficer=${true}`,
         method: "GET",
         headers: {
           Authorization: `Bearer 41899|p9Ua0dvtsdhYBLUU0IhiawM32yC6tYZT9JQQgQpa099f8725`,
