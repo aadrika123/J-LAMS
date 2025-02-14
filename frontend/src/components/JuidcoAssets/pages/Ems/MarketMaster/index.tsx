@@ -71,7 +71,7 @@ const Marketmaster = () => {
         setIsModalOpen(false);
         setModalData(null);
     };
-
+console.log(showModal, "for build solution")
     const BuildingModal: React.FC<BuildingModalProps> = ({ onClose, data }) => (
         <div
             className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center"
