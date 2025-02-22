@@ -12,8 +12,6 @@ import { Request, Response } from "express";
 
 
 
-// console.log(process.env.DMS_URL_POST)
-
 const dmsUrl = process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/upload";
 const DMS_GET =   process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
 

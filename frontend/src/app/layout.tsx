@@ -43,7 +43,7 @@ export default function RootLayout({
         };
 
         const res = await axios.post(
-          `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+          `${process.env.backend}/api/get/services-by-module`,
           requestBody, // Send the request body directly
           {
             headers: {
@@ -52,7 +52,7 @@ export default function RootLayout({
           }
         );
 
-        console.log("API Response:", res.data?.status);
+        // console.log("API Response:", res.data?.status);
 
         if (res.data?.status) {
           router.push('/servicerestriction'); // Navigate to '/servicerestriction'
