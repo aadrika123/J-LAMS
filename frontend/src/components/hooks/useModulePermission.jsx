@@ -19,7 +19,9 @@ const useModulePermission = () => {
 
     axios
       .post(
-        `${process.env.backend}/api/menu/by-module`,
+        "https://aadrikainfomedia.com/auth/api/menu/by-module",
+        // "https://jharkhandegovernance.com/auth",
+        // "http://localhost:8000",
         requestBody,
         {
           headers: {
