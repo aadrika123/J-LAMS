@@ -55,9 +55,9 @@ export default function RootLayout({
 
         console.log("API Response:", res.data?.status);
 
-        if (res.data?.status) {
-          router.push('/servicerestriction'); // Navigate to '/servicerestriction'
-        }
+        // if (res.data?.status) {
+        //   router.push('/servicerestriction'); // Navigate to '/servicerestriction'
+        // }
       }
     } catch (error) {
       console.error("Error:", error);
