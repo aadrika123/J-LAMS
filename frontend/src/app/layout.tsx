@@ -43,7 +43,8 @@ export default function RootLayout({
         };
 
         const res = await axios.post(
-          `${process.env.backend}/api/menu/by-module`,
+          `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+          // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
           requestBody, // Send the request body directly
           {
             headers: {
