@@ -19,8 +19,14 @@ const useModulePermission = () => {
 
     axios
       .post(
-        `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+
+        // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
         // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
+        `https://egov.rsccl.in/auth/api/get/services-by-module`,
+
+        // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+        // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
+
         requestBody,
         {
           headers: {
