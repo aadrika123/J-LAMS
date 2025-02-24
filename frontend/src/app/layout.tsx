@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import StoreProvider from "./storeProvider";
-import { usePathname, useRouter } from "next/navigation"; // Correct import for useRouter
+import { usePathname } from "next/navigation"; // Correct import for useRouter
 // import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
@@ -23,7 +23,7 @@ export default function RootLayout({
   console.log("rendering every time");
 
   const pathname = usePathname(); // Use Next.js's usePathname for routing
-  const router = useRouter(); // Use Next.js's useRouter for navigation
+  // const router = useRouter(); // Use Next.js's useRouter for navigation
 
   console.log("pathname", pathname);
 
@@ -43,9 +43,14 @@ export default function RootLayout({
         };
 
         const res = await axios.post(
+
           // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
           // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
           `https://egov.rsccl.in/auth/api/get/services-by-module`,
+
+          // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+          // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
+
           requestBody, // Send the request body directly
           {
             headers: {
@@ -56,9 +61,9 @@ export default function RootLayout({
 
         console.log("API Response:", res.data?.status);
 
-        if (res.data?.status) {
-          router.push('/servicerestriction'); // Navigate to '/servicerestriction'
-        }
+        // if (res.data?.status) {
+        //   router.push('/servicerestriction'); // Navigate to '/servicerestriction'
+        // }
       }
     } catch (error) {
       console.error("Error:", error);
