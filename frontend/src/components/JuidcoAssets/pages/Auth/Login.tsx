@@ -65,21 +65,21 @@ const Login = () => {
 
 
 
-        const requestBody = {
-          moduleId: 21,
-        };
+        // const requestBody = {
+        //   moduleId: 21,
+        // };
     
       
-          // Make API request
-          const res = await axios.post(
-           // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
-        // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
-        `https://egov.rsccl.in/auth/api/get/services-by-module`,
+        //   // Make API request
+        //   const res = await axios.post(
+        //    // `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
+        // // `https://jharkhandegovernance.com/auth/api/get/services-by-module`,
+        // `https://egov.rsccl.in/auth/api/get/services-by-module`,
 
-            requestBody,
+        //     requestBody,
            
-          );
-          console.log("datataa",res)
+        //   );
+        //   console.log("datataa",res)
 
   
         // Dispatch login and redirect user based on user type

@@ -8,7 +8,9 @@ const useModulePermission = () => {
   // Get the URL for api_getFreeMenuList from the ASSETS object
   // const api_getFreeMenuList = ASSETS.LIST.get;
 
-  const token = typeof window !== "undefined" ? window.localStorage.getItem("token") : null;
+  const token = typeof window !== "undefined" ? window.localStorage.getItem("accesstoken") : null;
+
+  console.log(token,"token")
 
   const fetchMenuList = () => {
     if (!token) return; // Avoid fetching if token is not available
