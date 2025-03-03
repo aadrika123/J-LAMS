@@ -50,7 +50,7 @@ export const ASSETS: Urls = {
     count: "/assets/update-list?limit=7",
     getAllData: "/assets/field-officer-list?limit=7",
     getAllAudit: "/assets/auditlog-list?limit=10",
-    updateMany:"/assets/checker-list?limit=100",
+    updateMany: "/assets/checker-list?limit=100",
     getcsvdata: "/asset/getcsvdata?",
     marketcircle: "/asset/marketcircle?",
     locationadd: "/asset/locationadd",
@@ -58,9 +58,8 @@ export const ASSETS: Urls = {
     locationDelete: "/asset/location-delete",
     locationselect: "asset/locationselect?",
     notifications: "/notifications/get",
-    buildingName: "/asset/get-circle-by-location"
-
-    
+    buildingName: "/asset/get-circle-by-location",
+    getmoduleId: undefined
   },
 };
 
