@@ -31,6 +31,10 @@ const ViewByIdList = () => {
     setIsModalOpen(true);
   };
 
+  const [modalImage, setModalImage] = useState(null);
+
+
+
   const closeModal = () => {
     setIsModalOpen(false);
     setModalContent('');
@@ -169,6 +173,14 @@ const ViewByIdList = () => {
             {viewData.type_of_assets === null
               ? 'No data found'
               : viewData.type_of_assets}
+          </p>
+        </div>
+        <div>
+          <InnerHeading>Asset Type</InnerHeading>
+          <p className="text-[#4338CA] mt-2 text-sm sm:text-base md:text-xl">
+            {viewData?.id === null
+              ? 'No data found'
+              : viewData?.id}
           </p>
         </div>
       </div>
@@ -509,6 +521,38 @@ const ViewByIdList = () => {
           </div>
         )}
       </div>
+
+      <div className="p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-4">
+        {["image_one", "image_two", "image_three", "image_four", "image_five"].map((key) => (
+          viewData?.asset_fieldOfficer?.[key] && (
+            <div key={key} className="bg-white rounded-lg shadow p-2 w-24 h-24 flex items-center justify-center">
+              <img
+                src={viewData.asset_fieldOfficer[key]}
+                alt=""
+                className="w-20 h-20 object-cover rounded-md cursor-pointer"
+                onClick={() => setModalImage(viewData.asset_fieldOfficer[key])}
+              />
+            </div>
+          )
+        ))}
+      </div>
+      {modalImage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="relative">
+            <button
+              className="absolute top-2 right-2 bg-white p-1 rounded-full"
+              onClick={() => setModalImage(null)}
+            >
+              ✕
+            </button>
+            <img src={modalImage} alt="Modal" className="w-auto h-auto max-w-screen max-h-screen rounded-md" />
+          </div>
+        </div>
+      )}
+    </div>
+
+
 
       {viewData?.status === 0 && (
   <div className="flex flex-col sm:flex-row items-center justify-center w-full py-4 mt-1 sm:p-8">

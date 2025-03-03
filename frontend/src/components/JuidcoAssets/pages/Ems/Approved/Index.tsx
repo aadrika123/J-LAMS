@@ -91,7 +91,7 @@ const Approved = () => {
     }, [ulbID]);
 
 
-    console.log("userDetails?.ulb_id",ulbID)
+    // console.log("userDetails?.ulb_id",ulbID)
   
 
     const COLUMN = [
@@ -410,7 +410,7 @@ const Approved = () => {
         }
     }
 
-    console.log("audit", audit)
+    // console.log("audit", audit)
 
  
     const handleOpenModal = (url:string) => {
@@ -435,7 +435,7 @@ const Approved = () => {
                 </div>
                 <div>
                     <InnerHeading className="mx-5 my-5 mb-0 text-2xl">
-                        Approval Application
+                        Approval Application 
                     </InnerHeading>
                 </div>
             </div>

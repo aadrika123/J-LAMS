@@ -87,7 +87,7 @@ const Adminhold = () => {
     }, [ulbID]);
 
 
-    console.log("userDetails?.ulb_id",ulbID)
+    // console.log("userDetails?.ulb_id",ulbID)
   
 
     const COLUMN = [
@@ -405,7 +405,7 @@ const Adminhold = () => {
         }
     }
 
-    console.log("audit", audit)
+    // console.log("audit", audit)
 
  
     const handleOpenModal = (url:string) => {

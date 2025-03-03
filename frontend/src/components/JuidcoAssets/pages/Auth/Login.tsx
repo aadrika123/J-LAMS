@@ -65,18 +65,7 @@ const Login = () => {
 
 
 
-        const requestBody = {
-          moduleId: 21,
-        };
-    
-      
-          // Make API request
-          const res = await axios.post(
-            "https://aadrikainfomedia.com/auth/api/menu/by-module",
-            requestBody,
-           
-          );
-          console.log("datataa",res)
+
 
   
         // Dispatch login and redirect user based on user type

@@ -1,6 +1,15 @@
 # Server Configuration
-PORT=5001
+PORT=5006
 
 # Database Configuration
-DATABASE_URL="postgresql://postgres:root@localhost:5432/juidco_hrms?schema=public"
+# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/lams?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/lams?schema=public"
 # "postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+
+# Aadrika
+DMS_URL_POST="https://aadrikainfomedia.com/dms/backend/document/upload"
+DMS_GET_url="https://aadrikainfomedia.com/dms/backend/document/view-by-reference"
+
+# Jharkhand
+# DMS_URL_POST="https://jharkhandegovernance.com/dms/backend/document/upload"
+# DMS_GET_url="https://jharkhandegovernance.com/dms/backend/document/view-by-reference"

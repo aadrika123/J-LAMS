@@ -4,12 +4,11 @@
  * status: Open
  */
 
-type UrlKeys =
-  | "LIST";
+type UrlKeys = "LIST";
 
 type Urls = {
   [key in UrlKeys]: {
-    getmoduleId: any;
+    getmoduleId?: string;  // Marked as optional for consistency
     get?: string;
     getRestructuredAssets?: string;
     create?: string;
@@ -24,12 +23,12 @@ type Urls = {
     validate?: string;
     count?: string;
     getAllData?: string;
-    getAllAudit?:string;
-    getcsvdata?:string;
-    marketcircle?:string;
+    getAllAudit?: string;
+    getcsvdata?: string;
+    marketcircle?: string;
     locationadd?: string;
-    locationEdit?:string;
-    locationDelete?:string;
+    locationEdit?: string;
+    locationDelete?: string;
     locationselect?: string;
     notifications?: string;
     buildingName?: string;
@@ -46,7 +45,7 @@ export const ASSETS: Urls = {
     delete: "/asset/delete-single",
     update: "/asset/update-single",
     getAll: "/assets/ulb-get",
-    validate: "dms/upload-gets",
+    validate: "/dms/upload-gets",
     count: "/assets/update-list?limit=7",
     getAllData: "/assets/field-officer-list?limit=7",
     getAllAudit: "/assets/auditlog-list?limit=10",
@@ -56,17 +55,14 @@ export const ASSETS: Urls = {
     locationadd: "/asset/locationadd",
     locationEdit: "/asset/location-edit",
     locationDelete: "/asset/location-delete",
-    locationselect: "asset/locationselect?",
+    locationselect: "/asset/locationselect?",
     notifications: "/notifications/get",
-    buildingName: "/asset/get-circle-by-location",
-    getmoduleId: undefined
+    buildingName: "/asset/get-circle-by-location"
   },
 };
 
-
-export const module: Urls = {
-  LIST: {
-    getmoduleId: "menu/by-module",
-
-  }
-}
+// export const module: Urls = {
+//   LIST: {
+//     getmoduleId: "/menu/by-module",
+//   },
+// };
