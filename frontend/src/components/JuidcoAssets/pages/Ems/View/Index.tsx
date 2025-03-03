@@ -1378,7 +1378,7 @@ const View = ({ id }: { id: number }) => {
 
                             <div>
                                 <InnerHeading>Remarks</InnerHeading>
-                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>No Review Given</> : <>{datas?.data[0]?.remarks}</>}</p>
                             </div>
 
                             <div>
@@ -1516,7 +1516,7 @@ const View = ({ id }: { id: number }) => {
 
                             <div>
                                 <InnerHeading>Remarks</InnerHeading>
-                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>No Review Given</> : <>{datas?.data[0]?.remarks}</>}</p>
+                                <p className='text-[#4338CA] mt-4 font-bold text-xl'>{datas?.data[0]?.remarks === null ? <>Pending for Verification</> : <>{datas?.data[0]?.remarks}</>}</p>
                             </div>
 
                             <div>
