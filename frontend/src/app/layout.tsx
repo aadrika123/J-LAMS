@@ -1,91 +1,54 @@
-/* eslint-disable react/react-in-jsx-scope */
-'use client'; // Marking the component as client-side
+"use client"; // Mark this file as a client component
 
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
-import StoreProvider from "./storeProvider";
-import { usePathname, useRouter } from "next/navigation"; // Correct import for useRouter
-// import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation"; // Get the current route
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
+const useModulePermission = () => {
+  const pathname = usePathname(); // Get the current pathname
+  const accessToken = typeof window !== "undefined" ? window.localStorage.getItem("token") : null;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  console.log("rendering every time");
+  const fetchMenuList = async () => {
+    if (!accessToken) return; // Avoid fetching if token is not available
 
-  const pathname = usePathname(); // Use Next.js's usePathname for routing
-  const router = useRouter(); // Use Next.js's useRouter for navigation
-
-  console.log("pathname", pathname);
-
-  const dataa = async () => {
     try {
-      // Ensure this code runs only on the client side
-      if (typeof window !== "undefined") {
-        const accessToken = localStorage.getItem("accesstoken");
+      const requestBody = {
+        path: pathname,
+        moduleId: 21,
+      };
 
-        if (!accessToken) {
-          throw new Error("Access token not found in localStorage");
+      const res = await axios.post(
+        `${process.env.backend}/api/get/services-by-module`,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/json",
+          },
         }
+      );
 
-        const requestBody = {
-          path: pathname,
-          moduleId: 21,
-        };
-
-        const res = await axios.post(
-          `https://aadrikainfomedia.com/auth/api/get/services-by-module`,
-          requestBody, // Send the request body directly
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        console.log("API Response:", res.data?.status);
-
-        if (res.data?.status) {
-          router.push('/servicerestriction'); // Navigate to '/servicerestriction'
+      if (res?.data?.status) {
+        const permissions = res?.data?.data?.permission || [];
+        if (permissions.length === 0) {
+          console.warn("You are not authorized");
+          localStorage.clear();
+          window.location.href =
+            "/lams?msg=You are not authorized to access this page. Please contact your administrator.";
         }
+      } else {
+        console.error("Permission check failed: ", res?.data?.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("API request failed:", error);
     }
   };
 
   useEffect(() => {
-    dataa(); // Call the function inside useEffect
-  }, [pathname]); // Add pathname as a dependency
+    fetchMenuList();
+  }, [accessToken]); // Run effect when token changes
 
-  // Example: Conditional rendering based on the route
-  // if (pathname === "/loginsssss") {
-  //   return (
-  //     <html lang="en">
-  //       <body className={inter.className}>
-  //         <ServiceRestrictionLayout />
-  //       </body>
-  //     </html>
-  //   );
-  // }
+  return null;
+};
 
-  return (
-    // eslint-disable-next-line react/react-in-jsx-scope
-    <StoreProvider>
-      <ReactQueryClientProvider>
-        <html lang="en">
-          <body className={inter.className}>{children}</body>
-        </html>
-      </ReactQueryClientProvider>
-    </StoreProvider>
-  );
-}
+export default useModulePermission;
