@@ -38,7 +38,7 @@ const FormikController: React.FC<FormikControllerProps> = (props) => {
   const { control, ...rest } = props;
   switch (control) {
     case "input":
-      return <Input {...rest} />;
+      return <Input autoComplete={""} {...rest} />;
     case "textarea":
       return <TextArea {...rest} />;
     case "radio":
