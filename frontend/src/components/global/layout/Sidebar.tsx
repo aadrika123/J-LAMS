@@ -236,7 +236,13 @@ const SideBar: React.FC<SideBarProps> = () => {
     try {
       // Make API request
       const res = await axios.post(
+<<<<<<< HEAD
         `${process.env.backend}/api/menu/by-module`,
+=======
+        // `https://aadrikainfomedia.com/auth/api/menu/by-module`,
+        // `https://jharkhandegovernance.com/auth/api/menu/by-module`,
+        `https://egov.rsccl.in/auth/api/menu/by-module`,
+>>>>>>> 820c62c53a384a6162701fd6d6c04ec4f4f12ff1
         requestBody,
         {
           headers: {

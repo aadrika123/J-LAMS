@@ -12,8 +12,15 @@ import { Request, Response } from "express";
 
 
 
+<<<<<<< HEAD
+=======
+// console.log(process.env.DMS_URL_POST)
+
+// console.log(process.env.DMS_URL_POST)
+
+>>>>>>> 820c62c53a384a6162701fd6d6c04ec4f4f12ff1
 const dmsUrl = process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/upload";
-const DMS_GET =   process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
+const DMS_GET =   process.env.DMS_GET_URL || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
 
 
 // const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";

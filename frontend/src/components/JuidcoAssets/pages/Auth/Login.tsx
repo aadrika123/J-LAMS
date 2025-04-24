@@ -65,7 +65,25 @@ const Login = () => {
 
 
 
+<<<<<<< HEAD
 
+=======
+        // const requestBody = {
+        //   moduleId: 21,
+        // };
+    
+      
+        //   // Make API request
+        //   const res = await axios.post(
+        //    // `https://aadrikainfomedia.com/auth/api/get/by-module`,
+        // // `https://jharkhandegovernance.com/auth/api/get/by-module`,
+        // `https://egov.rsccl.in/auth/api/get/by-module`,
+
+        //     requestBody,
+           
+        //   );
+        //   console.log("datataa",res)
+>>>>>>> 820c62c53a384a6162701fd6d6c04ec4f4f12ff1
 
   
         // Dispatch login and redirect user based on user type

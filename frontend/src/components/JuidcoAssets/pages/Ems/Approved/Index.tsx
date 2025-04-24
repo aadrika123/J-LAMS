@@ -53,6 +53,7 @@ const Approved = () => {
     const [box, setBox] = useState<any>(false)
     const [remarks, setRemarks] = useState<any>('')
     const [currentAssetId, setCurrentAssetId] = useState(null);
+    const [currentAssetIdValue, setCurrentAssetIdValue] = useState(null);
     const [actionType, setActionType] = useState<any>(null);
     const [audit, setAudit]= useState<any>();
 
@@ -346,21 +347,23 @@ const Approved = () => {
     
     const handleConfirm = () => {
         if (actionType === 'approve') {
-            appApprover(currentAssetId);
+            appApprover(currentAssetId , currentAssetIdValue);
         } else if (actionType === 'reject') {
-            appReject(currentAssetId);
+            appReject(currentAssetId, currentAssetIdValue);
         }
         setShowModal(false);
     };
 
-    const handleApprove = (assetId: any) => {
+    const handleApprove = (assetId: any , asset_id:any) => {
         setCurrentAssetId(assetId);
+        setCurrentAssetIdValue(asset_id); 
         setActionType('approve');
         setBox(true);
     };
 
-    const handleReject = (assetId: any) => {
+    const handleReject = (assetId: any , asset_id:any) => {
         setCurrentAssetId(assetId);
+        setCurrentAssetIdValue(asset_id); 
         setActionType('reject');
         setBox(true);
     };
@@ -373,9 +376,9 @@ const Approved = () => {
         setRemarks(e.target.value);
     };
 
-    const appApprover = async (assetId: any) => {
+    const appApprover = async (assetId: any, asset_id:any) => {
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: 2,
@@ -391,10 +394,10 @@ const Approved = () => {
         }
     }
 
-    const appReject = async (assetId: any) => {
+    const appReject = async (assetId: any , asset_id :any) => {
         console.log("remarks", remarks)
         const res = await axios({
-            url: `${ASSETS.LIST.update}?id=${assetId}`,
+            url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
             data: {
                 status: -2,
@@ -626,7 +629,7 @@ const Approved = () => {
                             {data?.data?.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
-                                    <td className="px-6 py-4">{item?.id || "---"}</td>
+                                    <td className="px-6 py-4">{item?.assets_id || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_assets || "---"}</td>
                                     <td className="px-6 py-4">{item?.assets_category_type || "---"}</td>
                                     <td className="px-6 py-4">{item?.type_of_land || "---"}</td>
@@ -679,7 +682,7 @@ const Approved = () => {
                                             {role === 'Admin' || item.is_drafted != true ? null : (
                                                 item.status === 3 ? (
                                                     <Link
-                                                        href={`/apply/approve-application/${item?.id}?status=clicked`}
+                                                        href={`/apply/approve-application/${item?.id}?status=clicked&assets_id=${item?.assets_id}`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline cursor-not-allowed"
                                                     >
 
@@ -720,7 +723,7 @@ const Approved = () => {
                                                     </Link>
                                                 ) : (
                                                     <Link
-                                                        href={`/apply/approve-application/${item?.id}?status=clicked`}
+                                                        href={`/apply/approve-application/${item?.id}?status=clicked&assets_id=${item?.assets_id}`}
                                                         className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
                                                     >
                                                         <svg
@@ -878,8 +881,8 @@ const Approved = () => {
                                             {item.status === 1 ? (
                                                 <td className="px-6 py-4">
                                                     <div className='flex justify-start gap-2'>
-                                                        <button onClick={() => { handleApprove(item?.id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
-                                                        <button onClick={() => { handleReject(item?.id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
+                                                        <button onClick={() => { handleApprove(item?.id , item?.assets_id ) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
+                                                        <button onClick={() => { handleReject(item?.id, item?.assets_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
                                                     </div>
                                                 </td>
 

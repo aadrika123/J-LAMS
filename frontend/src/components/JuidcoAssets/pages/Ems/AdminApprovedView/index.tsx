@@ -31,6 +31,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
     const params = new URLSearchParams(searchParams.toString());
     const status = params.get('status');
+    const asset_id = params.get('asset_id');
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
     const [ulbName, setUlbName] = useState<string>("");
@@ -44,6 +45,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
 
     const componentRef = useRef<HTMLDivElement | null>(null); // Ref for content to capture as PDF
 
+    console.log("asset_id line 48" ,asset_id)
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -196,9 +198,10 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
             }
 
             values.status = 0;
+            console.log(values, "valuesssssssssssssssss")
 
             const res = await axios({
-                url: `${ASSETS.LIST.reCreate}?assets_id=${id}`,
+                url: `${ASSETS.LIST.reCreate}?assets_id=${asset_id}`,
                 method: "POST",
                 data: {
                     id,
@@ -1207,7 +1210,7 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
                             </SubHeading>
                             {/* <InnerHeading></InnerHeading> */}
                             <div className="mt-5 w-full">
-                                <div className="grid grid-cols-5 gap-5 w-full">
+                                <div className="grid grid-cols-4 gap-5 w-full">
                                     {data?.data?.floorData?.map((floor: any) =>
                                         floor.details?.map((detail: any) => (
                                             <div key={detail.id} className="bg-gradient-to-r from-[#D1E8E2] to-[#E4D1E8] shadow-lg rounded-lg p-6">
@@ -1218,7 +1221,8 @@ const AdiminApprovedView = ({ id }: { id: number }) => {
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Length :</span> {detail.length}</p>
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Breadth :</span> {detail.breadth}</p>
                                                 <p className="text-lg font-semibold mb-3 pb-2 border-b-2 border-[#4338CA]"><span className='text-[#4338CA]'>Height :</span> {detail.height}</p>
-                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Name :</span> {detail.name}</p>
+                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Owner Name :</span> {detail.name}</p>
+                                                <p className="text-lg font-semibold"><span className='text-[#4338CA]'>Property Name :</span> {detail.property_name}</p>
                                             </div>
                                         ))
                                     )}

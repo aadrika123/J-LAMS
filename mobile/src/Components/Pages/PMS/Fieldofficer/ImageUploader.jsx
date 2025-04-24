@@ -76,6 +76,7 @@ const ImageUploader = () => {
   };
 
   const { id } = useParams();
+  const{assets_id} = useParams();
 
   const handleUpload = async () => {
     if (files.length > 0) {

@@ -1,0 +1,68 @@
+/*
+  Warnings:
+
+  - The primary key for the `assets_list` table will be changed. If it partially fails, the table could be left without primary key constraint.
+  - The `id` column on the `assets_list` table would be dropped and recreated. This will lead to data loss if there is data in the column.
+  - A unique constraint covering the columns `[assets_id]` on the table `assets_list` will be added. If there are existing duplicate values, this will fail.
+  - Changed the type of `assetId` on the `asset_checker_req` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+  - Changed the type of `assetId` on the `asset_fieldOfficer_req` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+  - Added the required column `assets_id` to the `assets_list` table without a default value. This is not possible if the table is not empty.
+  - Changed the type of `assetId` on the `assets_list_change_log` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+  - Changed the type of `assetsListId` on the `floorData` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+
+*/
+-- DropForeignKey
+ALTER TABLE "asset_checker_req" DROP CONSTRAINT "asset_checker_req_assetId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "asset_fieldOfficer_req" DROP CONSTRAINT "asset_fieldOfficer_req_assetId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "assets_list_change_log" DROP CONSTRAINT "assets_list_change_log_assetId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "floorData" DROP CONSTRAINT "floorData_assetsListId_fkey";
+
+-- AlterTable
+ALTER TABLE "asset_checker_req" DROP COLUMN "assetId",
+ADD COLUMN     "assetId" INTEGER NOT NULL;
+
+-- AlterTable
+ALTER TABLE "asset_fieldOfficer_req" DROP COLUMN "assetId",
+ADD COLUMN     "assetId" INTEGER NOT NULL;
+
+-- AlterTable
+ALTER TABLE "assets_list" DROP CONSTRAINT "assets_list_pkey",
+ADD COLUMN     "assets_id" TEXT NOT NULL,
+DROP COLUMN "id",
+ADD COLUMN     "id" SERIAL NOT NULL,
+ADD CONSTRAINT "assets_list_pkey" PRIMARY KEY ("id");
+
+-- AlterTable
+ALTER TABLE "assets_list_change_log" DROP COLUMN "assetId",
+ADD COLUMN     "assetId" INTEGER NOT NULL;
+
+-- AlterTable
+ALTER TABLE "floorData" DROP COLUMN "assetsListId",
+ADD COLUMN     "assetsListId" INTEGER NOT NULL;
+
+-- CreateIndex
+CREATE UNIQUE INDEX "asset_checker_req_assetId_key" ON "asset_checker_req"("assetId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "asset_fieldOfficer_req_assetId_key" ON "asset_fieldOfficer_req"("assetId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "assets_list_assets_id_key" ON "assets_list"("assets_id");
+
+-- AddForeignKey
+ALTER TABLE "floorData" ADD CONSTRAINT "floorData_assetsListId_fkey" FOREIGN KEY ("assetsListId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assets_list_change_log" ADD CONSTRAINT "assets_list_change_log_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "asset_checker_req" ADD CONSTRAINT "asset_checker_req_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "asset_fieldOfficer_req"("assetId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "asset_fieldOfficer_req" ADD CONSTRAINT "asset_fieldOfficer_req_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets_list"("id") ON DELETE CASCADE ON UPDATE CASCADE;

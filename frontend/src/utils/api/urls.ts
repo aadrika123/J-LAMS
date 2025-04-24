@@ -32,6 +32,10 @@ type Urls = {
     locationselect?: string;
     notifications?: string;
     buildingName?: string;
+    layout?: string;
+    sidebar?: string;
+    login?: string;
+    modulePermission?: string;
   };
 };
 
@@ -57,7 +61,8 @@ export const ASSETS: Urls = {
     locationDelete: "/asset/location-delete",
     locationselect: "/asset/locationselect?",
     notifications: "/notifications/get",
-    buildingName: "/asset/get-circle-by-location"
+    buildingName: "/asset/get-circle-by-location",
+    getmoduleId: "/menu/by-module",
   },
 };
 

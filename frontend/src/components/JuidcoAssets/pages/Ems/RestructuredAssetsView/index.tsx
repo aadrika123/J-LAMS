@@ -1302,8 +1302,12 @@ console.log("Updated Values:", values);
                       </div>
 
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-lg font-semibold text-[#4338CA]">Name</span>
+                        <span className="text-lg font-semibold text-[#4338CA]">Owner Name</span>
                         <span className="text-lg font-semibold">{detail.name}</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2">
+                        <span className="text-lg font-semibold text-[#4338CA]">Property Name</span>
+                        <span className="text-lg font-semibold">{detail.property_name}</span>
                       </div>
                     </div>
                   </div>
