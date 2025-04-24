@@ -177,6 +177,9 @@ const Login = () => {
                         error={errors.user_id}
                         touched={touched.user_id}
                         name="user_id"
+                         autoComplete="new-username"
+                         onCopy={(e:any) => e.preventDefault()}
+                         onPaste={(e:any) => e.preventDefault()}
                         className="border-0 focus:outline-none"
                       />
                     </div>
@@ -190,6 +193,9 @@ const Login = () => {
                       name="password"
                       type="password"
                       placeholder="Password"
+                       autoComplete="new-password"
+                       onCopy={(e:any) => e.preventDefault()}
+                       onPaste={(e:any) => e.preventDefault()}
                       className="mt-1 border-0 focus:border-0 visible:border-0 focus:outline-none"
 
                     />
