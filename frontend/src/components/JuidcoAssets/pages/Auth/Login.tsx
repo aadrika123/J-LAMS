@@ -16,6 +16,7 @@ import axios from "@/lib/axiosConfig";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/reducers/auth.reducer";
 import Cookies from "js-cookie";
+import CryptoJS from "crypto-js";
 // import { HRMS_URL } from "@/utils/api/urls";
 import { useWorkingAnimation } from "@/components/Helpers/Widgets/useWorkingAnimation";
 
@@ -23,6 +24,30 @@ interface LoginInitialData {
   user_id: string;
   password: string;
 }
+
+
+
+// 🔐 Encrypt password function using AES-256-CBC
+function encryptPassword(plainPassword: string): string {
+  const secretKeyHex =
+    "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7eb06609019115866bc8919ff3ef5503ac49e2442ab2a6b806083c0616e10d2d3d00f530e1ac3363e6e7ad420df3f864aa9cd6b05376dfa360147476efd67f3a56ee467670eb519a6139d4250d8f6dffb030923a25160011c23b296a6ceb291c52f49985cddba1949fa8666d64d199b408c8965761285655ee70a3291d0928a16b3f024281deb11969aa4fa499e313a658790013e0ebe7870b316abdd4aba8c8942ceaa1f365d925d05d77055db5bcb4bb219d93bdb4cf087133f50a8f0b0de5e21f5da89c0438b";
+
+  const secretKeyWA = CryptoJS.enc.Hex.parse(secretKeyHex);
+  const key = CryptoJS.SHA256(secretKeyWA);
+  const ivHex = CryptoJS.SHA256(secretKeyWA).toString().substring(0, 32);
+  const iv = CryptoJS.enc.Hex.parse(ivHex);
+
+  const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+
+
+
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -35,76 +60,41 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
-  ///////////////// Handling Login Logics /////////////
-
-  const handleLogin = async (values: LoginInitialData) => {
+ const handleLogin = async (values: LoginInitialData) => {
     try {
       activateWorkingAnimation();
-  
+
+      const payload = {
+        email: values.user_id,
+        password: encryptPassword(values.password), // 🔐 Encrypted using AES-256-CBC
+      };
+
       const res = await axios({
         url: `${process.env.backend}/api/login`,
         method: "POST",
-        data: {
-          email: values.user_id,
-          password: values.password,
-        },
+        data: payload,
       });
-  
-      console.log(res);
-  
+
       const data = res.data.data;
-  
+
       if (data) {
-        // Store user details and token in localStorage and cookies
         localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
         Cookies.set("emp_id", data?.userDetails?.emp_id);
         Cookies.set("accesstoken", data?.token);
-  
-        // Store token in localStorage
-        localStorage.setItem("accesstoken", data?.token); // Add this line
+        localStorage.setItem("accesstoken", data?.token);
 
-
-
-        // const requestBody = {
-        //   moduleId: 21,
-        // };
-    
-      
-        //   // Make API request
-        //   const res = await axios.post(
-        //    // `https://aadrikainfomedia.com/auth/api/get/by-module`,
-        // // `https://jharkhandegovernance.com/auth/api/get/by-module`,
-        // `https://egov.rsccl.in/auth/api/get/by-module`,
-
-        //     requestBody,
-           
-        //   );
-        //   console.log("datataa",res)
-
-  
-        // Dispatch login and redirect user based on user type
         if (typeof window !== "undefined") {
           const storedData = localStorage.getItem("user_details");
           const userData = storedData && JSON.parse(storedData);
-  
-          if (userData?.user_type === "Municipal") {
-            setErrrrr(false)
+
+          if (userData?.user_type === "Municipal" || userData?.user_type === "Admin") {
+            setErrrrr(false);
             dispatch(login(userData));
             window.location.replace("/lams/apply/approve-application");
-          } else if (userData?.user_type === "Admin") {
-            setErrrrr(false)
-            dispatch(login(userData));
-            window.location.replace("/lams/apply/approve-application");
-          } else{
+          } else {
             hideWorkingAnimation();
-            setErrrrr(true)
-            // window.location.href =
-            //   "/lams/auth/login";
+            setErrrrr(true);
           }
-          // else {
-          //   dispatch(login(userData));
-          //   window.location.replace("/hrms/ems/dashboard");
-          // }
         }
       } else {
         hideWorkingAnimation();
@@ -113,7 +103,7 @@ const Login = () => {
     } catch (error) {
       hideWorkingAnimation();
       setErrorMsg("Something Went Wrong!!");
-      console.log(error);
+      console.error(error);
     }
   };
 
