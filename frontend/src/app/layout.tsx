@@ -48,7 +48,7 @@ export default function RootLayout({
           `https://jharkhandegovernance.com/auth/api/menu/by-module`,
           // `https://egov.rsccl.in/auth/api/menu/by-module`,
 
-
+          // `${process.env.backend}`,
           requestBody, // Send the request body directly
           {
             headers: {

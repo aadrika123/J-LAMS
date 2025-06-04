@@ -239,6 +239,7 @@ const SideBar: React.FC<SideBarProps> = () => {
         // `https://aadrikainfomedia.com/auth/api/menu/by-module`,
         `https://jharkhandegovernance.com/auth/api/menu/by-module`,
         // `https://egov.rsccl.in/auth/api/menu/by-module`,
+        //  `${process.env.backend}`,
         requestBody,
         {
           headers: {
