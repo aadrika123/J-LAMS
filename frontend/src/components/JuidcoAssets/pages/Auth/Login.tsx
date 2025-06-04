@@ -28,14 +28,35 @@ interface LoginInitialData {
 
 
 // 🔐 Encrypt password function using AES-256-CBC
-function encryptPassword(plainPassword: string): string {
-  const secretKeyHex =
-    "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7eb06609019115866bc8919ff3ef5503ac49e2442ab2a6b806083c0616e10d2d3d00f530e1ac3363e6e7ad420df3f864aa9cd6b05376dfa360147476efd67f3a56ee467670eb519a6139d4250d8f6dffb030923a25160011c23b296a6ceb291c52f49985cddba1949fa8666d64d199b408c8965761285655ee70a3291d0928a16b3f024281deb11969aa4fa499e313a658790013e0ebe7870b316abdd4aba8c8942ceaa1f365d925d05d77055db5bcb4bb219d93bdb4cf087133f50a8f0b0de5e21f5da89c0438b";
+// function encryptPassword(plainPassword: string): string {
+//   const secretKeyHex =
+//     "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7eb06609019115866bc8919ff3ef5503ac49e2442ab2a6b806083c0616e10d2d3d00f530e1ac3363e6e7ad420df3f864aa9cd6b05376dfa360147476efd67f3a56ee467670eb519a6139d4250d8f6dffb030923a25160011c23b296a6ceb291c52f49985cddba1949fa8666d64d199b408c8965761285655ee70a3291d0928a16b3f024281deb11969aa4fa499e313a658790013e0ebe7870b316abdd4aba8c8942ceaa1f365d925d05d77055db5bcb4bb219d93bdb4cf087133f50a8f0b0de5e21f5da89c0438b";
 
-  const secretKeyWA = CryptoJS.enc.Hex.parse(secretKeyHex);
-  const key = CryptoJS.SHA256(secretKeyWA);
-  const ivHex = CryptoJS.SHA256(secretKeyWA).toString().substring(0, 32);
-  const iv = CryptoJS.enc.Hex.parse(ivHex);
+//   const secretKeyWA = CryptoJS.enc.Hex.parse(secretKeyHex);
+//   const key = CryptoJS.SHA256(secretKeyWA);
+//   const ivHex = CryptoJS.SHA256(secretKeyWA).toString().substring(0, 32);
+//   const iv = CryptoJS.enc.Hex.parse(ivHex);
+
+//   const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+//     iv: iv,
+//     mode: CryptoJS.mode.CBC,
+//     padding: CryptoJS.pad.Pkcs7,
+//   });
+
+//   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+// }
+
+function encryptPassword(plainPassword: string): string {
+  const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+  // Match PHP's binary hash key
+  const key = CryptoJS.enc.Latin1.parse(
+    CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+  );
+
+  // PHP IV is a 16-character *string* (not hex)
+  const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+  const iv = CryptoJS.enc.Latin1.parse(ivString); // treat as string, not hex
 
   const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
     iv: iv,
@@ -45,7 +66,6 @@ function encryptPassword(plainPassword: string): string {
 
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
-
 
 
 
