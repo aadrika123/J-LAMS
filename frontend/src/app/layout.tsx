@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation"; // Correct import for useRouter
 // import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
+import AutoLogoutProvider from '@/components/AutoLogoutProvider';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -87,9 +88,13 @@ export default function RootLayout({
     // eslint-disable-next-line react/react-in-jsx-scope
     <StoreProvider>
       <ReactQueryClientProvider>
+        <AutoLogoutProvider timeout={30 * 60 * 1000}>
+
         <html lang="en">
           <body className={inter.className}>{children}</body>
         </html>
+         </AutoLogoutProvider>
+
       </ReactQueryClientProvider>
     </StoreProvider>
   );
