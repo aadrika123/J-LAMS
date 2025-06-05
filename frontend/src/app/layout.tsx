@@ -58,6 +58,7 @@ export default function RootLayout({
           }
         );
 
+        console.log("API Response:", res.data?.status);
 
         // if (res.data?.status) {
         //   router.push('/servicerestriction'); // Navigate to '/servicerestriction'
