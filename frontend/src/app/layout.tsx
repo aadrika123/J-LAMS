@@ -58,7 +58,6 @@ export default function RootLayout({
           }
         );
 
-        console.log("API Response:", res.data?.status);
 
         // if (res.data?.status) {
         //   router.push('/servicerestriction'); // Navigate to '/servicerestriction'
@@ -73,16 +72,9 @@ export default function RootLayout({
     dataa(); // Call the function inside useEffect
   }, [pathname]); // Add pathname as a dependency
 
-  // Example: Conditional rendering based on the route
-  // if (pathname === "/loginsssss") {
-  //   return (
-  //     <html lang="en">
-  //       <body className={inter.className}>
-  //         <ServiceRestrictionLayout />
-  //       </body>
-  //     </html>
-  //   );
-  // }
+  // Now you can use nonce in inline scripts if needed, for example:
+  // <script nonce={nonce}> ... </script>
+
 
   return (
     // eslint-disable-next-line react/react-in-jsx-scope

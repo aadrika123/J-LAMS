@@ -51,28 +51,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Edge-compatible crypto (no need to import 'crypto' in edge runtime)
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-
-  const tok3n = request.cookies.get("accesstoken")?.value;
-
-  // Redirect to login if no access token
-  if (!tok3n) {
-    return NextResponse.redirect(new URL("/lams/auth/login", request.url));
-  }
-
-  // Redirect root and /lams to login
-  if (
-    request.url === "http://localhost:5005/" ||
-    request.url === "http://localhost:5005/lams"
-  ) {
-    return NextResponse.redirect(new URL("/lams/auth/login", request.url));
-  }
-
-  // Generate CSP nonce
+  // Generate CSP nonce (safe for Edge runtime)
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64").slice(0, 16);
 
-  // Set Content Security Policy header with nonce
+  // Prepare response first
+  const response = NextResponse.next();
+
+  // Attach dynamic Content-Security-Policy header
   response.headers.set(
     "Content-Security-Policy",
     `
@@ -87,16 +74,27 @@ export function middleware(request: NextRequest) {
     `.replace(/\s{2,}/g, " ").trim()
   );
 
-  // Pass nonce to client-side via custom header
+  // Send nonce to client for usage in _document.tsx
   response.headers.set("x-nonce", nonce);
+
+  // Auth token check
+  const token = request.cookies.get("accesstoken")?.value;
+
+  const url = new URL(request.url);
+  const isRoot = url.pathname === "/" || url.pathname === "/lams";
+
+  // Redirect if token not present or hitting root paths
+  if (!token || isRoot) {
+    return NextResponse.redirect(new URL("/lams/auth/login", request.url));
+  }
 
   return response;
 }
 
-// Matcher to protect most routes except static assets and auth/login
+// Protect all pages except public/static/auth routes
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|johar.png|Juidco.png|Jhar_logo.png|favicon.ico|auth/login|404|employee/comingsoon|ems/comingsoon|supervisor/comingsoon).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|johar.png|Juidco.png|Jhar_logo.png|auth/login|404|employee/comingsoon|ems/comingsoon|supervisor/comingsoon).*)",
     "/",
     "/lams",
   ],
