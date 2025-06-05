@@ -37,10 +37,17 @@ const nextConfig = {
         source: "/(.*)", // Applies to all routes
         headers: [
           {
-            key: "Content-Security-Policy",
-            value:
-              // "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; base-uri 'self';",
-              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';",
+            key: 'Content-Security-Policy',
+            value: `
+              default-src 'self';
+              script-src 'self' 'nonce-abc123';
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data:;
+              connect-src *;
+              font-src 'self';
+              object-src 'none';
+              base-uri 'self';
+            `.replace(/\s{2,}/g, ' ').trim(),
           },
         ],
       },
