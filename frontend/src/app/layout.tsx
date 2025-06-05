@@ -9,7 +9,6 @@ import { usePathname } from "next/navigation"; // Correct import for useRouter
 // import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
-import AutoLogoutProvider from '@/components/AutoLogoutProvider';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,21 +72,24 @@ export default function RootLayout({
     dataa(); // Call the function inside useEffect
   }, [pathname]); // Add pathname as a dependency
 
-  // Now you can use nonce in inline scripts if needed, for example:
-  // <script nonce={nonce}> ... </script>
-
+  // Example: Conditional rendering based on the route
+  // if (pathname === "/loginsssss") {
+  //   return (
+  //     <html lang="en">
+  //       <body className={inter.className}>
+  //         <ServiceRestrictionLayout />
+  //       </body>
+  //     </html>
+  //   );
+  // }
 
   return (
     // eslint-disable-next-line react/react-in-jsx-scope
     <StoreProvider>
       <ReactQueryClientProvider>
-        <AutoLogoutProvider timeout={30 * 60 * 1000}>
-
         <html lang="en">
           <body className={inter.className}>{children}</body>
         </html>
-         </AutoLogoutProvider>
-
       </ReactQueryClientProvider>
     </StoreProvider>
   );
