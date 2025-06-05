@@ -1,7 +1,7 @@
 // components/AutoLogoutProvider.tsx
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React,  { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Props {
