@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 // import { HRMS_URL } from "@/utils/api/urls";
 import { useWorkingAnimation } from "@/components/Helpers/Widgets/useWorkingAnimation";
+import useCaptchaGenerator from "@/components/JuidcoAssets/pages/Auth/useCaptchaGenerator";
 
 interface LoginInitialData {
   user_id: string;
@@ -80,7 +81,24 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
- const handleLogin = async (values: LoginInitialData) => {
+  const {
+    captchaImage,
+    // captchaInputField,
+    verifyCaptcha,
+    generateRandomCaptcha,
+  } = useCaptchaGenerator();
+
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+
+  const handleLogin = async (values: LoginInitialData) => {
+    if (!verifyCaptcha(captchaInput)) {
+      setCaptchaError("Captcha is incorrect");
+      generateRandomCaptcha(); // Optionally refresh it
+      return;
+    } else {
+      setCaptchaError(null); // clear previous error if any
+    }
     try {
       activateWorkingAnimation();
 
@@ -131,16 +149,16 @@ const Login = () => {
     <>
       {workingAnimation}
       {errrrr && (
-  <p className="bg-red-600 text-white pt-2 p-2 rounded mb-4 fixed top-14 left-0 right-0 z-50 text-center flex items-center justify-center">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="mr-2">
-      <polygon points="12,2 22,22 2,22" fill="yellow" stroke="black" strokeWidth="2" />
-      <text x="12" y="17" fontSize="12" textAnchor="middle" fill="black" fontFamily="Arial">!</text>
-    </svg>
-    <span>
-      Permission Denied. You are not authorized to access this page. Please contact your administrator for more information.
-    </span>
-  </p>
-)}
+        <p className="bg-red-600 text-white pt-2 p-2 rounded mb-4 fixed top-14 left-0 right-0 z-50 text-center flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="mr-2">
+            <polygon points="12,2 22,22 2,22" fill="yellow" stroke="black" strokeWidth="2" />
+            <text x="12" y="17" fontSize="12" textAnchor="middle" fill="black" fontFamily="Arial">!</text>
+          </svg>
+          <span>
+            Permission Denied. You are not authorized to access this page. Please contact your administrator for more information.
+          </span>
+        </p>
+      )}
 
       <div className="max-w-full w-full px-2 sm:px-12 lg:pr-20 mb-12 lg:mb-0">
         <div className="relative">
@@ -164,72 +182,108 @@ const Login = () => {
                 handleSubmit,
               }) => (
                 <>
-              
-                <form onSubmit={handleSubmit}>
-                  <div className="text-center">
-                   
-                    <h1 className="text-2xl leading-normal mb-3 font-bold text-gray-800 darks:text-gray-300 text-center">
-                      Welcome Back
-                    </h1>
-                  </div>
-                  <div className="flex flex-col mt-4 text-center">
-                    <span className="text-center text-red-400">{errorMsg}</span>
-                  </div>
-                  <hr className="block w-12 h-0.5 mx-auto my-5 bg-gray-700 border-gray-700" />
-                  <div className="mb-6">
-                    <div className="mt-1 mb-6">
+
+                  <form onSubmit={handleSubmit}>
+                    <div className="text-center">
+
+                      <h1 className="text-2xl leading-normal mb-3 font-bold text-gray-800 darks:text-gray-300 text-center">
+                        Welcome Back
+                      </h1>
+                    </div>
+                    <div className="flex flex-col mt-4 text-center">
+                      <span className="text-center text-red-400">{errorMsg}</span>
+                    </div>
+                    <hr className="block w-12 h-0.5 mx-auto my-5 bg-gray-700 border-gray-700" />
+                    <div className="mb-6">
+                      <div className="mt-1 mb-6">
+                        <Input
+                          label="Username"
+                          placeholder="Username"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.user_id}
+                          error={errors.user_id}
+                          touched={touched.user_id}
+                          name="user_id"
+                          className="border-0 focus:outline-none"
+                        />
+                      </div>
                       <Input
-                        label="Username"
-                        placeholder="Username"
+                        label="Password"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.user_id}
-                        error={errors.user_id}
-                        touched={touched.user_id}
-                        name="user_id"
-                        className="border-0 focus:outline-none"
+                        value={values.password}
+                        error={errors.password}
+                        touched={touched.password}
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        className="mt-1 border-0 focus:border-0 visible:border-0 focus:outline-none"
+
                       />
                     </div>
-                    <Input
-                      label="Password"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.password}
-                      error={errors.password}
-                      touched={touched.password}
-                      name="password"
-                      type="password"
-                      placeholder="Password"
-                      className="mt-1 border-0 focus:border-0 visible:border-0 focus:outline-none"
-
-                    />
-                  </div>
-
-                  <div className="grid mt-6">
-                    <Button
-                      className="w-[100%] flex justify-center mt-6"
-                      variant="primary"
-                      buttontype="submit"
-                    >
-                      <svg
-                        xmlnsXlink="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        className="inline-block w-4 h-4 ltr:mr-2 rtl:ml-2 bi bi-box-arrow-in-right"
-                        viewBox="0 0 16 16"
+                    {/* Captcha Image */}
+                    <div className="mt-4 mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Captcha</label>
+                      <img
+                        src={captchaImage}
+                        alt="Captcha"
+                        className="w-48 h-14 mt-2 border border-gray-300 rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={generateRandomCaptcha}
+                        className="mt-1 text-sm text-blue-500 underline"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"
-                        />
-                        <path
-                          fillRule="evenodd"
-                          d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
-                        />
-                      </svg>
-                      Log in
-                    </Button>
-                  </div>
-                </form> 
+                        Refresh Captcha
+                      </button>
+                    </div>
+
+                    {/* Captcha Input */}
+                    <div className="mb-4">
+                      <input
+                        type="text"
+                        placeholder="Enter Captcha"
+                        value={captchaInput}
+                        onChange={(e) => setCaptchaInput(e.target.value)}
+                        className="w-full p-2 border rounded border-black focus:outline-none"
+                        autoComplete="off"
+                        spellCheck={false}
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
+                      />
+                      {captchaError && (
+                        <p className="text-sm text-red-500 mt-1">{captchaError}</p>
+                      )}
+                    </div>
+
+
+                    <div className="grid mt-6">
+                      <Button
+                        className="w-[100%] flex justify-center mt-6"
+                        variant="primary"
+                        buttontype="submit"
+                      >
+                        <svg
+                          xmlnsXlink="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                          className="inline-block w-4 h-4 ltr:mr-2 rtl:ml-2 bi bi-box-arrow-in-right"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
+                          />
+                        </svg>
+                        Log in
+                      </Button>
+                    </div>
+                  </form>
                 </>
               )}
             </Formik>
