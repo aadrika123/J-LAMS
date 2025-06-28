@@ -207,6 +207,9 @@ const Login = () => {
                           autoComplete="off"
                           name="user_id"
                           className="border-0 focus:outline-none"
+                          onCopy={(e) => e.preventDefault()}
+                          onPaste={(e) => e.preventDefault()}
+                          onCut={(e) => e.preventDefault()}
                         />
                       </div>
                       <Input
@@ -221,6 +224,9 @@ const Login = () => {
                         type="password"
                         placeholder="Password"
                         className="mt-1 border-0 focus:border-0 visible:border-0 focus:outline-none"
+                        onCopy={(e) => e.preventDefault()}
+                        onPaste={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
 
                       />
                     </div>
