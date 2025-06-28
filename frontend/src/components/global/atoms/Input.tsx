@@ -21,7 +21,11 @@ interface InputProps {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   isRequired?: boolean | false;
   autoComplete?: string | "off";
+  onCopy?: (e: React.ClipboardEvent<HTMLInputElement>) => void;
+  onPaste?: (e: React.ClipboardEvent<HTMLInputElement>) => void;
+  onCut?: (e: React.ClipboardEvent<HTMLInputElement>) => void;
 }
+
 
 const Input: React.FC<InputProps> = (props) => {
   const fieldId = "id_" + props.name;
@@ -44,6 +48,9 @@ const Input: React.FC<InputProps> = (props) => {
           name={props.name}
           id={fieldId}
           autoComplete={props.autoComplete || "off"}
+          onCopy={props.onCopy}
+          onPaste={props.onPaste}
+          onCut={props.onCut}
         />
 
         {props.touched && props.error && (
