@@ -204,6 +204,7 @@ const Login = () => {
                           value={values.user_id}
                           error={errors.user_id}
                           touched={touched.user_id}
+                          autoComplete="off"
                           name="user_id"
                           className="border-0 focus:outline-none"
                         />
@@ -215,6 +216,7 @@ const Login = () => {
                         value={values.password}
                         error={errors.password}
                         touched={touched.password}
+                        autoComplete="off"
                         name="password"
                         type="password"
                         placeholder="Password"
