@@ -2183,19 +2183,20 @@ export const DashboardMain = () => {
     type_of_land: Yup.string().required("Type of Land"),
     // order_date: Yup.string().required("Enter order date"),
     acquisition: Yup.date()
-    .max(new Date(), "Date of Acquisition cannot be in the future")
-    .required("Date of Acquisition is required"),
-  
-  // Validate Order Date
-  order_date: Yup.date()
-    .max(new Date(), "Order Date cannot be in the future")
-    .required("Order Date is required"),
-  // });
+      .max(new Date(), "Date of Acquisition cannot be in the future")
+      .required("Date of Acquisition is required"),
 
-  // location: Yup.date()
-  // .max(new Date(), "Order Date cannot be in the future")
-  // .required("Location is required")
-});
+    // Validate Order Date
+    order_date: Yup.date()
+      .max(new Date(), "Order Date cannot be in the future")
+      .required("Order Date is required"),
+    // });
+
+    // location: Yup.date()
+    // .max(new Date(), "Order Date cannot be in the future")
+    // .required("Location is required")
+    ward_no: Yup.string().required("Ward No. is Required"),
+  });
 
   const handleUpload = async () => {
     if (file1) {
@@ -2473,19 +2474,19 @@ export const DashboardMain = () => {
 
   const handleSaveFloorData = () => {
     const floorData = processFloorData();
-  
+
     // Avoid duplicate entries by checking for existing floor names
     setSavedFloors((prevFloors) => {
       const existingFloorNames = prevFloors.map((floor) => floor.floor);
       const newFloorData = floorData.filter((floor) => !existingFloorNames.includes(floor.floor));
       return [...prevFloors, ...newFloorData];
     });
-  toast.success("Floor Details Saved Successfully")
+    toast.success("Floor Details Saved Successfully")
     console.log("Saved Floors: ", savedFloors); // For debugging
   };
 
-  
-  
+
+
   const handleEditFloor = (floor: any, index: any) => {
     setEditedFloor(floor.floor); // Store the floor number of the edited floor
     setEditedDetails(floor.details.map((detail: any) => ({ ...detail }))); // Copy the floor details
@@ -2528,7 +2529,7 @@ export const DashboardMain = () => {
     setSavedFloors(updatedFloors);
     setEditedFloorIndex(null); // Exit edit mode
   };
-  
+
 
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
@@ -2861,7 +2862,7 @@ export const DashboardMain = () => {
     }
   };
 
-  
+
   const handleClose = () => {
     setIsModalVisible(false)
   }
@@ -2877,24 +2878,24 @@ export const DashboardMain = () => {
     window.location.replace("/lams/apply/approve-application");
   }
 
-  const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits:any, type: string) => {
+  const validateUnitCount = (newCount: number, existingCount: any, maxCount: number, setCount: { (value: any): void; (value: any): void; (arg0: number): void; }, setUnits: any, type: string) => {
     if (newCount + existingCount > maxCount) {
-        alert(`The total number of Commercial and Residential units cannot exceed ${maxCount}.`);
-        setCount(0);
+      alert(`The total number of Commercial and Residential units cannot exceed ${maxCount}.`);
+      setCount(0);
     } else {
-        setCount(newCount);
-        const emptyUnits = Array.from({ length: newCount }, (_, i) => ({
-            length: 0,
-            breadth: 0,
-            height: 0,
-            name: "",
-            property_name: "",
-            index: i,
-            type: type
-        }));
-        setUnits(emptyUnits);
+      setCount(newCount);
+      const emptyUnits = Array.from({ length: newCount }, (_, i) => ({
+        length: 0,
+        breadth: 0,
+        height: 0,
+        name: "",
+        property_name: "",
+        index: i,
+        type: type
+      }));
+      setUnits(emptyUnits);
     }
-};
+  };
 
 
   console.log("savedFloors", savedFloors)
@@ -3118,64 +3119,64 @@ export const DashboardMain = () => {
                                 />
                               </div>
                             )}
-                            
+
                             {/* new */}
 
                             {plotNo > 0 && (
-  <div>
-    <input
-      key={`type-Commercial`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Commercial units`}
-      onChange={(e) => {
-        const commercialUnitsCount = parseInt(e.target.value) || 0;
-        validateUnitCount(
-          commercialUnitsCount,
-          residentialCount,
-          plotNo,
-          setCommercialCount,
-          setCommercialUnits,
-          "Commercial"
-        );
-      }}
-      value={commercialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Commercial</label>
+                              <div>
+                                <input
+                                  key={`type-Commercial`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Commercial units`}
+                                  onChange={(e) => {
+                                    const commercialUnitsCount = parseInt(e.target.value) || 0;
+                                    validateUnitCount(
+                                      commercialUnitsCount,
+                                      residentialCount,
+                                      plotNo,
+                                      setCommercialCount,
+                                      setCommercialUnits,
+                                      "Commercial"
+                                    );
+                                  }}
+                                  value={commercialCount}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="">Commercial</label>
 
-    <input
-      key={`type-Residential`}
-      type="text"
-      className="border p-2 m-2"
-      placeholder={`Number of Residential units`}
-      onChange={(e) => {
-        const residentialUnitsCount = parseInt(e.target.value) || 0;
-        validateUnitCount(
-          residentialUnitsCount,
-          commercialCount,
-          plotNo,
-          setResidentialCount,
-          setResidentialUnits,
-          "Residential"
-        );
-      }}
-      value={residentialCount}
-      maxLength={2}
-      onKeyPress={(e) => {
-        if (!(e.key >= "0" && e.key <= "9")) {
-          e.preventDefault();
-        }
-      }}
-    />
-    <label htmlFor="">Residential</label>
-  </div>
-)}
+                                <input
+                                  key={`type-Residential`}
+                                  type="text"
+                                  className="border p-2 m-2"
+                                  placeholder={`Number of Residential units`}
+                                  onChange={(e) => {
+                                    const residentialUnitsCount = parseInt(e.target.value) || 0;
+                                    validateUnitCount(
+                                      residentialUnitsCount,
+                                      commercialCount,
+                                      plotNo,
+                                      setResidentialCount,
+                                      setResidentialUnits,
+                                      "Residential"
+                                    );
+                                  }}
+                                  value={residentialCount}
+                                  maxLength={2}
+                                  onKeyPress={(e) => {
+                                    if (!(e.key >= "0" && e.key <= "9")) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="">Residential</label>
+                              </div>
+                            )}
 
 
 
@@ -3578,6 +3579,11 @@ export const DashboardMain = () => {
                           id: 1,
                           name: "Immovable",
                         },
+                        {
+                          id: 2,
+                          name: "movable",
+                        }
+
                       ]}
                     />
 
@@ -3711,20 +3717,20 @@ export const DashboardMain = () => {
                       }}
                     />
 
-<div className="flex flex-col w-full">
-                   <label className="flex items-center">
-   Order Date
-    <span className="text-red-500 ml-1">*</span>
-  </label>
+                    <div className="flex flex-col w-full">
+                      <label className="flex items-center">
+                        Order Date
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
 
-                    
-                    <InputBox
+
+                      <InputBox
                         // onChange={handleChange}
                         onChange={(e) => {
                           if (handleDateChange(e as any)) {
                             handleChange(e);
                           }
-                        } }
+                        }}
                         onBlur={handleBlur}
                         error={errors.order_date}
                         touched={touched.order_date}
@@ -3737,12 +3743,13 @@ export const DashboardMain = () => {
                           if ((
                             (e.key >= "a" || e.key >= "z") ||
                             (e.key <= "A" || e.key <= "Z") ||
-                            (e.key <= "0" || e.key <= "9") ||
+                            (e.key <= 0 || e.key <= 9) ||
                             e.key === " "
                           )) {
                             e.preventDefault();
                           }
-                        } } label={undefined}                    />
+                        }} 
+                        label={undefined} />
                     </div>
                     <InputBox
                       onChange={handleChange}
@@ -3766,12 +3773,12 @@ export const DashboardMain = () => {
                         }
                       }}
                     />
-                   <div className="flex flex-col w-full">
-                   <label className="flex items-center">
-    Date of Acquisition
-    <span className="text-red-500 ml-1">*</span>
-  </label>
-                    <InputBox
+                    <div className="flex flex-col w-full">
+                      <label className="flex items-center">
+                        Date of Acquisition
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <InputBox
                         onChange={handleChange}
                         onBlur={handleBlur}
                         error={errors.acquisition}
@@ -3789,10 +3796,10 @@ export const DashboardMain = () => {
                           )) {
                             e.preventDefault();
                           }
-                        } } label={undefined}                    />
+                        }} label={undefined} />
 
                     </div>
-                   
+
                     <SelectForNoApi
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -3830,31 +3837,31 @@ export const DashboardMain = () => {
                       maxLength={50}
                     />
                     <div className="marketSelection mt-4">
-  <label htmlFor="location" className="selectLabel text-gray-700 font-medium">
-    Select Location:
-  </label>
-  <select
-    name="location"
-    id="location"
-    value={selectedMarket}
-    onChange={handleMarketChange}
-    className="selectInput w-full p-2 mt-2 border border-gray-300 rounded bg-gray-50"
-  >
-    <option value="" disabled>
-      -- Choose a Location --
-    </option>
-    {circleData?.map((item: any) => (
-      <option key={item.id} value={item.location}>
-        {item.location}
-      </option>
-    ))}
-  </select>
-  {touched.location && errors.location && (
-    <div className="error-message text-red-500 text-sm mt-1">
-      {errors.location}
-    </div>
-  )}
-</div>
+                      <label htmlFor="location" className="selectLabel text-gray-700 font-medium">
+                        Select Location:
+                      </label>
+                      <select
+                        name="location"
+                        id="location"
+                        value={selectedMarket}
+                        onChange={handleMarketChange}
+                        className="selectInput w-full p-2 mt-2 border border-gray-300 rounded bg-gray-50"
+                      >
+                        <option value="" disabled>
+                          -- Choose a Location --
+                        </option>
+                        {circleData?.map((item: any) => (
+                          <option key={item.id} value={item.location}>
+                            {item.location}
+                          </option>
+                        ))}
+                      </select>
+                      {touched.location && errors.location && (
+                        <div className="error-message text-red-500 text-sm mt-1">
+                          {errors.location}
+                        </div>
+                      )}
+                    </div>
                     <InputBox
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -3872,7 +3879,10 @@ export const DashboardMain = () => {
                       label="Ward no."
                       name="ward_no"
                       value={values.ward_no}
+                      error={errors.ward_no}
+                      touched={touched.ward_no}
                       placeholder={"Ward no."}
+                      required = {true}
                       options={Array.from({ length: 55 }, (_, index) => ({
                         id: index + 1,
                         name: `${index + 1}`,
@@ -3904,7 +3914,7 @@ export const DashboardMain = () => {
                       variant="primary"
                       onClick={() => {
                         setDraft(false); // Set status to 1 for Save
-                        sessionStorage.clear() 
+                        sessionStorage.clear()
                       }}
                     >
                       Save

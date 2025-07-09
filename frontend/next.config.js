@@ -10,6 +10,7 @@ const nextConfig = {
     // backend: "https://egov.rsccl.in/auth" 
 
         // backend: "http://172.30.48.1:2000",
+        
   },
 
 };

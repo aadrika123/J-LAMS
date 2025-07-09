@@ -277,7 +277,7 @@ const SideBar: React.FC<SideBarProps> = () => {
         {
           <div
             className={
-              (toggleBar ? open3 : close3) + ` bg-${bg}-100 w-full inset-0 `
+              (toggleBar ? open3 : close3) + ` bg-${bg}-100 w-full inset-0  `
             }
             id="mobile-menu"
           >
@@ -298,7 +298,7 @@ const SideBar: React.FC<SideBarProps> = () => {
                       <span
                         className={`text-[50px] flex justify-center py-2 text-${tcolor}-800`}
                       >
-                        {/* <FcBusinessman /> */}
+                       
                         <Image src={icon} width={100} height={100} alt="logo" />
                       </span>
                     </span>
