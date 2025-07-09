@@ -136,6 +136,7 @@ const Login = () => {
         }
       } else {
         hideWorkingAnimation();
+        generateRandomCaptcha();
         setErrorMsg("You have entered wrong credentials !!");
       }
     } catch (error) {

@@ -9,18 +9,10 @@ import axios from "axios";
 import crypto from "crypto";
 import FormData from "form-data";
 import { Request, Response } from "express";
+import { DMS_URL_POST, DMS_GET_URL } from "../../../config"; 
 
 
-
-// console.log(process.env.DMS_URL_POST)
-
-// console.log(process.env.DMS_URL_POST)
-
-const dmsUrl = process.env.DMS_URL_POST || "https://aadrikainfomedia.com/dms/backend/document/upload";
-const DMS_GET =   process.env.DMS_GET_URL || "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";     
-
-
-// const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";
+// const DMS_URL_POST = "https://jharkhandegovernance.com/dms/backend/document/upload";
 
 // const DMS_GET = "https://jharkhandegovernance.com/dms/backend/document/view-by-reference"
 
@@ -48,7 +40,7 @@ class DMSFileHandlerController {
         ...formData.getHeaders(),
       };
 
-      const response = await axios.post(dmsUrl, formData, { headers });
+      const response = await axios.post(DMS_URL_POST, formData, { headers });
 
       return res.status(200).json({
         status: true,
@@ -83,7 +75,7 @@ class DMSFileHandlerController {
         token: "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
       };
       const response = await axios.post(
-        DMS_GET,
+        DMS_GET_URL,
         { referenceNo: req.params.referenceNo },
         { headers }
       );
@@ -135,11 +127,11 @@ class DMSFileHandlerController {
         ...formData.getHeaders(),
       };
 
-      const response = await axios.post(dmsUrl, formData, { headers });
+      const response = await axios.post(DMS_URL_POST, formData, { headers });
 
       const refNo = response.data.data.ReferenceNo;
       const resData: any = await axios.post(
-        DMS_GET,
+        DMS_GET_URL,
         { referenceNo: refNo },
         { headers: { token: headers.token } }
       );
