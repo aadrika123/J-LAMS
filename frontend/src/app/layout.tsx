@@ -9,7 +9,6 @@ import { usePathname } from "next/navigation"; // Correct import for useRouter
 // import ServiceRestrictionLayout from "@/components/JuidcoAssets/servicerestriction";
 import axios from "axios";
 import { useEffect } from "react";
-import { ASSETS } from '@/utils/api/urls';
 
 const inter = Inter({
   subsets: ["latin"],
