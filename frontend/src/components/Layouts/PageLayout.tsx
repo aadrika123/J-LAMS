@@ -19,7 +19,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
     <main className="relative min-h-screen bg-[#FCFDFF]">
       {/* Toggle Sidebar Button */}
       <div
-        className="fixed top-10 left-5 lg:left-80 z-50 cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-all"
+        className="absolute top-10 left-5 lg:left-80 z-50 cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-all"
         onClick={handleToggleSidebar}
         title={isSidebarCollapsed ? "Open Sidebar" : "Close Sidebar"}
       >
@@ -46,9 +46,8 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
 
         {/* Sidebar */}
         <div
-          className={`col-span-2 border-r border-zinc-400 rounded-br-2xl shadow-xl mx-1 ${
-            isSidebarCollapsed ? "hidden" : ""
-          }`}
+          className={`col-span-2 border-r border-zinc-400 rounded-br-2xl shadow-xl mx-1 ${isSidebarCollapsed ? "hidden" : ""
+            }`}
         >
           <Sidebar className="w-full min-h-screen" />
         </div>
@@ -56,9 +55,8 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
         {/* Main Content */}
         <div className={`col-span-8 ${isSidebarCollapsed ? "col-span-full p-0" : ""}`}>
           <section
-            className={`p-8 h-full bg-[#FCFDFF] overflow-y-auto ${
-              isSidebarCollapsed ? "content-collapsed" : ""
-            }`}
+            className={`p-8 h-full bg-[#FCFDFF] overflow-y-auto ${isSidebarCollapsed ? "content-collapsed" : ""
+              }`}
           >
             {children}
           </section>
