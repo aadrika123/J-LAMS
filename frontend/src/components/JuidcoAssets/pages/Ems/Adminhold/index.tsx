@@ -109,7 +109,7 @@ const Adminhold = () => {
     const fetchData = async (page: number, searchQuery: string, filter: string,itemsPerPage:number,ulbID:number) => {
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&status=1`,
+                url: `${ASSETS.LIST.get}?limit=${itemsPerPage}&page=${page}&search=${searchQuery}&filter=${filter}&id=${ulbID}&status=-2`,
                 method: "GET",
             });
             setCount(res?.data)
