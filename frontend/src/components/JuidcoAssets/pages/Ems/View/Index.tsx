@@ -337,6 +337,7 @@ const View = ({ id }: { id: number }) => {
                 type_of_plot: detail.type_of_plot
             }))
         })),
+        is_drafted:  false,
     }
 
     const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {

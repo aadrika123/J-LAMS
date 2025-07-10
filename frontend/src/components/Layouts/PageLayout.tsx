@@ -19,7 +19,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
     <main className="relative min-h-screen bg-[#FCFDFF]">
       {/* Toggle Sidebar Button */}
       <div
-        className="absolute top-10 left-5 lg:left-80 z-50 cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-all"
+        className="absolute top-10 left-5 lg:left-80 z-50 cursor-pointer bg-white p-2 rounded-full hover:bg-gray-100 transition-all"
         onClick={handleToggleSidebar}
         title={isSidebarCollapsed ? "Open Sidebar" : "Close Sidebar"}
       >
