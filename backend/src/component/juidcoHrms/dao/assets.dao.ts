@@ -1390,7 +1390,8 @@ class AssetsManagementDao {
             building_name,
             ulb_id,
             location,
-            is_drafted
+            is_drafted,
+            status
         } = req.body;
     
         // Convert id to an integer
