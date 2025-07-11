@@ -21,7 +21,7 @@
     "apexcharts": "^3.49.1",
     "axios": "^1.5.0",
     "browser-image-compression": "^2.0.2",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.11",
     "exif-js": "^2.3.0",

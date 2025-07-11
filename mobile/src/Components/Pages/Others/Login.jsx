@@ -8,6 +8,7 @@ import { RotatingLines } from "react-loader-spinner";
 import ProjectApiList from "@/Components/api/ProjectApiList";
 import axios from "axios";
 import {Login1} from "@/Components/temp.js"
+import CryptoJS from "crypto-js";
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -23,6 +24,26 @@ const validationSchema = Yup.object({
   username: Yup.string().required("Enter Username"),
   password: Yup.string().required("Enter Password"),
 });
+
+
+function encryptPassword(plainPassword) {
+  const secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+
+  const key = CryptoJS.enc.Latin1.parse(
+    CryptoJS.SHA256(secretKey).toString(CryptoJS.enc.Latin1)
+  );
+
+  const ivString = CryptoJS.SHA256(secretKey).toString().substring(0, 16);
+  const iv = CryptoJS.enc.Latin1.parse(ivString);
+
+  const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
 
 function Login() {
 
@@ -56,40 +77,40 @@ function Login() {
   };
 
   const authUser = async () => {
-    setLoaderStatus(true);
-    let requestBody = {
-      email: formik.values.username,
-      password: formik.values.password,
-      type:"mobile"
-    };
+  setLoaderStatus(true);
 
-    await axios.post(api_login, requestBody, header)
+  const encryptedPassword = encryptPassword(formik.values.password);
 
-      .then(function (response) {
-        console.log("message check login ", response.data);
-
-        const data = response.data.data;
-        localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
-
-        // if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "Field Officer") {
-          if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "TC") {
-          setLocalStorageItem("token", response?.data?.data?.token);
-          navigate("/field-officer");
-          toast.success("Login Successful");
-
-        } else {
-          console.log("Login failed or user is not a Field Officer...");
-          setLoaderStatus(false);
-          toast.error("error occured");
-        }
-
-      })
-      .catch(function (error) {
-        setLoaderStatus(false);
-        console.log("--2--login error...", error);
-        toast.error("Server Error");
-      });
+  let requestBody = {
+    email: formik.values.username,
+    password: encryptedPassword,
+    type: "mobile",
   };
+
+  await axios.post(api_login, requestBody, header)
+    .then(function (response) {
+      console.log("message check login ", response.data);
+
+      const data = response.data.data;
+      localStorage.setItem("user_details", JSON.stringify(data?.userDetails));
+
+      if (response?.data?.status === true && response?.data?.data?.userDetails?.user_type === "TC") {
+        setLocalStorageItem("token", response?.data?.data?.token);
+        navigate("/field-officer");
+        toast.success("Login Successful");
+      } else {
+        console.log("Login failed or user is not a Field Officer...");
+        setLoaderStatus(false);
+        toast.error("error occurred");
+      }
+    })
+    .catch(function (error) {
+      setLoaderStatus(false);
+      console.log("--2--login error...", error);
+      toast.error("Server Error");
+    });
+};
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
