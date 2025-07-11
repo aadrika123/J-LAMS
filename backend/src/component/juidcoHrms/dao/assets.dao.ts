@@ -1477,7 +1477,7 @@ class AssetsManagementDao {
                         acquisition,
                         from_whom_acquired,
                         mode_of_acquisition,
-                        status: Number(req.body.status),
+                        status: Number(status),
                         is_drafted
                     }
                 });
