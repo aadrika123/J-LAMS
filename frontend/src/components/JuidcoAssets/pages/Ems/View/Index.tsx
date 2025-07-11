@@ -30,7 +30,7 @@ const View = ({ id }: { id: number }) => {
     const searchParams = useSearchParams()
     const params = new URLSearchParams(searchParams.toString());
     const status = params.get('status');
-    const asset_id = params.get('assets_id');
+    const asset_id = params.get('asset_id');
     const [isOpen, setIsOpen] = useState(false);
     const [ulbId, setUlbId] = useState<string>("");
     const [ulbName, setUlbName] = useState<string>("");
@@ -134,7 +134,7 @@ const View = ({ id }: { id: number }) => {
     const fetchAdminData = async () => {
         try {
             const res = await axios({
-                url: `${ASSETS.LIST.updateMany}&id=${id}`,
+                url: `${ASSETS.LIST.updateMany}&id=${id}&assets_id=${asset_id}`,
                 method: "GET",
             });
             setDatas(res.data?.data)
