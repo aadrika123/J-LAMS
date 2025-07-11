@@ -1393,6 +1393,9 @@ class AssetsManagementDao {
             is_drafted,
             status
         } = req.body;
+        
+        
+        console.log("req.body", plot_no);
     
         // Convert id to an integer
         const id = parseInt(req.query.id as string, 10);
@@ -1477,7 +1480,7 @@ class AssetsManagementDao {
                         acquisition,
                         from_whom_acquired,
                         mode_of_acquisition,
-                        status: Number(status),
+                        status: Number(req.body.status),
                         is_drafted
                     }
                 });
