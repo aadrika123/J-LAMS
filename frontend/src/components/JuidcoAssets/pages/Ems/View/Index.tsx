@@ -912,7 +912,7 @@ const View = ({ id }: { id: number }) => {
 
                                                                                 <div className="mb-4">
                                                                                     <label className="block text-sm font-medium text-gray-700  p-2 m-2">
-                                                                                        Property Name:
+                                                                                        Property Namee:
                                                                                         <Field
                                                                                             name={`floorData[${floorIndex}].details[${detailIndex}].property_name`}
                                                                                             type="text"
@@ -1787,14 +1787,6 @@ const View = ({ id }: { id: number }) => {
                     </div>
                 </div>
             )}
-
-
-
-
-
-
-
-
         </div>
     )
 }

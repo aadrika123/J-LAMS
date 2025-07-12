@@ -15,7 +15,7 @@ interface ModalProps {
   editData?: any;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData }) => {
   // const [selectedMarket, setSelectedMarket] = useState<string>('');
   const [marketInput, setMarketInput] = useState<string>('');
   const [addressInput, setAddressInput] = useState<string>('');
@@ -65,7 +65,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
     setAddressInput(event.target.value);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (
       // !selectedMarket ||
       !marketInput) {
@@ -104,9 +104,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
         // window.location.reload()
         return res?.data?.data;
 
-        } else {
-            // toast.error("Failed to save location");
-        }
+      } else {
+        // toast.error("Failed to save location");
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -171,6 +171,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
             onChange={handleMarketInputChange}
             placeholder="Enter Location"
             required
+            onKeyPress={(e: any) => {
+              if (!/[a-zA-Z0-9/-]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
           />
           <label htmlFor="addressInput">Address:</label>
           <input
@@ -180,6 +185,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, ulbID, editData  }) => {
             onChange={handleAddressInputChange}
             placeholder="Enter Address"
             required
+            onKeyPress={(e: any) => {
+              if (!/[a-zA-Z0-9,/-]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
           />
           {!isMarketValid && <span className={"error"}>Both fields are required!</span>}
         </div>
