@@ -71,7 +71,7 @@ const Marketmaster = () => {
         setIsModalOpen(false);
         setModalData(null);
     };
-console.log(showModal, "for build solution")
+    console.log(showModal, "for build solution")
     const BuildingModal: React.FC<BuildingModalProps> = ({ onClose, data }) => (
         <div
             className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center"
@@ -85,14 +85,14 @@ console.log(showModal, "for build solution")
                 aria-labelledby="modalTitle"
                 aria-modal="true"
             >
-                
+
                 <button
                     onClick={onClose}
                     className="absolute top-2 right-2 w-6 h-6 items-center bg-red-500 hover:bg-red-300 text-sm rounded-full  overflow-auto"
                     aria-label="Close"
                 >
-                <span className=' text-white'>X</span>
-                    
+                    <span className=' text-white'>X</span>
+
                 </button>
                 <h2 id="modalTitle" className="text-xl text-black font-bold mb-4">
                     Building Information
@@ -112,25 +112,25 @@ console.log(showModal, "for build solution")
 
     const handleDelete = async (id: any) => {
         try {
-          const response = await axios({
-            url: `${ASSETS.LIST.locationDelete}?id=${id}`, // API URL to delete the location
-            method: 'POST', // HTTP method to delete
-          });
-      
-          // Handle the response from the API
-          if (response.data.status === true) {
-           
-            toast.success("Location deleted successfully.");
-            
-          } else {
-            toast.error(response.data.message || "Failed to delete location.");
-          }
-          window.location.reload()
+            const response = await axios({
+                url: `${ASSETS.LIST.locationDelete}?id=${id}`, // API URL to delete the location
+                method: 'POST', // HTTP method to delete
+            });
+
+            // Handle the response from the API
+            if (response.data.status === true) {
+
+                toast.success("Location deleted successfully.");
+
+            } else {
+                toast.error(response.data.message || "Failed to delete location.");
+            }
+            window.location.reload()
         } catch (error) {
-          console.error('Error deleting location:', error);
-          toast.error("Error occurred while deleting the location.");
+            console.error('Error deleting location:', error);
+            toast.error("Error occurred while deleting the location.");
         }
-      };
+    };
 
     useEffect(() => {
         const storedUserDetails = localStorage.getItem("user_details");
@@ -172,19 +172,24 @@ console.log(showModal, "for build solution")
         }
     };
 
-    
+
 
 
 
 
     const { isLoading, error, data } = useQuery({
-        queryKey: ['assets', currentPage, debouncedSearch, itemsPerPage, ulbID],
-        queryFn: () => fetchData(currentPage, debouncedSearch, itemsPerPage, ulbID as number),
+        queryKey: ['assets', currentPage, itemsPerPage, ulbID], // REMOVE debouncedSearch from queryKey
+        queryFn: () => fetchData(currentPage, '', itemsPerPage, ulbID as number), // empty search param
         enabled: !!ulbID,
         staleTime: 1000,
     });
 
-
+    const filteredData = data?.data?.filter((item: any) => {
+        const searchText = debouncedSearch.toLowerCase();
+        const locationMatch = item?.location?.toLowerCase().includes(searchText);
+        const addressMatch = item?.address?.toLowerCase().includes(searchText);
+        return locationMatch || addressMatch;
+    });
 
 
     useEffect(() => {
@@ -192,10 +197,9 @@ console.log(showModal, "for build solution")
             setDebouncedSearch(search);
         }, 500);
 
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [search]);
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -219,7 +223,7 @@ console.log(showModal, "for build solution")
         return <div>Error</div>;
     }
 
-   
+
 
     const totalPages = data?.totalPages;
 
@@ -259,21 +263,21 @@ console.log(showModal, "for build solution")
         if (actionType === 'approve') {
             appApprover(currentAssetId, currentAssetIdValue);
         } else if (actionType === 'reject') {
-            appReject(currentAssetId ,currentAssetIdValue);
+            appReject(currentAssetId, currentAssetIdValue);
         }
         setShowModal(false);
     };
 
-    const handleApprove = (assetId: any, asset_id:any) => {
+    const handleApprove = (assetId: any, asset_id: any) => {
         setCurrentAssetId(assetId);
-        setCurrentAssetIdValue(asset_id); 
+        setCurrentAssetIdValue(asset_id);
         setActionType('approve');
         setBox(true);
     };
 
-    const handleReject = (assetId: any , asset_id:any) => {
+    const handleReject = (assetId: any, asset_id: any) => {
         setCurrentAssetId(assetId);
-        setCurrentAssetIdValue(asset_id); 
+        setCurrentAssetIdValue(asset_id);
         setActionType('reject');
         setBox(true);
     };
@@ -286,7 +290,7 @@ console.log(showModal, "for build solution")
         setRemarks(e.target.value);
     };
 
-    const appApprover = async (assetId: any , asset_id:any) => {
+    const appApprover = async (assetId: any, asset_id: any) => {
         const res = await axios({
             url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
             method: "POST",
@@ -304,7 +308,7 @@ console.log(showModal, "for build solution")
         }
     }
 
-    const appReject = async (assetId: any , asset_id:any) => {
+    const appReject = async (assetId: any, asset_id: any) => {
         console.log("remarks", remarks)
         const res = await axios({
             url: `${ASSETS.LIST.update}?id=${assetId}&assets_id=${asset_id}`,
@@ -421,7 +425,7 @@ console.log(showModal, "for build solution")
 
 
 
-                        <button onClick={() => handleMarketOpenModal(true)}  type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" disabled={count == 0 ? true : false}>
+                        <button onClick={() => handleMarketOpenModal(true)} type="submit" className="w-[11rem] inline-flex items-center h-10 py-0 px-3 ms-2 text-sm font-medium text-white bg-[#4338CA] rounded-lg border border-blue-700" disabled={count == 0 ? true : false}>
                             Add Location
                         </button>
 
@@ -429,7 +433,7 @@ console.log(showModal, "for build solution")
                     </div>
                 </div>
 
-                {data?.data?.length ? (
+                {filteredData?.length ? (
                     <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="data-table">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
@@ -439,7 +443,7 @@ console.log(showModal, "for build solution")
                             </tr>
                         </thead>
                         <tbody>
-                            {data?.data?.map((item: any, index: any) => (
+                            {filteredData.map((item: any, index: any) => (
                                 <tr key={item.id} className="bg-white border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td className="px-6 py-4">{index + 1}</td>
                                     <td className="px-6 py-4">{item?.location || "---"}</td>
@@ -541,8 +545,8 @@ console.log(showModal, "for build solution")
                                             {item.status === 1 ? (
                                                 <td className="px-6 py-4">
                                                     <div className='flex justify-start gap-2'>
-                                                        <button onClick={() => { handleApprove(item?.id ,item?.asset_id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
-                                                        <button onClick={() => { handleReject(item?.id ,item?.asset_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
+                                                        <button onClick={() => { handleApprove(item?.id, item?.asset_id) }} className='bg-[#4338CA] text-white text-xs p-2 rounded-3xl'>Approve</button>
+                                                        <button onClick={() => { handleReject(item?.id, item?.asset_id) }} className='bg-red-500 text-white text-xs p-2 rounded-3xl'>Reject</button>
                                                     </div>
                                                 </td>
 
