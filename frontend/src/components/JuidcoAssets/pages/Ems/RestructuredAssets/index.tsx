@@ -574,9 +574,9 @@ const RestructuredAsstes = () => {
                                                  (
                                                     <Link
                                                         href={`/assets/restructured-assets/${item?.id}?status=clicked`}
-                                                        className="text-sm p-2 text-blue-600 dark:text-blue-500 hover:underline"
+                                                        className=""
                                                     >
-                                                        <svg
+                                                        {/* <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             width="23"
                                                             height="20"
@@ -608,7 +608,7 @@ const RestructuredAsstes = () => {
                                                                     />
                                                                 </clipPath>
                                                             </defs>
-                                                        </svg>
+                                                        </svg> */}
                                                     </Link>
                                                 )
                                             )}

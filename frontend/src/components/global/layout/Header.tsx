@@ -95,13 +95,13 @@ const Header: React.FC<SideBarProps> = (props) => {
       {/* Header Section */}
       <div className="flex items-center justify-center gap-3 mx-20">
         <div className="text-center">
-          <h1 className="text-[2rem] text-primary font-bold">UD&HD</h1>
+          <h1 className="text-[2rem] font-bold text-black">UD&HD</h1>
           <h4 className="text-[1rem] text-blue-600 font-bold">{ulbName}</h4>
         </div>
       </div>
   
       {/* Main Content Section */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2 text-black">
         {/* Subheading */}
         <SubHeading className="mr-5">
           Land and Asset Management System
