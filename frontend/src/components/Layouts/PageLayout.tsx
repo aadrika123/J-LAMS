@@ -19,7 +19,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
     <main className="relative min-h-screen bg-[#FCFDFF]">
       {/* Toggle Sidebar Button */}
       <div
-        className="absolute top-10 left-5 lg:left-80 z-50 cursor-pointer bg-white p-2 rounded-full hover:bg-gray-100 transition-all"
+        className="absolute top-10 left-5 lg:left-80 z-50 cursor-pointer p-2 rounded-full  transition-all"
         onClick={handleToggleSidebar}
         title={isSidebarCollapsed ? "Open Sidebar" : "Close Sidebar"}
       >
@@ -49,7 +49,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
           className={`col-span-2 border-r border-zinc-400 rounded-br-2xl shadow-xl mx-1 ${isSidebarCollapsed ? "hidden" : ""
             }`}
         >
-          <Sidebar className="w-full min-h-screen" />
+          <Sidebar className="w-full max-h-screen min-h-screen" />
         </div>
 
         {/* Main Content */}

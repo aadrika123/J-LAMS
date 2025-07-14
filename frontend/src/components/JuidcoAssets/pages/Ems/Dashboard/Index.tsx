@@ -680,7 +680,7 @@ export const DashboardMain = () => {
               </Button>
             </div>
             <div>
-              <InnerHeading className="text-2xl font-bold text-gray-900">Asset Registration</InnerHeading>
+              <InnerHeading className="text-2xl font-bold text-gray-950">Land & Asset Registration</InnerHeading>
             </div>
           </div>
         </div>
@@ -1250,7 +1250,7 @@ export const DashboardMain = () => {
                                               className={`h-16 flex flex-col items-center justify-center relative ${isSaved
                                                   ? "bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
                                                   : selectedFloor === index
-                                                    ? "bg-blue-600 text-white"
+                                                    ? "bg-blue-600 text-white hover:bg-gray-600"
                                                     : "hover:bg-gray-50"
                                                 }`}
                                               onClick={() => !isSaved && handleFloor(index)}
