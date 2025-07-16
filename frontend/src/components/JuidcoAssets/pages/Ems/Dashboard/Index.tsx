@@ -92,15 +92,13 @@ export const DashboardMain = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [succeessId, setSucceessId] = useState()
   const [savedFloors, setSavedFloors] = useState<any[]>([])
-  // const [showBuildingModal, setShowBuildingModal] = useState(false)
-
+  const [assetType, setAssetType] = useState<string>("")
 
   //for successfull buid consiling the varibles
   console.log(data, "data")
   console.log(sessionData, "sessionData")
   console.log(editedFloor, "editedFloor")
   console.log(sessionData, "sessionData")
-
 
   // Event handlers
   const handleMarketChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -139,6 +137,14 @@ export const DashboardMain = () => {
       setSessionData(JSON.parse(storedData))
     }
   }, [isModalVisibleData])
+
+  useEffect(() => {
+    if (assetType === "Building") {
+      setIsModalVisible(true)
+    } else {
+      setIsModalVisible(false)
+    }
+  }, [assetType])
 
   // Form configuration
   const initialValues = {
@@ -233,63 +239,69 @@ export const DashboardMain = () => {
     }
   }
 
-  // Business logic functions
+  // Fixed processFloorData function
   const processFloorData = () => {
-    const mergedUnits = [
-      ...(Array.isArray(commercialUnits) ? commercialUnits : []).map((unit) => ({ unitType: "Commercial", ...unit })),
-      ...(Array.isArray(residentialUnits) ? residentialUnits : []).map((unit) => ({
-        unitType: "Residential",
-        ...unit,
-      })),
-    ]
+    // Get all units with their complete data
+    const allCommercialUnits = commercialUnits.filter(
+      (unit) => unit && unit.length && unit.breadth && unit.height && unit.name && unit.property_name,
+    )
 
-    const isUnitFilled = (unit: any) => {
-      return unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name
+    const allResidentialUnits = residentialUnits.filter(
+      (unit) => unit && unit.length && unit.breadth && unit.height && unit.name && unit.property_name,
+    )
+
+    // Create floor data structure
+    const floorName =
+      selectedFloor === null ? "Unknown Floor" : selectedFloor === 0 ? "Basement" : `Floor ${selectedFloor - 1}`
+
+    const floorData = {
+      floor: floorName,
+      plotCount: allCommercialUnits.length + allResidentialUnits.length,
+      details: [
+        // Add all commercial units
+        ...allCommercialUnits.map((unit, index) => ({
+          index: index + 1,
+          type: "Commercial",
+          length: String(unit.length || "Not Provided"),
+          breadth: String(unit.breadth || "Not Provided"),
+          height: String(unit.height || "Not Provided"),
+          name: unit.name || `Commercial Unit ${index + 1}`,
+          property_name: unit.property_name || "Unknown Property",
+          type_of_plot: "Commercial",
+        })),
+        // Add all residential units
+        ...allResidentialUnits.map((unit, index) => ({
+          index: allCommercialUnits.length + index + 1,
+          type: "Residential",
+          length: String(unit.length || "Not Provided"),
+          breadth: String(unit.breadth || "Not Provided"),
+          height: String(unit.height || "Not Provided"),
+          name: unit.name || `Residential Unit ${index + 1}`,
+          property_name: unit.property_name || "Unknown Property",
+          type_of_plot: "Residential",
+        })),
+      ],
     }
 
-    const filledUnits = mergedUnits.filter((unit) => isUnitFilled(unit))
-
-    return mergedUnits.map((unit, index) => {
-      const length = unit.length && !isNaN(Number(unit.length)) ? String(unit.length) : null
-      const breadth = unit.breadth && !isNaN(Number(unit.breadth)) ? String(unit.breadth) : null
-      const height = unit.height && !isNaN(Number(unit.height)) ? String(unit.height) : null
-      const name = unit.name || `Unnamed Unit ${index + 1}`
-      const propertyName = unit.property_name || "Unknown Property"
-
-      const plotCount = filledUnits.filter((filledUnit) => filledUnit.name === unit.name).length
-      const floorName =
-        selectedFloor === null ? "Unknown Floor" : selectedFloor === 0 ? "Basement" : `Floor ${selectedFloor - 1}`
-
-      const details = [
-        {
-          index: index + 1,
-          type: unit.type,
-          length: length || "Not Provided",
-          breadth: breadth || "Not Provided",
-          height: height || "Not Provided",
-          name: name,
-          property_name: propertyName,
-          type_of_plot: unit.type === "Commercial" ? "Commercial" : "Residential",
-        },
-      ]
-
-      return {
-        floor: floorName,
-        plotCount: plotCount,
-        type: unit.type,
-        details: details,
-      }
-    })
+    return [floorData]
   }
 
   const handleSaveFloorData = () => {
     const floorData = processFloorData()
+
+    if (floorData[0].details.length === 0) {
+      toast.error("Please fill at least one unit's complete details before saving")
+      return
+    }
+
     setSavedFloors((prevFloors) => {
-      const existingFloorNames = prevFloors.map((floor) => floor.floor)
-      const newFloorData = floorData.filter((floor) => !existingFloorNames.includes(floor.floor))
-      return [...prevFloors, ...newFloorData]
+      // Remove any existing data for this floor
+      const filteredFloors = prevFloors.filter((floor) => floor.floor !== floorData[0].floor)
+      // Add the new floor data
+      return [...filteredFloors, ...floorData]
     })
-    toast.success("Floor Details Saved Successfully")
+
+    toast.success(`Floor Details Saved Successfully - ${floorData[0].details.length} units saved`)
   }
 
   const handleEditFloor = (floor: any, index: any) => {
@@ -311,11 +323,12 @@ export const DashboardMain = () => {
       updatedFloors[editedFloorIndex] = {
         ...updatedFloors[editedFloorIndex],
         details: editedDetails,
-        plotCount: editedDetails.filter((detail: { type: any }) => detail.type).length,
+        plotCount: editedDetails.length,
       }
     }
     setSavedFloors(updatedFloors)
     setEditedFloorIndex(null)
+    toast.success("Floor data updated successfully")
   }
 
   const handleSubmitFormik = async (values: any, { resetForm }: FormikHelpers<any>, draft: boolean) => {
@@ -440,10 +453,6 @@ export const DashboardMain = () => {
   const handleBack = () => {
     window.location.replace("/lams/apply/approve-application")
   }
-
-  // const closeModal = () => {
-  //   setIsModalOpen(false)
-  // }
 
   const handleClose = () => {
     setIsModalVisible(false)
@@ -713,14 +722,6 @@ export const DashboardMain = () => {
                     setIsModalVisibleData(!isModalVisibleData)
                   }
 
-                  useEffect(() => {
-                    if (values.type_of_assets === "Building") {
-                      setIsModalVisible(true)
-                    } else {
-                      setIsModalVisible(false)
-                    }
-                  }, [values.type_of_assets])
-
                   return (
                     <>
                       <form onSubmit={handleSubmit} className="space-y-8">
@@ -737,7 +738,10 @@ export const DashboardMain = () => {
                                 Asset Category Name <span className="text-red-500">*</span>
                               </Label>
                               <SelectForNoApi
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                  handleChange(e)
+                                  setAssetType(e.target.value)
+                                }}
                                 onBlur={handleBlur}
                                 value={values.type_of_assets}
                                 error={errors.type_of_assets}
@@ -1247,12 +1251,13 @@ export const DashboardMain = () => {
                                             <Button
                                               key={index}
                                               variant={selectedFloor === index ? "default" : "outline"}
-                                              className={`h-16 flex flex-col items-center justify-center relative ${isSaved
+                                              className={`h-16 flex flex-col items-center justify-center relative ${
+                                                isSaved
                                                   ? "bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
                                                   : selectedFloor === index
                                                     ? "bg-blue-600 text-white hover:bg-gray-600"
                                                     : "hover:bg-gray-50"
-                                                }`}
+                                              }`}
                                               onClick={() => !isSaved && handleFloor(index)}
                                               disabled={isSaved}
                                             >
@@ -1379,17 +1384,18 @@ export const DashboardMain = () => {
                                                       key={num}
                                                       variant={
                                                         selectedUnit?.type === "Commercial" &&
-                                                          selectedUnit?.index === num - 1
+                                                        selectedUnit?.index === num - 1
                                                           ? "default"
                                                           : "outline"
                                                       }
-                                                      className={`h-12 ${isComplete
+                                                      className={`h-12 ${
+                                                        isComplete
                                                           ? "bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
                                                           : selectedUnit?.type === "Commercial" &&
-                                                            selectedUnit?.index === num - 1
+                                                              selectedUnit?.index === num - 1
                                                             ? "bg-blue-600 text-white"
                                                             : "hover:bg-gray-50"
-                                                        }`}
+                                                      }`}
                                                       onClick={() => handleUnitClick("Commercial", num - 1)}
                                                     >
                                                       {isComplete && <Check className="h-3 w-3 mr-1" />}
@@ -1421,17 +1427,18 @@ export const DashboardMain = () => {
                                                       key={num}
                                                       variant={
                                                         selectedUnit?.type === "Residential" &&
-                                                          selectedUnit?.index === num - 1
+                                                        selectedUnit?.index === num - 1
                                                           ? "default"
                                                           : "outline"
                                                       }
-                                                      className={`h-12 ${isComplete
+                                                      className={`h-12 ${
+                                                        isComplete
                                                           ? "bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
                                                           : selectedUnit?.type === "Residential" &&
-                                                            selectedUnit?.index === num - 1
+                                                              selectedUnit?.index === num - 1
                                                             ? "bg-blue-600 text-white"
                                                             : "hover:bg-gray-50"
-                                                        }`}
+                                                      }`}
                                                       onClick={() => handleUnitClick("Residential", num - 1)}
                                                     >
                                                       {isComplete && <Check className="h-3 w-3 mr-1" />}
@@ -1562,7 +1569,9 @@ export const DashboardMain = () => {
                                               <div className="text-sm text-gray-600">Commercial</div>
                                             </div>
                                             <div>
-                                              <div className="text-2xl font-bold text-green-600">{residentialCount}</div>
+                                              <div className="text-2xl font-bold text-green-600">
+                                                {residentialCount}
+                                              </div>
                                               <div className="text-sm text-gray-600">Residential</div>
                                             </div>
                                             <div>
@@ -1570,7 +1579,11 @@ export const DashboardMain = () => {
                                                 {
                                                   [...commercialUnits, ...residentialUnits].filter(
                                                     (u) =>
-                                                      u?.length && u?.breadth && u?.height && u?.name && u?.property_name,
+                                                      u?.length &&
+                                                      u?.breadth &&
+                                                      u?.height &&
+                                                      u?.name &&
+                                                      u?.property_name,
                                                   ).length
                                                 }
                                               </div>
@@ -1589,7 +1602,9 @@ export const DashboardMain = () => {
                                         {/* Commercial Units Display */}
                                         {commercialUnits?.length > 0 && (
                                           <div>
-                                            <h4 className="text-lg font-semibold text-blue-600 mb-4">Commercial Units</h4>
+                                            <h4 className="text-lg font-semibold text-blue-600 mb-4">
+                                              Commercial Units
+                                            </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                               {commercialUnits.map((unit, index) => {
                                                 const isValid =
@@ -1758,147 +1773,125 @@ export const DashboardMain = () => {
 
                                 {/* Saved Floors Data */}
                                 <div className="space-y-4">
-                                  {Object.values(
-                                    savedFloors?.reduce((acc: any, floor: any) => {
-                                      const floorNumber = floor.floor
-                                      if (!acc[floorNumber]) {
-                                        acc[floorNumber] = []
-                                      }
-                                      acc[floorNumber].push(floor)
-                                      return acc
-                                    }, {}),
-                                  ).map((floorGroup: any, idx) => (
+                                  {savedFloors.map((floor: any, idx) => (
                                     <Card key={idx} className="border-green-300 bg-green-50">
                                       <CardHeader>
                                         <CardTitle className="flex items-center justify-between">
-                                          <span className="text-green-800">
-                                            {floorGroup[0]?.floor === 0 ? "Basement" : `Floor ${floorGroup[0]?.floor}`}
-                                          </span>
-                                          <Badge className="bg-green-100 text-green-800">Complete</Badge>
+                                          <span className="text-green-800">{floor.floor}</span>
+                                          <div className="flex items-center space-x-2">
+                                            <Badge className="bg-green-100 text-green-800">
+                                              {floor.details.length} Units
+                                            </Badge>
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => handleEditFloor(floor, idx)}
+                                            >
+                                              <Edit3 className="h-4 w-4 mr-1" />
+                                              Edit
+                                            </Button>
+                                          </div>
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                          {floorGroup.map((floor: any, index: any) => {
-                                            const isEditMode = editedFloorIndex === index
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                          {floor.details.map((detail: any, detailIdx: any) => {
+                                            const isEditMode = editedFloorIndex === idx
 
                                             return (
-                                              <div key={index} className="space-y-4">
-                                                <div className="flex items-center justify-between">
-                                                  <h4 className="font-semibold text-green-700">
-                                                    Plot Count: {floor.plotCount}
-                                                  </h4>
+                                              <Card key={detailIdx} className="bg-white border-green-200">
+                                                <CardHeader className="pb-2">
+                                                  <CardTitle className="text-sm font-medium">
+                                                    {detail.type} Unit {detail.index}
+                                                  </CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="space-y-2">
                                                   {isEditMode ? (
-                                                    <Button
-                                                      size="sm"
-                                                      onClick={handleSaves}
-                                                      className="bg-blue-600 hover:bg-blue-700"
-                                                    >
-                                                      <Save className="h-4 w-4 mr-1" />
-                                                      Save
-                                                    </Button>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                      <div>
+                                                        <Label className="text-xs">Length:</Label>
+                                                        <Input
+                                                          type="number"
+                                                          value={editedDetails[detailIdx]?.length || ""}
+                                                          onChange={(e: any) =>
+                                                            handleInputChange(e, detailIdx, "length")
+                                                          }
+                                                          className="h-8 text-sm"
+                                                        />
+                                                      </div>
+                                                      <div>
+                                                        <Label className="text-xs">Breadth:</Label>
+                                                        <Input
+                                                          type="number"
+                                                          value={editedDetails[detailIdx]?.breadth || ""}
+                                                          onChange={(e: any) =>
+                                                            handleInputChange(e, detailIdx, "breadth")
+                                                          }
+                                                          className="h-8 text-sm"
+                                                        />
+                                                      </div>
+                                                      <div>
+                                                        <Label className="text-xs">Height:</Label>
+                                                        <Input
+                                                          type="number"
+                                                          value={editedDetails[detailIdx]?.height || ""}
+                                                          onChange={(e: any) =>
+                                                            handleInputChange(e, detailIdx, "height")
+                                                          }
+                                                          className="h-8 text-sm"
+                                                        />
+                                                      </div>
+                                                      <div>
+                                                        <Label className="text-xs">Owner:</Label>
+                                                        <Input
+                                                          value={editedDetails[detailIdx]?.name || ""}
+                                                          onChange={(e: any) => handleInputChange(e, detailIdx, "name")}
+                                                          className="h-8 text-sm"
+                                                        />
+                                                      </div>
+                                                      <div className="col-span-2">
+                                                        <Label className="text-xs">Property:</Label>
+                                                        <Input
+                                                          value={editedDetails[detailIdx]?.property_name || ""}
+                                                          onChange={(e: any) =>
+                                                            handleInputChange(e, detailIdx, "property_name")
+                                                          }
+                                                          className="h-8 text-sm"
+                                                        />
+                                                      </div>
+                                                    </div>
                                                   ) : (
-                                                    <Button
-                                                      size="sm"
-                                                      variant="outline"
-                                                      onClick={() => handleEditFloor(floor, index)}
-                                                    >
-                                                      <Edit3 className="h-4 w-4 mr-1" />
-                                                      Edit
-                                                    </Button>
+                                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                                      <p>
+                                                        <strong>Length:</strong> {detail.length} m
+                                                      </p>
+                                                      <p>
+                                                        <strong>Breadth:</strong> {detail.breadth} m
+                                                      </p>
+                                                      <p>
+                                                        <strong>Height:</strong> {detail.height} m
+                                                      </p>
+                                                      <p>
+                                                        <strong>Owner:</strong> {detail.name}
+                                                      </p>
+                                                      <p className="col-span-2">
+                                                        <strong>Property:</strong> {detail.property_name}
+                                                      </p>
+                                                    </div>
                                                   )}
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                  {floor.details.map((detail: any, idx: any) => (
-                                                    <Card key={idx} className="bg-white border-green-200">
-                                                      <CardContent className="p-4">
-                                                        {isEditMode ? (
-                                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                            <div>
-                                                              <Label className="text-xs">Type:</Label>
-                                                              <Input
-                                                                value={editedDetails[idx]?.type || ""}
-                                                                onChange={(e: any) => handleInputChange(e, idx, "type")}
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                            <div>
-                                                              <Label className="text-xs">Length:</Label>
-                                                              <Input
-                                                                type="number"
-                                                                value={editedDetails[idx]?.length || ""}
-                                                                onChange={(e: any) => handleInputChange(e, idx, "length")}
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                            <div>
-                                                              <Label className="text-xs">Breadth:</Label>
-                                                              <Input
-                                                                type="number"
-                                                                value={editedDetails[idx]?.breadth || ""}
-                                                                onChange={(e: any) => handleInputChange(e, idx, "breadth")}
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                            <div>
-                                                              <Label className="text-xs">Height:</Label>
-                                                              <Input
-                                                                type="number"
-                                                                value={editedDetails[idx]?.height || ""}
-                                                                onChange={(e: any) => handleInputChange(e, idx, "height")}
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                            <div>
-                                                              <Label className="text-xs">Owner Name:</Label>
-                                                              <Input
-                                                                value={editedDetails[idx]?.name || ""}
-                                                                onChange={(e: any) => handleInputChange(e, idx, "name")}
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                            <div>
-                                                              <Label className="text-xs">Property Name:</Label>
-                                                              <Input
-                                                                value={editedDetails[idx]?.property_name || ""}
-                                                                onChange={(e: any) =>
-                                                                  handleInputChange(e, idx, "property_name")
-                                                                }
-                                                                className="h-8 text-sm"
-                                                              />
-                                                            </div>
-                                                          </div>
-                                                        ) : (
-                                                          <div className="grid grid-cols-2 gap-2 text-sm">
-                                                            <p>
-                                                              <strong>Type:</strong> {detail.type}
-                                                            </p>
-                                                            <p>
-                                                              <strong>Length:</strong> {detail.length} m
-                                                            </p>
-                                                            <p>
-                                                              <strong>Breadth:</strong> {detail.breadth} m
-                                                            </p>
-                                                            <p>
-                                                              <strong>Height:</strong> {detail.height} m
-                                                            </p>
-                                                            <p>
-                                                              <strong>Owner:</strong> {detail.name}
-                                                            </p>
-                                                            <p>
-                                                              <strong>Property:</strong> {detail.property_name}
-                                                            </p>
-                                                          </div>
-                                                        )}
-                                                      </CardContent>
-                                                    </Card>
-                                                  ))}
-                                                </div>
-                                              </div>
+                                                </CardContent>
+                                              </Card>
                                             )
                                           })}
                                         </div>
+                                        {editedFloorIndex === idx && (
+                                          <div className="flex justify-center mt-4">
+                                            <Button onClick={handleSaves} className="bg-blue-600 hover:bg-blue-700">
+                                              <Save className="h-4 w-4 mr-2" />
+                                              Save Changes
+                                            </Button>
+                                          </div>
+                                        )}
                                       </CardContent>
                                     </Card>
                                   ))}
