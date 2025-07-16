@@ -1,0 +1,259 @@
+//!-----------------------------------------------------------------//
+// !Author: Jaideep
+// !status: Open
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model assets_list {
+//   id                      Int                      @id @default(autoincrement())
+//   type_of_assets          String?
+//   asset_sub_category_name String?
+//   assets_category_type    String?
+//   khata_no                String?
+//   plot_no                 String?
+//   ward_no                 String?
+//   address                 String?
+//   depreciation_method     String?
+//   apreciation_method      String?
+//   blue_print              String?
+//   ownership_doc           String?
+//   type_of_land            String?
+//   area                    String?
+//   order_no                String?  @unique
+//   order_date              String?
+//   acquisition             String?
+//   from_whom_acquired      String?
+//   mode_of_acquisition     String?
+//   role                    String?
+//   asset_list              assets_list_change_log[]
+//   asset_fieldOfficer      asset_fieldOfficer_req?
+
+//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+
+//   created_at DateTime @default(now()) @map("created_at")
+//   updated_at DateTime @updatedAt @map("updated_at")
+// }
+
+// model assets_list {
+//   id                      String @id @default(cuid())
+//   type_of_assets          String?
+//   asset_sub_category_name String?
+//   assets_category_type    String?
+//   khata_no                String?
+//   plot_no                 String?
+//   ward_no                 String?
+//   building_name           String?
+//   address                 String?
+//   ulb_id                  Int?  
+//   depreciation_method     String?
+//   location                String?
+//   apreciation_method      String?
+//   blue_print              String?
+//   ownership_doc           String?
+//   type_of_land            String?
+//   area                    String?
+//   order_no                String?                  @unique
+//   order_date              String?
+//   acquisition             String?
+//   from_whom_acquired      String?
+//   mode_of_acquisition     String?
+//   role                    String?
+//   no_of_floors            Int?
+//   asset_list              assets_list_change_log[]
+//   asset_fieldOfficer      asset_fieldOfficer_req?
+//   floorData               floorData[]
+//   // details                 details[]
+
+//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+//   is_restructured Boolean @default(false)
+//   is_drafted              Boolean @default(false) 
+//   location_id             Int     @default(2)    // Foreign key to location model
+
+//   locationRelation        location   @relation(fields: [location_id], references: [id])
+
+
+//   created_at DateTime @default(now()) @map("created_at")
+//   updated_at DateTime @updatedAt @map("updated_at")
+// }
+
+
+model assets_list {
+  id                      Int     @id @default(autoincrement()) // Changed from String to Int with auto-increment
+  assets_id               String  @unique // New field to store the custom asset ID
+  type_of_assets          String?
+  asset_sub_category_name String?
+  assets_category_type    String?
+  khata_no                String?
+  plot_no                 String?
+  ward_no                 String?
+  building_name           String?
+  address                 String?
+  ulb_id                  Int?  
+  depreciation_method     String?
+  location                String?
+  apreciation_method      String?
+  blue_print              String?
+  ownership_doc           String?
+  type_of_land            String?
+  area                    String?
+  order_no                String?                  @unique
+  order_date              String?
+  acquisition             String?
+  from_whom_acquired      String?
+  mode_of_acquisition     String?
+  role                    String?
+  no_of_floors            Int?
+  asset_list              assets_list_change_log[]
+  asset_fieldOfficer      asset_fieldOfficer_req?
+  floorData               floorData[]
+
+  status                  Int? @default(0) // 0: pending, 1: approved, -1: rejected
+  is_restructured         Boolean @default(false)
+  is_drafted              Boolean @default(false) 
+  location_id             Int     @default(2)    // Foreign key to location model
+
+  locationRelation        location   @relation(fields: [location_id], references: [id])
+
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+}
+
+
+model floorData {
+  id           Int         @id @default(autoincrement())
+  floor        String?
+  plotCount    Int?
+  type         String?
+  assetsList   assets_list @relation(fields: [assetsListId], references: [id], onDelete: Cascade)
+  assetsListId Int 
+
+  details details[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model details {
+  id            Int       @id @default(autoincrement())
+  index         Int?
+  type          String?
+  length        String?
+  breadth       String?
+  height        String?
+  name          String?
+  property_name String?
+  type_of_plot  String?
+  floorData     floorData @relation(fields: [floorDataId], references: [id], onDelete: Cascade)
+  floorDataId   Int
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model assets_list_change_log {
+  id Int @id @default(autoincrement())
+
+  type_of_assets          String?
+  asset_sub_category_name String?
+  assets_category_type    String?
+  khata_no                String?
+  plot_no                 String?
+  ward_no                 String?
+  address                 String?
+  depreciation_method     String?
+  apreciation_method      String?
+  blue_print              String?
+  ownership_doc           String?
+  type_of_land            String?
+  area                    String?
+  order_no                String?
+  order_date              String?
+  acquisition             String?
+  from_whom_acquired      String?
+  mode_of_acquisition     String?
+  role                    String?
+
+  status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+
+  asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId Int 
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model asset_checker_req {
+  id Int @id @default(autoincrement())
+
+  fieldOfficer    asset_fieldOfficer_req @relation(fields: [assetId], references: [assetId], onDelete: Cascade)
+  assetId         Int                     @unique
+  checker_remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model asset_fieldOfficer_req {
+  id Int @id @default(autoincrement())
+
+  long        String?
+  lat         String?
+  remarks     String?
+  image_one   String?
+  image_two   String?
+  image_three String?
+  image_four  String?
+  image_five  String?
+
+  asset   assets_list @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId Int          @unique
+
+  asset_checker_req asset_checker_req[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+
+model market {
+  id           Int      @id @default(autoincrement())
+  circle_id    Int
+  market_name  String
+  is_active    Boolean
+  created_at   DateTime
+  updated_at   DateTime
+  shop_counter Int
+  toll_counter Int
+  ulb_id       Int
+}
+
+model location {
+  id           Int      @id @default(autoincrement())
+  location     String?   
+  ulb_id       Int
+  building_name String? // Added building_name field
+  address      String?  // Added address field
+  is_active    Boolean?
+  assets       assets_list[] // Back-reference to assets_list
+  created_at   DateTime @db.Timestamp
+  updated_at   DateTime @db.Timestamp
+}
+
+model notifications {
+  id           Int   @id @default(autoincrement())
+  asset_id     String   // Foreign key to the assets_list table
+  message      String
+  created_at   DateTime @default(now())
+  status       Int
+  role         String?  // Role (e.g., Municipal, Field Officer)
+}
+

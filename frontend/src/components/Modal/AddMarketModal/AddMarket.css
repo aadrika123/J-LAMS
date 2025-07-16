@@ -1,0 +1,154 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 10px;
+  }
+  
+  .modalContent {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    width: 450px; /* Set width to 400px */
+    height: 300px; /* Set height to 200px */
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%; 
+    width: 40px;        
+    height: 40px;       
+    padding: 0;          
+    display: flex;        
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .closeButton:hover {
+    background-color: #c0392b;
+  }
+  
+  
+  .modalTitle { /* Update class name */
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .marketSelection {
+    margin-bottom: 10px;
+    flex-grow: 1; /* Allow this section to grow if needed */
+  }
+  
+  .selectLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .selectInput {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .selectInput:focus {
+    border-color: #3498db;
+  }
+  
+  .marketInput {
+    margin-top: 10px;
+  }
+  
+  .marketInput label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .marketInput input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .marketInput input:focus {
+    border-color: #3498db;
+  }
+  
+  .marketInput input::placeholder {
+    color: #bdc3c7;
+  }
+  
+  .error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .submitButtonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .submitButton {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submitButton:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+  
+  .submitButton:hover:enabled {
+    background-color: #2980b9;
+  }
+  
