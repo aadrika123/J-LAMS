@@ -1,551 +1,609 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-/* eslint-disable react/react-in-jsx-scope */
-"use client"
+// "use client"
 
-import { useState } from "react"
-import toast from "react-hot-toast"
-import DataModal from "./data-modal"
+// import type React from "react"
 
-interface UnitDetail {
-  type: string;
-  length?: string;
-  breadth?: string;
-  height?: string;
-  name?: string;
-  property_name?: string;
-  index?: number;
-}
+// import { useState } from "react"
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import { Badge } from "@/components/ui/badge"
+// import { ScrollArea } from "@/components/ui/scroll-area"
+// import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+// import { Separator } from "@/components/ui/separator"
+// import { toast } from "react-hot-toast"
+// import { Building, Plus, Eye, Save, Home, Users, Ruler, CheckCircle, AlertCircle } from "lucide-react"
+// import DataModal from "./data-modal"
 
-interface FloorData {
-  floor: string | number;
-  plotCount: number;
-  details: UnitDetail[];
-}
+// interface UnitDetail {
+//   type: string
+//   length?: string
+//   breadth?: string
+//   height?: string
+//   name?: string
+//   property_name?: string
+//   index?: number
+// }
 
-interface BuildingModalProps {
-  isModalVisible: boolean
-  onClose: () => void
-  Home3: unknown
-  values: unknown
-  handleDataModal: () => void
-  onSave?: (data: { buildingName: string; floors: FloorData[] }) => void
-  onSaveEdit?: (data: FloorData) => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setFloorData:any
-}
+// interface FloorData {
+//   floor: string | number
+//   plotCount: number
+//   details: UnitDetail[]
+// }
 
-export default function BuildingModal({
-  isModalVisible,
-  onClose,
-  values,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleDataModal,
-  onSave,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onSaveEdit,
-  setFloorData
-}: BuildingModalProps) {
-  // Basic building info
-  const [buildingName, setBuildingName] = useState("")
-  const [floorCount, setFloorCount] = useState("")
-  const [floorDisable, setFloorDisable] = useState(false)
+// interface BuildingModalProps {
+//   isModalVisible: boolean
+//   onClose: () => void
+//   Home3: unknown
+//   values: unknown
+//   handleDataModal: () => void
+//   onSave?: (data: { buildingName: string; floors: FloorData[] }) => void
+//   onSaveEdit?: (data: FloorData) => void
+//   setFloorData: any
+// }
 
-  // Floor and plot management
-  const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
-  const [plotNos, setPlotNos] = useState<{ [key: number]: string }>({})
-  const [plotNo, setPlotNo] = useState(0)
+// export default function BuildingModal({ isModalVisible, onClose, values, onSave, setFloorData }: BuildingModalProps) {
+//   // Basic building info
+//   const [buildingName, setBuildingName] = useState("")
+//   const [floorCount, setFloorCount] = useState("")
+//   const [floorDisable, setFloorDisable] = useState(false)
 
-  // Unit management
-  const [commercialCount, setCommercialCount] = useState("")
-  const [residentialCount, setResidentialCount] = useState("")
-  const [commercialUnits, setCommercialUnits] = useState<UnitDetail[]>([])
-  const [residentialUnits, setResidentialUnits] = useState<UnitDetail[]>([])
-  const [selectedUnit, setSelectedUnit] = useState<{ type: string; index: number } | null>(null)
+//   // Floor and plot management
+//   const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
+//   const [plotNos, setPlotNos] = useState<{ [key: number]: string }>({})
+//   const [plotNo, setPlotNo] = useState(0)
 
-  // Saved data
-  const [savedFloors, setSavedFloors] = useState([])
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<any[]>([])
-  console.log("data",data)
+//   // Unit management
+//   const [commercialCount, setCommercialCount] = useState("")
+//   const [residentialCount, setResidentialCount] = useState("")
+//   const [commercialUnits, setCommercialUnits] = useState<UnitDetail[]>([])
+//   const [residentialUnits, setResidentialUnits] = useState<UnitDetail[]>([])
+//   const [selectedUnit, setSelectedUnit] = useState<{ type: string; index: number } | null>(null)
 
-  // Add with other state declarations at the top
-  const [isDataModalVisible, setIsDataModalVisible] = useState(false)
+//   // Saved data
+//   const [savedFloors, setSavedFloors] = useState<FloorData[]>([])
+//   const [isDataModalVisible, setIsDataModalVisible] = useState(false)
 
-  const handleSave = (value: boolean) => {
-    if (!buildingName && !floorCount) {
-      toast.error("Building Name & Floor Cannot be Empty")
-      return false
-    }
-    if (!buildingName) {
-      toast.error("Building Name Cannot be Empty")
-      return false
-    }
-    if (!floorCount) {
-      toast.error("Floor Cannot be Empty")
-      return false
-    }
+//   const handleSave = (value: boolean) => {
+//     if (!buildingName && !floorCount) {
+//       toast.error("Building Name & Floor Cannot be Empty")
+//       return false
+//     }
+//     if (!buildingName) {
+//       toast.error("Building Name Cannot be Empty")
+//       return false
+//     }
+//     if (!floorCount) {
+//       toast.error("Floor Cannot be Empty")
+//       return false
+//     }
 
-    const numericFloorCount = Number(floorCount)
-    if (isNaN(numericFloorCount) || numericFloorCount < 0) {
-      toast.error("Invalid floor count")
-      return false
-    }
+//     const numericFloorCount = Number(floorCount)
+//     if (isNaN(numericFloorCount) || numericFloorCount < 0) {
+//       toast.error("Invalid floor count")
+//       return false
+//     }
 
-    setFloorDisable(true)
+//     setFloorDisable(true)
+//     return true
+//   }
 
-    if (value) {
-      handleTypeBox(numericFloorCount, "Residential", 0)
-      handleTypeBox(numericFloorCount, "Commercial", 0)
-    }
+//   const handleFloor = (index: number) => {
+//     setSelectedFloor(index)
+//     setPlotNo(0)
+//     setCommercialCount("")
+//     setResidentialCount("")
+//     setCommercialUnits([])
+//     setResidentialUnits([])
+//     setSelectedUnit(null)
+//   }
 
-    return true
-  }
+//   const handlePlotCountChange = (e: React.ChangeEvent<HTMLInputElement>, floor: number) => {
+//     const value = e.target.value
+//     setPlotNos({ ...plotNos, [floor]: value })
+//     setPlotNo(Number.parseInt(value) || 0)
+//   }
 
-  const handleFloor = (index: number) => {
-    setSelectedFloor(index)
-    // Reset fields when changing floor
-    setPlotNo(0)
-    setCommercialCount("")
-    setResidentialCount("")
-    setCommercialUnits([])
-    setResidentialUnits([])
-    setSelectedUnit(null)
-  }
+//   const validateUnitCount = (
+//     newCount: number,
+//     otherCount: string,
+//     totalPlots: number,
+//     setCount: (value: string) => void,
+//     setUnits: (units: UnitDetail[]) => void,
+//     type: string,
+//   ) => {
+//     const otherCountNum = Number.parseInt(otherCount) || 0
+//     if (newCount + otherCountNum <= totalPlots) {
+//       setCount(newCount.toString())
+//       setUnits(Array(newCount).fill({ type }))
+//     } else {
+//       toast.error(`Total units cannot exceed ${totalPlots}`)
+//     }
+//   }
 
-  const handleTypeBox = (count: number, type: string, index: number | null) => {
-    if (isNaN(count)) return
+//   const generateBoxes = (count: string) => {
+//     return Array.from({ length: Number.parseInt(count) || 0 }, (_, i) => i + 1)
+//   }
 
-    setData((prevData) => {
-      const updatedData = [...prevData]
-      if (index !== null && index >= 0 && index < updatedData.length) {
-        const floorObj = updatedData[index] || {}
-        floorObj.units = floorObj.units || {}
-        floorObj.units[type] = Array(count)
-          .fill({})
-          .map((_, unitIndex) => ({
-            index: unitIndex + 1,
-            type,
-          }))
-        updatedData[index] = floorObj
-      }
-      return updatedData
-    })
-  }
+//   const handleUnitClick = (type: string, index: number) => {
+//     setSelectedUnit({ type, index })
+//   }
 
-  const handlePlotCountChange = (e: React.ChangeEvent<HTMLInputElement>, floor: number) => {
-    const value = e.target.value
-    setPlotNos({ ...plotNos, [floor]: value })
-    setPlotNo(Number.parseInt(value) || 0)
-  }
+//   const handleUnitDetailsChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+//     if (!selectedUnit) return
 
-  const validateUnitCount = (
-    newCount: number,
-    otherCount: string,
-    totalPlots: number,
-    setCount: (value: string) => void,
-    setUnits: (units: UnitDetail[]) => void,
-    type: string,
-  ) => {
-    const otherCountNum = Number.parseInt(otherCount) || 0
-    if (newCount + otherCountNum <= totalPlots) {
-      setCount(newCount.toString())
-      setUnits(Array(newCount).fill({ type }))
-    } else {
-      toast.error(`Total units cannot exceed ${totalPlots}`)
-    }
-  }
+//     const { type, index } = selectedUnit
+//     const units = type === "Commercial" ? [...commercialUnits] : [...residentialUnits]
+//     units[index] = { ...units[index], [field]: e.target.value }
 
-  const generateBoxes = (count: string) => {
-    return Array.from({ length: Number.parseInt(count) || 0 }, (_, i) => i + 1)
-  }
+//     if (type === "Commercial") {
+//       setCommercialUnits(units)
+//     } else {
+//       setResidentialUnits(units)
+//     }
+//   }
 
-  const handleUnitClick = (type: string, index: number) => {
-    setSelectedUnit({ type, index })
-  }
+//   const handleSaveFloorData = () => {
+//     if (selectedFloor === null) return
 
-  const handleUnitDetailsChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    if (!selectedUnit) return
+//     const allUnits = [...commercialUnits, ...residentialUnits]
+//     const floorData: FloorData = {
+//       floor: selectedFloor === 0 ? "B" : selectedFloor - 1,
+//       plotCount: plotNo,
+//       details: allUnits,
+//     }
 
-    const { type, index } = selectedUnit
-    const units = type === "Commercial" ? [...commercialUnits] : [...residentialUnits]
-    units[index] = { ...units[index], [field]: e.target.value }
+//     setSavedFloors((prev) => [...prev, floorData])
+//     setFloorData((prev: any) => (Array.isArray(prev) ? [...prev, floorData] : [floorData]))
 
-    if (type === "Commercial") {
-      setCommercialUnits(units)
-    } else {
-      setResidentialUnits(units)
-    }
-  }
+//     // Reset fields after saving
+//     setSelectedFloor(null)
+//     setPlotNo(0)
+//     setCommercialCount("")
+//     setResidentialCount("")
+//     setCommercialUnits([])
+//     setResidentialUnits([])
+//     setSelectedUnit(null)
 
-  // const validateUnitDetails = (units: UnitDetail[]) => {
-  //   return units.every((unit) => unit.length && unit.breadth && unit.height && unit.name && unit.property_name)
-  // }
+//     toast.success("Floor data saved successfully")
+//     onSave?.({ buildingName, floors: [...savedFloors, floorData] })
+//   }
 
-  const handleSaveFloorData = () => {
-    if (selectedFloor === null) return
+//   const getFloorDisplayName = (index: number) => {
+//     return index === 0 ? "Basement" : `Floor ${index - 1}`
+//   }
 
-    // Validate all units have complete data
-    const allUnits = [...commercialUnits, ...residentialUnits]
-    // if (!validateUnitDetails(allUnits)) {
-    //   toast.error("Please fill in all unit details")
-    //   return
-    // }
+//   const isFloorSaved = (index: number) => {
+//     const savedFloorNumbers = savedFloors.map((floor) => {
+//       const floorNum = floor.floor
+//       return typeof floorNum === "number" ? floorNum : floorNum === "B" ? -1 : Number.parseInt(floorNum)
+//     })
+//     return savedFloorNumbers.includes(index - 1)
+//   }
 
-    const floorData: FloorData = {
-      floor: selectedFloor === 0 ? "B" : selectedFloor - 1,
-      plotCount: plotNo,
-      details: allUnits,
-    }
+//   const getUnitDetails = (type: string, index: number) => {
+//     const units = type === "Commercial" ? commercialUnits : residentialUnits
+//     return units[index] || {}
+//   }
 
-    setSavedFloors((prev) => [...prev, floorData])
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setFloorData((prev:any) => (Array.isArray(prev) ? [...prev, floorData] : [floorData]));
+//   const isUnitComplete = (type: string, index: number) => {
+//     const unit = getUnitDetails(type, index)
+//     return unit.length && unit.breadth && unit.height && unit.name && unit.property_name
+//   }
 
-    // Reset fields after saving
-    setSelectedFloor(null)
-    setPlotNo(0)
-    setCommercialCount("")
-    setResidentialCount("")
-    setCommercialUnits([])
-    setResidentialUnits([])
-    setSelectedUnit(null)
+//   if (!isModalVisible || values?.type_of_assets !== "Building") return null
 
-    toast.success("Floor data saved successfully")
+//   return (
+//     <>
+//       <Dialog open={isModalVisible} onOpenChange={onClose}>
+//         <DialogContent className="max-w-6xl max-h-[90vh] bg-white text-gray-800">
+//           <DialogHeader>
+//             <DialogTitle className="flex items-center justify-between">
+//               <div className="flex items-center space-x-2">
+//                 <Building className="w-5 h-5 text-blue-600" />
+//                 <span>Building Configuration</span>
+//               </div>
+//               <div className="flex items-center space-x-2">
+//                 <Button
+//                   variant="outline"
+//                   onClick={() => setIsDataModalVisible(true)}
+//                   className="flex items-center space-x-2"
+//                   disabled={savedFloors.length === 0}
+//                 >
+//                   <Eye className="w-4 h-4" />
+//                   <span>View Data</span>
+//                 </Button>
+//               </div>
+//             </DialogTitle>
+//           </DialogHeader>
 
-    // Call onSave callback if provided
-    onSave?.({ buildingName, floors: [...savedFloors, floorData] })
-  }
+//           <ScrollArea className="h-[75vh] pr-4">
+//             <Tabs defaultValue="basic" className="w-full">
+//               <TabsList className="grid w-full grid-cols-4">
+//                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
+//                 <TabsTrigger value="floors" disabled={!floorDisable}>
+//                   Floor Selection
+//                 </TabsTrigger>
+//                 <TabsTrigger value="units" disabled={selectedFloor === null}>
+//                   Unit Configuration
+//                 </TabsTrigger>
+//                 <TabsTrigger value="details" disabled={!selectedUnit}>
+//                   Unit Details
+//                 </TabsTrigger>
+//               </TabsList>
 
-  const handleCloseDataModal = () => {
-    setIsDataModalVisible(false)
-  }
+//               <TabsContent value="basic" className="space-y-6">
+//                 <Card>
+//                   <CardHeader>
+//                     <CardTitle className="flex items-center space-x-2">
+//                       <Building className="w-5 h-5" />
+//                       <span>Building Information</span>
+//                     </CardTitle>
+//                   </CardHeader>
+//                   <CardContent className="space-y-4">
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                       <div className="space-y-2">
+//                         <Label htmlFor="buildingName">Building Name</Label>
+//                         <Input
+//                           id="buildingName"
+//                           value={buildingName}
+//                           onChange={(e) => setBuildingName(e.target.value)}
+//                           placeholder="Enter building name"
+//                           disabled={floorDisable}
+//                         />
+//                       </div>
+//                       <div className="space-y-2">
+//                         <Label htmlFor="floorCount">Number of Floors (1-10)</Label>
+//                         <Input
+//                           id="floorCount"
+//                           type="number"
+//                           value={floorCount}
+//                           onChange={(e) => {
+//                             const value = Number.parseInt(e.target.value)
+//                             if (!isNaN(value) && value >= 1 && value <= 10) {
+//                               setFloorCount(value.toString())
+//                             } else if (e.target.value === "") {
+//                               setFloorCount("")
+//                             }
+//                           }}
+//                           placeholder="Enter number of floors"
+//                           disabled={floorDisable}
+//                           min={1}
+//                           max={10}
+//                         />
+//                       </div>
+//                     </div>
+//                     <Button
+//                       onClick={() => handleSave(false)}
+//                       disabled={floorDisable}
+//                       className="w-full flex items-center space-x-2"
+//                     >
+//                       <Plus className="w-4 h-4" />
+//                       <span>Initialize Building Configuration</span>
+//                     </Button>
+//                   </CardContent>
+//                 </Card>
 
-  const handleSaveEdit = (editedFloor: FloorData) => {
-    const newSavedFloors = [...savedFloors]
-    const index = newSavedFloors.findIndex((floor) => floor.floor === editedFloor.floor)
-    if (index !== -1) {
-      newSavedFloors[index] = editedFloor
-      setSavedFloors(newSavedFloors)
-    }
-  }
+//                 {floorDisable && (
+//                   <Card>
+//                     <CardHeader>
+//                       <CardTitle>Building Summary</CardTitle>
+//                     </CardHeader>
+//                     <CardContent>
+//                       <div className="grid grid-cols-2 gap-4 text-sm">
+//                         <div>
+//                           <Label className="text-gray-500">Building Name</Label>
+//                           <p className="font-semibold">{buildingName}</p>
+//                         </div>
+//                         <div>
+//                           <Label className="text-gray-500">Total Floors</Label>
+//                           <p className="font-semibold">{floorCount}</p>
+//                         </div>
+//                         <div>
+//                           <Label className="text-gray-500">Configured Floors</Label>
+//                           <p className="font-semibold">{savedFloors.length}</p>
+//                         </div>
+//                         <div>
+//                           <Label className="text-gray-500">Total Units</Label>
+//                           <p className="font-semibold">
+//                             {savedFloors.reduce((total, floor) => total + floor.plotCount, 0)}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     </CardContent>
+//                   </Card>
+//                 )}
+//               </TabsContent>
 
-  if (!isModalVisible || values?.type_of_assets !== "Building") return null
+//               <TabsContent value="floors" className="space-y-6">
+//                 <Card>
+//                   <CardHeader>
+//                     <CardTitle>Select Floor to Configure</CardTitle>
+//                   </CardHeader>
+//                   <CardContent>
+//                     <div className="grid grid-cols-6 gap-3">
+//                       {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => {
+//                         const isSaved = isFloorSaved(index)
+//                         const isSelected = selectedFloor === index
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm" onClick={onClose} />
+//                         return (
+//                           <Button
+//                             key={index}
+//                             variant={isSelected ? "default" : isSaved ? "secondary" : "outline"}
+//                             className={`h-16 flex flex-col items-center justify-center relative ${
+//                               isSaved ? "cursor-not-allowed opacity-75" : ""
+//                             }`}
+//                             onClick={() => !isSaved && handleFloor(index)}
+//                             disabled={isSaved}
+//                           >
+//                             {isSaved && (
+//                               <CheckCircle className="absolute -top-1 -right-1 w-4 h-4 text-green-600 bg-white rounded-full" />
+//                             )}
+//                             <Building className="w-5 h-5 mb-1" />
+//                             <span className="text-xs font-medium">{getFloorDisplayName(index)}</span>
+//                           </Button>
+//                         )
+//                       })}
+//                     </div>
 
-      {/* Modal Content */}
-      <div className="bg-slate-100 p-6 rounded-lg shadow-md w-[70rem] max-h-[80vh] overflow-auto z-20">
-        {/* Modal Header */}
-        <div className="mb-[3rem] flex justify-end items-center">
-          <button
-            onClick={() => setIsDataModalVisible(true)}
-            className="bg-[#4338CA] text-white px-4 py-2 rounded-xl mr-4 hover:bg-[#4338CA]/90 transition-colors"
-          >
-            View Data
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-red-600 text-white w-[3rem] p-2 rounded-xl hover:bg-red-700 transition-colors"
-          >
-            X
-          </button>
-        </div>
+//                     {selectedFloor !== null && (
+//                       <Card className="mt-6">
+//                         <CardHeader>
+//                           <CardTitle className="text-lg">Configure {getFloorDisplayName(selectedFloor)}</CardTitle>
+//                         </CardHeader>
+//                         <CardContent>
+//                           <div className="space-y-2">
+//                             <Label htmlFor="plotCount">Number of Units on this Floor</Label>
+//                             <Input
+//                               id="plotCount"
+//                               type="number"
+//                               placeholder="Enter number of units"
+//                               value={plotNos[selectedFloor] || ""}
+//                               onChange={(e) => handlePlotCountChange(e, selectedFloor)}
+//                               maxLength={3}
+//                             />
+//                           </div>
+//                         </CardContent>
+//                       </Card>
+//                     )}
+//                   </CardContent>
+//                 </Card>
+//               </TabsContent>
 
-        {/* Building Form */}
-        <div className="space-y-6">
-          <div className="flex gap-4">
-            <input
-              type="text"
-              value={buildingName}
-              onChange={(e) => setBuildingName(e.target.value)}
-              placeholder="Building Name"
-              className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-              disabled={floorDisable}
-            />
-            <input
-              type="number"
-              value={floorCount}
-              onChange={(e) => {
-                const value = Number.parseInt(e.target.value)
-                if (!isNaN(value) && value >= 1 && value <= 10) {
-                  setFloorCount(value.toString())
-                } else if (e.target.value === "") {
-                  setFloorCount("")
-                }
-              }}
-              placeholder="Number of Floors"
-              className="border p-2 rounded w-40 focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-              disabled={floorDisable}
-              min={1}
-              max={10}
-            />
-            <button
-              onClick={() => handleSave(false)}
-              className="bg-[#4338CA] text-white px-4 py-2 rounded hover:bg-[#4338CA]/90 transition-colors disabled:opacity-50"
-              disabled={floorDisable}
-            >
-              Add Floor
-            </button>
-          </div>
+//               <TabsContent value="units" className="space-y-6">
+//                 {plotNo > 0 && (
+//                   <Card>
+//                     <CardHeader>
+//                       <CardTitle className="flex items-center space-x-2">
+//                         <Users className="w-5 h-5" />
+//                         <span>Unit Type Distribution</span>
+//                         <Badge variant="secondary">{plotNo} Total Units</Badge>
+//                       </CardTitle>
+//                     </CardHeader>
+//                     <CardContent className="space-y-6">
+//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                         <Card className="border-2 border-blue-100">
+//                           <CardHeader className="bg-blue-50">
+//                             <CardTitle className="text-lg flex items-center space-x-2">
+//                               <Building className="w-4 h-4 text-blue-600" />
+//                               <span>Commercial Units</span>
+//                             </CardTitle>
+//                           </CardHeader>
+//                           <CardContent className="pt-4">
+//                             <div className="space-y-3">
+//                               <div className="space-y-2">
+//                                 <Label>Number of Commercial Units</Label>
+//                                 <Input
+//                                   type="number"
+//                                   placeholder="Enter count"
+//                                   value={commercialCount}
+//                                   onChange={(e) => {
+//                                     const value = Number.parseInt(e.target.value) || 0
+//                                     validateUnitCount(
+//                                       value,
+//                                       residentialCount,
+//                                       plotNo,
+//                                       setCommercialCount,
+//                                       setCommercialUnits,
+//                                       "Commercial",
+//                                     )
+//                                   }}
+//                                   maxLength={2}
+//                                 />
+//                               </div>
+//                               <div className="flex flex-wrap gap-2">
+//                                 {generateBoxes(commercialCount).map((num) => (
+//                                   <Button
+//                                     key={num}
+//                                     variant={
+//                                       selectedUnit?.type === "Commercial" && selectedUnit?.index === num - 1
+//                                         ? "default"
+//                                         : "outline"
+//                                     }
+//                                     size="sm"
+//                                     className="w-10 h-10 p-0 relative"
+//                                     onClick={() => handleUnitClick("Commercial", num - 1)}
+//                                   >
+//                                     {isUnitComplete("Commercial", num - 1) && (
+//                                       <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 text-green-600 bg-white rounded-full" />
+//                                     )}
+//                                     {num}
+//                                   </Button>
+//                                 ))}
+//                               </div>
+//                             </div>
+//                           </CardContent>
+//                         </Card>
 
-          {/* Floor Selection */}
-          {floorDisable && (
-            <div className="flex flex-row gap-2">
-              {Array.from({ length: Math.max(Number(floorCount), 0) + 2 }, (_, index) => {
-                const savedFloorNumbers = savedFloors.map((floor) => {
-                  const floorNum = floor.floor
-                  return typeof floorNum === "number" ? floorNum : Number.parseInt(floorNum)
-                })
+//                         <Card className="border-2 border-green-100">
+//                           <CardHeader className="bg-green-50">
+//                             <CardTitle className="text-lg flex items-center space-x-2">
+//                               <Home className="w-4 h-4 text-green-600" />
+//                               <span>Residential Units</span>
+//                             </CardTitle>
+//                           </CardHeader>
+//                           <CardContent className="pt-4">
+//                             <div className="space-y-3">
+//                               <div className="space-y-2">
+//                                 <Label>Number of Residential Units</Label>
+//                                 <Input
+//                                   type="number"
+//                                   placeholder="Enter count"
+//                                   value={residentialCount}
+//                                   onChange={(e) => {
+//                                     const value = Number.parseInt(e.target.value) || 0
+//                                     validateUnitCount(
+//                                       value,
+//                                       commercialCount,
+//                                       plotNo,
+//                                       setResidentialCount,
+//                                       setResidentialUnits,
+//                                       "Residential",
+//                                     )
+//                                   }}
+//                                   maxLength={2}
+//                                 />
+//                               </div>
+//                               <div className="flex flex-wrap gap-2">
+//                                 {generateBoxes(residentialCount).map((num) => (
+//                                   <Button
+//                                     key={num}
+//                                     variant={
+//                                       selectedUnit?.type === "Residential" && selectedUnit?.index === num - 1
+//                                         ? "default"
+//                                         : "outline"
+//                                     }
+//                                     size="sm"
+//                                     className="w-10 h-10 p-0 relative"
+//                                     onClick={() => handleUnitClick("Residential", num - 1)}
+//                                   >
+//                                     {isUnitComplete("Residential", num - 1) && (
+//                                       <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 text-green-600 bg-white rounded-full" />
+//                                     )}
+//                                     {num}
+//                                   </Button>
+//                                 ))}
+//                               </div>
+//                             </div>
+//                           </CardContent>
+//                         </Card>
+//                       </div>
 
-                const isSaved = savedFloorNumbers.includes(index - 1)
+//                       {selectedUnit && (
+//                         <Card className="border-2 border-orange-200 bg-orange-50">
+//                           <CardHeader>
+//                             <CardTitle className="flex items-center space-x-2">
+//                               <AlertCircle className="w-4 h-4 text-orange-600" />
+//                               <span>
+//                                 Selected: {selectedUnit.type} Unit {selectedUnit.index + 1}
+//                               </span>
+//                             </CardTitle>
+//                           </CardHeader>
+//                           <CardContent>
+//                             <p className="text-sm text-gray-600">
+//                               Click on the "Unit Details" tab to configure this unit's information.
+//                             </p>
+//                           </CardContent>
+//                         </Card>
+//                       )}
+//                     </CardContent>
+//                   </Card>
+//                 )}
+//               </TabsContent>
 
-                return (
-                  <button
-                    key={index}
-                    className={`
-                      w-12 h-12 rounded-md text-white transition-all
-                      ${isSaved ? "bg-green-600 cursor-not-allowed" : "bg-[#4338CA] hover:bg-[#4338CA]/90"}
-                      ${selectedFloor === index ? "ring-2 ring-offset-2 ring-[#4338CA]" : ""}
-                    `}
-                    onClick={() => !isSaved && handleFloor(index)}
-                    disabled={isSaved}
-                  >
-                    {index === 0 ? "B" : (index - 1).toString()}
-                  </button>
-                )
-              })}
-            </div>
-          )}
+//               <TabsContent value="details" className="space-y-6">
+//                 {selectedUnit && (
+//                   <Card>
+//                     <CardHeader>
+//                       <CardTitle className="flex items-center space-x-2">
+//                         <Ruler className="w-5 h-5" />
+//                         <span>
+//                           {selectedUnit.type} Unit {selectedUnit.index + 1} Details
+//                         </span>
+//                       </CardTitle>
+//                     </CardHeader>
+//                     <CardContent className="space-y-6">
+//                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                         <div className="space-y-2">
+//                           <Label>Length (meters)</Label>
+//                           <Input
+//                             type="number"
+//                             placeholder="Length"
+//                             value={getUnitDetails(selectedUnit.type, selectedUnit.index).length || ""}
+//                             onChange={(e) => handleUnitDetailsChange(e, "length")}
+//                           />
+//                         </div>
+//                         <div className="space-y-2">
+//                           <Label>Width (meters)</Label>
+//                           <Input
+//                             type="number"
+//                             placeholder="Width"
+//                             value={getUnitDetails(selectedUnit.type, selectedUnit.index).breadth || ""}
+//                             onChange={(e) => handleUnitDetailsChange(e, "breadth")}
+//                           />
+//                         </div>
+//                         <div className="space-y-2">
+//                           <Label>Height (meters)</Label>
+//                           <Input
+//                             type="number"
+//                             placeholder="Height"
+//                             value={getUnitDetails(selectedUnit.type, selectedUnit.index).height || ""}
+//                             onChange={(e) => handleUnitDetailsChange(e, "height")}
+//                           />
+//                         </div>
+//                       </div>
 
-          {/* Plot Count Input */}
-          {selectedFloor !== null && (
-            <div className="flex items-center gap-4">
-              <label className="font-semibold">{selectedFloor === 0 ? "Basement" : `Floor ${selectedFloor - 1}`}</label>
-              <input
-                type="text"
-                className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                placeholder={`No of shop/flat on the floor ${selectedFloor === 0 ? "B" : selectedFloor - 1}`}
-                value={plotNos[selectedFloor] || ""}
-                onChange={(e) => handlePlotCountChange(e, selectedFloor)}
-                maxLength={3}
-                onKeyPress={(e) => {
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault()
-                  }
-                }}
-              />
-            </div>
-          )}
+//                       <Separator />
 
-          {/* Unit Type Selection */}
-          {plotNo > 0 && (
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div>
-                  <input
-                    type="text"
-                    className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                    placeholder="Number of Commercial units"
-                    value={commercialCount}
-                    onChange={(e) => {
-                      const value = Number.parseInt(e.target.value) || 0
-                      validateUnitCount(
-                        value,
-                        residentialCount,
-                        plotNo,
-                        setCommercialCount,
-                        setCommercialUnits,
-                        "Commercial",
-                      )
-                    }}
-                    maxLength={2}
-                    onKeyPress={(e) => {
-                      if (!/[0-9]/.test(e.key)) {
-                        e.preventDefault()
-                      }
-                    }}
-                  />
-                  <label className="ml-2">Commercial</label>
-                </div>
+//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                         <div className="space-y-2">
+//                           <Label>Owner Name</Label>
+//                           <Input
+//                             placeholder="Enter owner name"
+//                             value={getUnitDetails(selectedUnit.type, selectedUnit.index).name || ""}
+//                             onChange={(e) => handleUnitDetailsChange(e, "name")}
+//                           />
+//                         </div>
+//                         <div className="space-y-2">
+//                           <Label>Property Name</Label>
+//                           <Input
+//                             placeholder="Enter property name"
+//                             value={getUnitDetails(selectedUnit.type, selectedUnit.index).property_name || ""}
+//                             onChange={(e) => handleUnitDetailsChange(e, "property_name")}
+//                           />
+//                         </div>
+//                       </div>
 
-                <div>
-                  <input
-                    type="text"
-                    className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                    placeholder="Number of Residential units"
-                    value={residentialCount}
-                    onChange={(e) => {
-                      const value = Number.parseInt(e.target.value) || 0
-                      validateUnitCount(
-                        value,
-                        commercialCount,
-                        plotNo,
-                        setResidentialCount,
-                        setResidentialUnits,
-                        "Residential",
-                      )
-                    }}
-                    maxLength={2}
-                    onKeyPress={(e) => {
-                      if (!/[0-9]/.test(e.key)) {
-                        e.preventDefault()
-                      }
-                    }}
-                  />
-                  <label className="ml-2">Residential</label>
-                </div>
-              </div>
+//                       <div className="flex justify-center pt-4">
+//                         <Button onClick={handleSaveFloorData} size="lg" className="flex items-center space-x-2">
+//                           <Save className="w-4 h-4" />
+//                           <span>Save Floor Configuration</span>
+//                         </Button>
+//                       </div>
+//                     </CardContent>
+//                   </Card>
+//                 )}
+//               </TabsContent>
+//             </Tabs>
+//           </ScrollArea>
+//         </DialogContent>
+//       </Dialog>
 
-              {/* Unit Selection */}
-              <div className="space-y-4">
-                <h4 className="text-sm text-[#4338CA] font-semibold">Commercial Units:</h4>
-                <div className="flex gap-2 flex-wrap">
-                  {generateBoxes(commercialCount).map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => handleUnitClick("Commercial", num - 1)}
-                      className={`
-                        w-10 h-10 rounded border border-[#4338CA] transition-all
-                        ${
-                          selectedUnit?.type === "Commercial" && selectedUnit?.index === num - 1
-                            ? "bg-[#4338CA] text-white"
-                            : "text-[#4338CA] hover:bg-[#4338CA]/10"
-                        }
-                      `}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-
-                <h4 className="text-sm text-[#4338CA] font-semibold">Residential Units:</h4>
-                <div className="flex gap-2 flex-wrap">
-                  {generateBoxes(residentialCount).map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => handleUnitClick("Residential", num - 1)}
-                      className={`
-                        w-10 h-10 rounded border border-[#4338CA] transition-all
-                        ${
-                          selectedUnit?.type === "Residential" && selectedUnit?.index === num - 1
-                            ? "bg-[#4338CA] text-white"
-                            : "text-[#4338CA] hover:bg-[#4338CA]/10"
-                        }
-                      `}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Unit Details Form */}
-          {selectedUnit && (
-            <div className="space-y-4 border-t pt-4">
-              <h4 className="font-semibold">
-                {selectedUnit.type} Unit {selectedUnit.index + 1} Details:
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                  placeholder="Length in meters"
-                  value={
-                    selectedUnit.type === "Commercial"
-                      ? commercialUnits[selectedUnit.index]?.length || ""
-                      : residentialUnits[selectedUnit.index]?.length || ""
-                  }
-                  onChange={(e) => handleUnitDetailsChange(e, "length")}
-                />
-                <input
-                  type="number"
-                  className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                  placeholder="Breadth in meters"
-                  value={
-                    selectedUnit.type === "Commercial"
-                      ? commercialUnits[selectedUnit.index]?.breadth || ""
-                      : residentialUnits[selectedUnit.index]?.breadth || ""
-                  }
-                  onChange={(e) => handleUnitDetailsChange(e, "breadth")}
-                />
-                <input
-                  type="number"
-                  className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                  placeholder="Height in meters"
-                  value={
-                    selectedUnit.type === "Commercial"
-                      ? commercialUnits[selectedUnit.index]?.height || ""
-                      : residentialUnits[selectedUnit.index]?.height || ""
-                  }
-                  onChange={(e) => handleUnitDetailsChange(e, "height")}
-                />
-                <input
-                  type="text"
-                  className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                  placeholder="Owner Name"
-                  value={
-                    selectedUnit.type === "Commercial"
-                      ? commercialUnits[selectedUnit.index]?.name || ""
-                      : residentialUnits[selectedUnit.index]?.name || ""
-                  }
-                  onChange={(e) => handleUnitDetailsChange(e, "name")}
-                />
-                <input
-                  type="text"
-                  className="border p-2 rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent transition-all"
-                  placeholder="Property Name"
-                  value={
-                    selectedUnit.type === "Commercial"
-                      ? commercialUnits[selectedUnit.index]?.property_name || ""
-                      : residentialUnits[selectedUnit.index]?.property_name || ""
-                  }
-                  onChange={(e) => handleUnitDetailsChange(e, "property_name")}
-                />
-              </div>
-
-              <div className="flex justify-center">
-                <button
-                  onClick={handleSaveFloorData}
-                  className="bg-[#4338CA] text-white px-6 py-3 rounded-xl text-sm w-[15rem] hover:bg-[#4338CA]/90 transition-colors"
-                >
-                  Save & Move to Next Step
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Summary */}
-          <div className="border-t pt-4">
-            <h3 className="text-sm text-[#4338CA] font-bold">Entered Data:</h3>
-            <h4 className="text-sm text-[#4338CA] font-semibold">
-              Total Floor: <span className="font-normal">{floorCount || 0}</span>
-            </h4>
-            <h4 className="text-sm text-[#4338CA] font-semibold">
-              Total Shop/Flat: <span className="font-normal">{plotNo || 0}</span>
-            </h4>
-          </div>
-        </div>
-      </div>
-      {
-        isDataModalVisible &&
-
-        <DataModal
-                isVisible={isDataModalVisible}
-                onClose={handleCloseDataModal}
-                savedFloors={savedFloors}
-                selectedFloor={selectedFloor}
-                onSaveEdit={handleSaveEdit}
-              />
-      }
-
-      
-    </div>
-  )
-}
-
+//       <DataModal
+//         isVisible={isDataModalVisible}
+//         onClose={() => setIsDataModalVisible(false)}
+//         savedFloors={savedFloors}
+//         selectedFloor={selectedFloor}
+//         onSaveEdit={(editedFloor) => {
+//           const newSavedFloors = [...savedFloors]
+//           const index = newSavedFloors.findIndex((floor) => floor.floor === editedFloor.floor)
+//           if (index !== -1) {
+//             newSavedFloors[index] = editedFloor
+//             setSavedFloors(newSavedFloors)
+//           }
+//         }}
+//       />
+//     </>
+//   )
+// }

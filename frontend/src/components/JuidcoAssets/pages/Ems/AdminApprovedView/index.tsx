@@ -61,11 +61,11 @@ interface Unit {
   [key: string]: any;
 }
 
-interface FloorData {
-  floor: string;
-  plotCount: number;
-  units: Record<string, Unit[]>;
-}
+// interface FloorData {
+//   floor: string;
+//   plotCount: number;
+//   units: Record<string, Unit[]>;
+// }
 
 const AdminApprovedView = ({ id }: { id: number }) => {
   const searchParams = useSearchParams();
@@ -378,6 +378,7 @@ const AdminApprovedView = ({ id }: { id: number }) => {
   };
 
   const handleSave = (value: boolean) => {
+    console.log("Save button clicked with value:", value);
     if (buildingName?.length === 0 && floorCount?.length === 0) {
       toast.error("Building Name & Floor Cannot be Empty");
       return false;

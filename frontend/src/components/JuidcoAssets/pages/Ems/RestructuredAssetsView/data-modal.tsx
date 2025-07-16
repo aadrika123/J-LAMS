@@ -1,258 +1,278 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-"use client"
+// "use client"
 
-import { useState } from "react"
-import { X,  } from "lucide-react"
-import Image from "next/image"
-import Input from "@/components/global/atoms/Input"
-import Card from "@mui/material/Card/Card"
-// import CardHeader from "@mui/material/CardHeader/CardHeader"
-// import { Button } from "/components/ui/button"
-// import { Card, CardHeader, CardTitle } from "/components/ui/card"
+// import type React from "react"
 
-interface FloorDetail {
-  type: string
-  length: string
-  breadth: string
-  height: string
-  name: string
-  property_name: string
-  type_of_plot?: string
-  index?: number
-}
+// import { useState } from "react"
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import { Badge } from "@/components/ui/badge"
+// import { ScrollArea } from "@/components/ui/scroll-area"
+// import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+// import { Separator } from "@/components/ui/separator"
+// import { Edit, Save, Building, Ruler } from "lucide-react"
 
-interface Floor {
-  floor: string | number
-  plotCount: number
-  details: FloorDetail[]
-}
+// interface FloorDetail {
+//   type: string
+//   length: string
+//   breadth: string
+//   height: string
+//   name: string
+//   property_name: string
+//   type_of_plot?: string
+//   index?: number
+// }
 
-interface DataModalProps {
-  isVisible: boolean
-  onClose: () => void
-  savedFloors: Floor[]
-  selectedFloor: number | null
-  onSaveEdit: (editedFloor: Floor) => void
-  Home3?: string
-}
+// interface Floor {
+//   floor: string | number
+//   plotCount: number
+//   details: FloorDetail[]
+// }
 
-export default function DataModal({
-  isVisible,
-  onClose,
-  savedFloors,
-  // selectedFloor,
-  onSaveEdit,
-  Home3,
-}: DataModalProps) {
-  const [editedFloorIndex, setEditedFloorIndex] = useState<number | null>(null)
-  const [editedDetails, setEditedDetails] = useState<FloorDetail[]>([])
+// interface DataModalProps {
+//   isVisible: boolean
+//   onClose: () => void
+//   savedFloors: Floor[]
+//   selectedFloor: number | null
+//   onSaveEdit: (editedFloor: Floor) => void
+//   Home3?: string
+// }
 
-  const handleEditFloor = (floor: Floor, index: number) => {
-    setEditedFloorIndex(index)
-    setEditedDetails([...floor.details])
-  }
+// export default function DataModal({ isVisible, onClose, savedFloors, onSaveEdit }: DataModalProps) {
+//   const [editedFloorIndex, setEditedFloorIndex] = useState<number | null>(null)
+//   const [editedDetails, setEditedDetails] = useState<FloorDetail[]>([])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, detailIndex: number, field: keyof FloorDetail) => {
-    const newDetails = [...editedDetails]
-    newDetails[detailIndex] = {
-      ...newDetails[detailIndex],
-      [field]: e.target.value,
-    }
-    setEditedDetails(newDetails)
-  }
+//   const handleEditFloor = (floor: Floor, index: number) => {
+//     setEditedFloorIndex(index)
+//     setEditedDetails([...floor.details])
+//   }
 
-  const handleSave = () => {
-    if (editedFloorIndex === null) return
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, detailIndex: number, field: keyof FloorDetail) => {
+//     const newDetails = [...editedDetails]
+//     newDetails[detailIndex] = {
+//       ...newDetails[detailIndex],
+//       [field]: e.target.value,
+//     }
+//     setEditedDetails(newDetails)
+//   }
 
-    const editedFloor = {
-      ...savedFloors[editedFloorIndex],
-      details: editedDetails,
-    }
+//   const handleSave = () => {
+//     if (editedFloorIndex === null) return
 
-    onSaveEdit(editedFloor)
-    setEditedFloorIndex(null)
-    setEditedDetails([])
-  }
+//     const editedFloor = {
+//       ...savedFloors[editedFloorIndex],
+//       details: editedDetails,
+//     }
 
-  if (!isVisible) return null
+//     onSaveEdit(editedFloor)
+//     setEditedFloorIndex(null)
+//     setEditedDetails([])
+//   }
 
-  console.log("savedFloors",savedFloors)
+//   const getFloorDisplayName = (floor: string | number) => {
+//     return floor === "B" || floor === 0 ? "Basement" : `Floor ${floor}`
+//   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-7xl w-full h-[90vh] shadow-xl">
-        {/* Header */}
-        <div className="flex justify-between items-center border-b pb-4 mb-6">
-          <div className="flex items-center">
-            <Image src={Home3 || "/placeholder.svg"} alt="building" width={40} height={20} />
-            <h3 className="text-2xl font-semibold text-[#4338CA] ml-3">Floor Details</h3>
-          </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-all">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+//   const isUnitComplete = (detail: FloorDetail) => {
+//     return detail.type && detail.length && detail.breadth && detail.height && detail.name && detail.property_name
+//   }
 
-        {/* Content */}
-        <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
-          {savedFloors.map((floor, floorIndex) => (
-            <div key={floorIndex} className="mb-6">
-              <Card className="mb-4 py-4">
-                 <div className="text-xl font-semibold text-[#4338CA]">
-                    Floor {floor.floor} - Plot Count: {floor.plotCount}
-                  </div>
-                  </Card>
-              {/* <Card className="mb-4">
-                <CardHeader>asd
-                  <div className="text-2xl font-semibold text-[#4338CA]">
-                    Floor {floor.floor} - Plot Count: {floor.plotCount}
-                  </div>
-                </CardHeader>
-              </Card>asd */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {floor.details.map((detail, detailIndex) => {
-                  const isEditMode = editedFloorIndex === floorIndex
-                  const isComplete = detail.type && detail.length && detail.breadth && detail.height && detail.name && detail.property_name
+//   if (!isVisible) return null
 
-                  if (isEditMode) {
-                    return (
-                      <div
-                        key={`${floorIndex}-${detailIndex}`}
-                        className="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition-all"
-                      >
-                        <div className="space-y-4">
-                          <h4 className="text-xl font-semibold text-[#4338CA] border-b pb-2">Edit Details</h4>
-                          <div className="space-y-3">
-                            <Input
-                              type="text"
-                              value={editedDetails[detailIndex]?.type || ""}
-                              onChange={(e) => handleInputChange(e, detailIndex, "type")}
-                              placeholder="Type"
-                              className="w-full p-2 border rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent"
-                            />
-                            <div className="bg-white/50 rounded-lg p-3 space-y-2 border-2 border-[#4338CA]/10">
-                              <p className="text-lg font-semibold text-[#4338CA] border-b-2 border-[#4338CA]/30 pb-1">
-                                Dimensions
-                              </p>
-                              <div className="grid grid-cols-3 gap-2">
-                                <Input
-                                  type="number"
-                                  value={editedDetails[detailIndex]?.length || ""}
-                                  onChange={(e) => handleInputChange(e, detailIndex, "length")}
-                                  placeholder="Length"
-                                  className="w-full p-2 border rounded"
-                                />
-                                <Input
-                                  type="number"
-                                  value={editedDetails[detailIndex]?.breadth || ""}
-                                  onChange={(e) => handleInputChange(e, detailIndex, "breadth")}
-                                  placeholder="Breadth"
-                                  className="w-full p-2 border rounded"
-                                />
-                                <Input
-                                  type="number"
-                                  value={editedDetails[detailIndex]?.height || ""}
-                                  onChange={(e) => handleInputChange(e, detailIndex, "height")}
-                                  placeholder="Height"
-                                  className="w-full p-2 border rounded"
-                                />
-                              </div>
-                            </div>
-                            <Input
-                              type="text"
-                              value={editedDetails[detailIndex]?.name || ""}
-                              onChange={(e) => handleInputChange(e, detailIndex, "name")}
-                              placeholder="Name"
-                              className="w-full p-2 border rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent"
-                            />
-                            <Input
-                              type="text"
-                              value={editedDetails[detailIndex]?.property_name || ""}
-                              onChange={(e) => handleInputChange(e, detailIndex, "property_name")}
-                              placeholder="Property Name"
-                              className="w-full p-2 border rounded focus:ring-2 focus:ring-[#4338CA] focus:border-transparent"
-                            />
-                          </div>
-                          <button
-                            onClick={handleSave}
-                            className="w-full bg-[#4338CA] text-white px-4 py-2 rounded-lg hover:bg-[#4338CA]/90 transition-all"
-                          >
-                            Save Changes
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  }
+//   return (
+//     <Dialog open={isVisible} onOpenChange={onClose}>
+//       <DialogContent className="max-w-7xl max-h-[90vh] bg-white text-gray-800">
+//         <DialogHeader>
+//           <DialogTitle className="flex items-center space-x-2">
+//             <Building className="w-5 h-5 text-blue-600" />
+//             <span>Building Floor Details</span>
+//           </DialogTitle>
+//         </DialogHeader>
 
-                  return (
-                    <div
-                      key={`${floorIndex}-${detailIndex}`}
-                      className={`shadow-lg rounded-xl p-6 hover:shadow-xl transition-all ${
-                        isComplete ? 'border-2 border-green-200' : 'border-2 border-yellow-200'
-                      }`}
-                      style={isComplete ? { backgroundColor: '#dcfce7' } : { backgroundColor: '#fef9c3' }}
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
-                          <span className="text-lg font-bold text-[#4338CA]">Type</span>
-                          <span className="text-lg font-semibold">{detail.type}</span>
-                        </div>
+//         <ScrollArea className="h-[70vh] pr-4">
+//           <div className="space-y-8">
+//             {savedFloors.map((floor, floorIndex) => (
+//               <div key={floorIndex} className="space-y-4">
+//                 <Card className="border-2 border-blue-100">
+//                   <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+//                     <CardTitle className="flex items-center justify-between">
+//                       <div className="flex items-center space-x-2">
+//                         <Building className="w-5 h-5 text-blue-600" />
+//                         <span className="text-blue-800">{getFloorDisplayName(floor.floor)}</span>
+//                         <Badge variant="secondary" className="ml-2">
+//                           {floor.plotCount} Units
+//                         </Badge>
+//                       </div>
+//                       <Button
+//                         variant="outline"
+//                         size="sm"
+//                         onClick={() => handleEditFloor(floor, floorIndex)}
+//                         className="flex items-center space-x-1"
+//                         disabled={editedFloorIndex === floorIndex}
+//                       >
+//                         <Edit className="w-3 h-3" />
+//                         <span>Edit Floor</span>
+//                       </Button>
+//                     </CardTitle>
+//                   </CardHeader>
+//                 </Card>
 
-                        <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
-                          <span className="text-lg font-semibold text-[#4338CA]">Plot Type</span>
-                          <span className="text-lg font-semibold">{detail.type_of_plot || "N/A"}</span>
-                        </div>
+//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+//                   {floor.details.map((detail, detailIndex) => {
+//                     const isEditMode = editedFloorIndex === floorIndex
+//                     const isComplete = isUnitComplete(detail)
 
-                        <div className="flex items-center justify-between border-b-2 border-[#4338CA]/30 pb-2">
-                          <span className="text-lg font-semibold text-[#4338CA]">Plot</span>
-                          <span className="text-lg font-semibold">{detail.index || detailIndex + 1}</span>
-                        </div>
+//                     return (
+//                       <Card
+//                         key={`${floorIndex}-${detailIndex}`}
+//                         className={`transition-all duration-200 hover:shadow-lg ${
+//                           isComplete ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"
+//                         } ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+//                       >
+//                         <CardHeader className="pb-3">
+//                           <CardTitle className="flex items-center justify-between text-sm">
+//                             <div className="flex items-center space-x-2">
+//                               <Badge variant={detail.type === "Commercial" ? "default" : "secondary"}>
+//                                 {detail.type}
+//                               </Badge>
+//                               <span className="text-gray-600">Unit {detail.index || detailIndex + 1}</span>
+//                             </div>
+//                             {isComplete && <Badge className="bg-green-500 text-white">Complete</Badge>}
+//                           </CardTitle>
+//                         </CardHeader>
 
-                        <div className="bg-white/50 rounded-lg p-3 space-y-2 border-2 border-[#4338CA]/10">
-                          <p className="text-lg font-semibold text-[#4338CA] border-b-2 border-[#4338CA]/30 pb-1">
-                            Dimensions
-                          </p>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div>
-                              <p className="text-sm text-[#4338CA]">Length</p>
-                              <p className="font-semibold">{detail.length || "Not Provided meters"}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-[#4338CA]">Breadth</p>
-                              <p className="font-semibold">{detail.breadth || "Not Provided meters"}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-[#4338CA]">Height</p>
-                              <p className="font-semibold">{detail.height || "Not Provided meters"}</p>
-                            </div>
-                          </div>
-                        </div>
+//                         <CardContent className="space-y-4">
+//                           {isEditMode ? (
+//                             <div className="space-y-3">
+//                               <div className="space-y-2">
+//                                 <Label className="text-xs font-medium">Type</Label>
+//                                 <Input
+//                                   value={editedDetails[detailIndex]?.type || ""}
+//                                   onChange={(e) => handleInputChange(e, detailIndex, "type")}
+//                                   placeholder="Unit type"
+//                                   className="h-8"
+//                                 />
+//                               </div>
 
-                        <div className="flex items-center justify-between pt-2">
-                          <span className="text-lg font-semibold text-[#4338CA]">Name</span>
-                          <span className="text-lg font-semibold">{detail.name || "Unnamed Unit 1"}</span>
-                        </div>
+//                               <div className="space-y-2">
+//                                 <Label className="text-xs font-medium flex items-center space-x-1">
+//                                   <Ruler className="w-3 h-3" />
+//                                   <span>Dimensions</span>
+//                                 </Label>
+//                                 <div className="grid grid-cols-3 gap-1">
+//                                   <Input
+//                                     value={editedDetails[detailIndex]?.length || ""}
+//                                     onChange={(e) => handleInputChange(e, detailIndex, "length")}
+//                                     placeholder="L"
+//                                     className="h-8 text-xs"
+//                                   />
+//                                   <Input
+//                                     value={editedDetails[detailIndex]?.breadth || ""}
+//                                     onChange={(e) => handleInputChange(e, detailIndex, "breadth")}
+//                                     placeholder="W"
+//                                     className="h-8 text-xs"
+//                                   />
+//                                   <Input
+//                                     value={editedDetails[detailIndex]?.height || ""}
+//                                     onChange={(e) => handleInputChange(e, detailIndex, "height")}
+//                                     placeholder="H"
+//                                     className="h-8 text-xs"
+//                                   />
+//                                 </div>
+//                               </div>
 
-                        <div className="flex items-center justify-between pt-2">
-                          <span className="text-lg font-semibold text-[#4338CA]">Property Name</span>
-                          <span className="text-lg font-semibold">{detail.property_name || "Unknown Property"}</span>
-                        </div>
+//                               <div className="space-y-2">
+//                                 <Label className="text-xs font-medium">Owner Name</Label>
+//                                 <Input
+//                                   value={editedDetails[detailIndex]?.name || ""}
+//                                   onChange={(e) => handleInputChange(e, detailIndex, "name")}
+//                                   placeholder="Owner name"
+//                                   className="h-8"
+//                                 />
+//                               </div>
 
-                        <button
-                          onClick={() => handleEditFloor(floor, floorIndex)}
-                          className="w-full mt-4 bg-[#4338CA] text-white px-4 py-2 rounded-lg hover:bg-[#4338CA]/90 transition-all"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+//                               <div className="space-y-2">
+//                                 <Label className="text-xs font-medium">Property Name</Label>
+//                                 <Input
+//                                   value={editedDetails[detailIndex]?.property_name || ""}
+//                                   onChange={(e) => handleInputChange(e, detailIndex, "property_name")}
+//                                   placeholder="Property name"
+//                                   className="h-8"
+//                                 />
+//                               </div>
+
+//                               <Button onClick={handleSave} size="sm" className="w-full flex items-center space-x-1">
+//                                 <Save className="w-3 h-3" />
+//                                 <span>Save Changes</span>
+//                               </Button>
+//                             </div>
+//                           ) : (
+//                             <div className="space-y-3">
+//                               <div className="space-y-2">
+//                                 <div className="flex justify-between items-center">
+//                                   <Label className="text-xs text-gray-500">Plot Type</Label>
+//                                   <span className="text-sm font-medium">{detail.type_of_plot || "N/A"}</span>
+//                                 </div>
+//                                 <Separator />
+//                               </div>
+
+//                               <div className="bg-white/70 rounded-lg p-3 space-y-2">
+//                                 <Label className="text-xs font-medium text-blue-600 flex items-center space-x-1">
+//                                   <Ruler className="w-3 h-3" />
+//                                   <span>Dimensions (m)</span>
+//                                 </Label>
+//                                 <div className="grid grid-cols-3 gap-2 text-xs">
+//                                   <div className="text-center">
+//                                     <div className="text-gray-500">Length</div>
+//                                     <div className="font-semibold">{detail.length || "N/A"}</div>
+//                                   </div>
+//                                   <div className="text-center">
+//                                     <div className="text-gray-500">Width</div>
+//                                     <div className="font-semibold">{detail.breadth || "N/A"}</div>
+//                                   </div>
+//                                   <div className="text-center">
+//                                     <div className="text-gray-500">Height</div>
+//                                     <div className="font-semibold">{detail.height || "N/A"}</div>
+//                                   </div>
+//                                 </div>
+//                               </div>
+
+//                               <div className="space-y-2">
+//                                 <div className="flex justify-between items-center">
+//                                   <Label className="text-xs text-gray-500">Owner</Label>
+//                                   <span className="text-sm font-medium">{detail.name || "Unnamed"}</span>
+//                                 </div>
+//                                 <Separator />
+//                                 <div className="flex justify-between items-center">
+//                                   <Label className="text-xs text-gray-500">Property</Label>
+//                                   <span className="text-sm font-medium">{detail.property_name || "Unknown"}</span>
+//                                 </div>
+//                               </div>
+//                             </div>
+//                           )}
+//                         </CardContent>
+//                       </Card>
+//                     )
+//                   })}
+//                 </div>
+//               </div>
+//             ))}
+
+//             {savedFloors.length === 0 && (
+//               <Card className="border-2 border-dashed border-gray-300">
+//                 <CardContent className="flex flex-col items-center justify-center py-12">
+//                   <Building className="w-12 h-12 text-gray-400 mb-4" />
+//                   <h3 className="text-lg font-medium text-gray-900 mb-2">No Floor Data</h3>
+//                   <p className="text-gray-500 text-center">
+//                     No floor information has been saved yet. Add floors using the building modal.
+//                   </p>
+//                 </CardContent>
+//               </Card>
+//             )}
+//           </div>
+//         </ScrollArea>
+//       </DialogContent>
+//     </Dialog>
+//   )
+// }
