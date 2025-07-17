@@ -1,14 +1,20 @@
+"use client";
+
 import Approved from "@/components/JuidcoAssets/pages/Ems/Approved/Index";
-// import { DashboardMain } from "@/components/JuidcoAssets/pages/Ems/Dashboard/Index";
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
+import { useRouter } from "next/navigation"
 
-function page() {
+export default function Page() {
+  const router = useRouter()
+
+  const handleAddNewAsset = (assetType: string) => {
+    router.push(`/add-assets/${assetType}`)
+  }
+
   return (
     <PageLayout>
-      <Approved />
+      <Approved onAddNewAsset={handleAddNewAsset} />
     </PageLayout>
-  );
+  )
 }
-
-export default page;
