@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,169 +22,198 @@ import {
   Download,
   Calendar,
   DollarSign,
+  CheckCircle,
+  Clock,
+  X,
+  AlertCircle,
+  Loader2,
 } from "lucide-react"
 import { toast } from "react-hot-toast"
 import AssetTypeSelector from "@/components/Modals/asset-type-selector"
 
 interface Asset {
-  id: string
-  assetId: string
-  type: string
-  subCategory: string
-  location: string
-  wardNo: string
-  status: "Active" | "Draft" | "Under Review" | "Approved"
-  acquisitionDate: string
-  totalCost: number
-  khataNo: string
-  plotNo: string
-  createdDate: string
+  id: number
+  assets_id: string
+  asset_type: string
+  khata_no: string | null
+  plot_no: string | null
+  ward_no: string | null
+  building_name: string | null
+  location: string | null
+  ulb_id: number
+  blue_print: string | null
+  ownership_doc: string | null
+  type_of_land: string | null
+  area: string | null
+  acquired_from: string | null
+  mode_of_acquisition: string | null
+  cost_of_acquisition: number | null
+  ownership_type: string | null
+  survey_no: string | null
+  date_of_acquisition: string | null
+  improvement_done: boolean | null
+  improvement_date: string | null
+  total_cost: number | null
+  current_usage: string | null
+  current_market_value: number | null
+  remarks: string | null
+  contractor_name: string | null
+  road_name: string | null
+  road_type: string | null
+  financial_year: string | null
+  status: number
+  is_drafted: boolean
+  created_at: string
+  updated_at: string
+  floor_data: any[]
+}
+
+interface ApiResponse {
+  status: boolean
+  message: string
+  "meta-data": {
+    apiId: string
+    action: string
+    version: string
+  }
+  data: {
+    totalPages: number
+    count: number
+    status1Items: number
+    statusMinus1Items: number
+    statusPendingAssets: number
+    page: number
+    data: Asset[]
+  }
 }
 
 interface AssetDashboardProps {
   onAddNewAsset: (assetType: string) => void
 }
 
-export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
+export default function AssetDashboard({ onAddNewAsset }: AssetDashboardProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
   const [showAssetTypeModal, setShowAssetTypeModal] = useState(false)
+  const [assets, setAssets] = useState<Asset[]>([])
+  const [loading, setLoading] = useState(true)
+  const [apiData, setApiData] = useState<ApiResponse["data"] | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [count, setCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [itemsPerPage] = useState(10) // You can make this configurable
 
-  // Mock data for assets
-  const mockAssets: Asset[] = [
-    {
-      id: "1",
-      assetId: "AST001",
-      type: "Building",
-      subCategory: "Hospital",
-      location: "Central Market",
-      wardNo: "12",
-      status: "Active",
-      acquisitionDate: "2023-01-15",
-      totalCost: 2500000,
-      khataNo: "KH001",
-      plotNo: "P001",
-      createdDate: "2024-01-15",
-    },
-    {
-      id: "2",
-      assetId: "AST002",
-      type: "Land",
-      subCategory: "Vacant Land",
-      location: "North Zone",
-      wardNo: "8",
-      status: "Draft",
-      acquisitionDate: "2023-03-20",
-      totalCost: 1800000,
-      khataNo: "KH002",
-      plotNo: "P002",
-      createdDate: "2024-01-20",
-    },
-    {
-      id: "3",
-      assetId: "AST003",
-      type: "Public Lighting",
-      subCategory: "Street Lights",
-      location: "Main Road",
-      wardNo: "15",
-      status: "Approved",
-      acquisitionDate: "2023-05-10",
-      totalCost: 450000,
-      khataNo: "KH003",
-      plotNo: "P003",
-      createdDate: "2024-02-01",
-    },
-    {
-      id: "4",
-      assetId: "AST004",
-      type: "Heritage",
-      subCategory: "Monument",
-      location: "City Center",
-      wardNo: "5",
-      status: "Under Review",
-      acquisitionDate: "2023-07-25",
-      totalCost: 3200000,
-      khataNo: "KH004",
-      plotNo: "P004",
-      createdDate: "2024-02-10",
-    },
-    {
-      id: "5",
-      assetId: "AST005",
-      type: "Lakes & Ponds",
-      subCategory: "Public Lake",
-      location: "East Park",
-      wardNo: "22",
-      status: "Active",
-      acquisitionDate: "2023-09-12",
-      totalCost: 1200000,
-      khataNo: "KH005",
-      plotNo: "P005",
-      createdDate: "2024-02-15",
-    },
-    {
-      id: "6",
-      assetId: "AST006",
-      type: "Plant & Machinery",
-      subCategory: "Construction Equipment",
-      location: "Municipal Depot",
-      wardNo: "18",
-      status: "Active",
-      acquisitionDate: "2023-11-08",
-      totalCost: 850000,
-      khataNo: "KH006",
-      plotNo: "P006",
-      createdDate: "2024-02-20",
-    },
-  ]
+  // Fetch assets from API
+  useEffect(() => {
+    fetchAssets(currentPage)
+  }, [currentPage])
+
+  const fetchAssets = async (page = 1) => {
+    try {
+      setLoading(true)
+      const response = await fetch(`https://jharkhandegovernance.com/auth/api/lams/v1/asset/get-all?page=${page}`)
+
+      if (response.ok) {
+        const result: ApiResponse = await response.json()
+        setAssets(result.data.data)
+        setApiData(result.data)
+        setCurrentPage(result.data.page)
+        setTotalPages(result.data.totalPages)
+        setCount(result.data.count)
+        toast.success("Assets loaded successfully")
+      } else {
+        throw new Error("Failed to fetch assets")
+      }
+    } catch (error) {
+      console.error("Error fetching assets:", error)
+      toast.error("Failed to load assets")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const getAssetIcon = (type: string) => {
     switch (type) {
-      case "Building":
+      case "BUILDING":
         return <Building className="h-4 w-4 text-blue-600" />
-      case "Land":
+      case "LAND":
         return <MapPin className="h-4 w-4 text-green-600" />
-      case "Public Lighting":
+      case "PUBLIC_LIGHTING":
         return <Lightbulb className="h-4 w-4 text-yellow-600" />
-      case "Heritage":
+      case "HERITAGE":
         return <Landmark className="h-4 w-4 text-purple-600" />
-      case "Lakes & Ponds":
+      case "LAKES_PONDS":
         return <Waves className="h-4 w-4 text-cyan-600" />
-      case "Plant & Machinery":
+      case "PLANT_MACHINERY":
         return <Cog className="h-4 w-4 text-red-600" />
       default:
         return <Building className="h-4 w-4 text-gray-600" />
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      Active: "bg-green-100 text-green-800 border-green-200",
-      Draft: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      "Under Review": "bg-blue-100 text-blue-800 border-blue-200",
-      Approved: "bg-purple-100 text-purple-800 border-purple-200",
-    }
-    return <Badge className={`${statusConfig[status as keyof typeof statusConfig]} border`}>{status}</Badge>
+const getStatusBadge = (statusValue: number) => {
+  switch (statusValue) {
+    case 2:
+      return (
+        <Badge className="bg-green-500 hover:bg-green-600 text-white h-8 min-w-[180px] justify-center">
+          <CheckCircle className="w-3 h-3 mr-1" />
+          Approved by Admin
+        </Badge>
+      )
+    case 1:
+      return (
+        <Badge className="bg-blue-500 hover:bg-blue-600 text-white h-8 min-w-[180px] justify-center">
+          <CheckCircle className="w-3 h-3 mr-1" />
+          Approved by Field Officer
+        </Badge>
+      )
+    case 0:
+      return (
+        <Badge className="bg-orange-500 hover:bg-orange-600 text-white h-8 min-w-[180px] justify-center">
+          <Clock className="w-3 h-3 mr-1" />
+          Pending
+        </Badge>
+      )
+    case -1:
+      return (
+        <Badge className="bg-red-500 hover:bg-red-600 text-white h-8 min-w-[180px] justify-center">
+          <X className="w-3 h-3 mr-1" />
+          Rejected
+        </Badge>
+      )
+    case 3:
+      return (
+        <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white h-8 min-w-[180px] justify-center">
+          <AlertCircle className="w-3 h-3 mr-1" />
+          Sent back by Field Officer
+        </Badge>
+      )
+    default:
+      return <Badge variant="secondary" className="h-8 min-w-[180px] justify-center">Unknown Status</Badge>
   }
+}
 
-  const filteredAssets = mockAssets.filter((asset) => {
+
+  const filteredAssets = assets.filter((asset) => {
     const matchesSearch =
-      asset.assetId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.khataNo.toLowerCase().includes(searchTerm.toLowerCase())
+      asset.assets_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.asset_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (asset.location && asset.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (asset.khata_no && asset.khata_no.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (asset.building_name && asset.building_name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-    const matchesType = filterType === "all" || asset.type === filterType
-    const matchesStatus = filterStatus === "all" || asset.status === filterStatus
+    const matchesType = filterType === "all" || asset.asset_type === filterType
+    const matchesStatus = filterStatus === "all" || asset.status.toString() === filterStatus
 
     return matchesSearch && matchesType && matchesStatus
   })
 
-  const totalAssets = mockAssets.length
-  const activeAssets = mockAssets.filter((asset) => asset.status === "Active").length
-  const draftAssets = mockAssets.filter((asset) => asset.status === "Draft").length
-  const totalValue = mockAssets.reduce((sum, asset) => sum + asset.totalCost, 0)
+  const totalAssets = assets.length
+  const activeAssets = assets.filter((asset) => asset.status === 2).length
+  const pendingAssets = assets.filter((asset) => asset.status === 0).length
+  const draftAssets = assets.filter((asset) => asset.is_drafted).length
+  const totalValue = assets.reduce((sum, asset) => sum + (asset.total_cost || asset.cost_of_acquisition || 0), 0)
 
   const handleViewAsset = (assetId: string) => {
     toast.success(`Viewing asset ${assetId}`)
@@ -211,6 +240,48 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
     onAddNewAsset(assetType)
   }
 
+  const formatAssetType = (type: string) => {
+    return type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+  }
+
+  const getSubCategory = (asset: Asset) => {
+    if (asset.asset_type === "BUILDING") {
+      return asset.building_name || "Building"
+    } else if (asset.asset_type === "LAND") {
+      return asset.type_of_land || "Land"
+    }
+    return formatAssetType(asset.asset_type)
+  }
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading assets...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -231,11 +302,19 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
                 <span>Export Report</span>
               </Button>
               <Button
+                onClick={() => fetchAssets(currentPage)}
+                variant="outline"
+                className="flex items-center space-x-2 bg-transparent"
+              >
+                <Loader2 className="h-4 w-4" />
+                <span>Refresh</span>
+              </Button>
+              <Button
                 onClick={handleAddNewAssetClick}
                 className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2 text-white"
               >
                 <Plus className="h-4 w-4" />
-                <span className="text-white"> Add New Asset</span>
+                <span className="text-white">Add New Asset</span>
               </Button>
             </div>
           </div>
@@ -252,34 +331,45 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
               <Building className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalAssets}</div>
+              <div className="text-2xl font-bold">{count}</div>
               <p className="text-xs text-muted-foreground">Registered assets</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Assets</CardTitle>
-              <Badge className="bg-green-100 text-green-800 border-green-200 border h-4 w-4 p-0" />
+              <CardTitle className="text-sm font-medium">Approved</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeAssets}</div>
-              <p className="text-xs text-muted-foreground">Currently active</p>
+              <p className="text-xs text-muted-foreground">Admin approved</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <Clock className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{pendingAssets}</div>
+              <p className="text-xs text-muted-foreground">Awaiting review</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Draft Assets</CardTitle>
-              <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 border h-4 w-4 p-0" />
+              <Edit className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{draftAssets}</div>
-              <p className="text-xs text-muted-foreground">Pending completion</p>
+              <p className="text-xs text-muted-foreground">Incomplete</p>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Value</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -288,7 +378,7 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
               <div className="text-2xl font-bold">₹{(totalValue / 10000000).toFixed(1)}Cr</div>
               <p className="text-xs text-muted-foreground">Asset portfolio value</p>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Filters and Search */}
@@ -317,12 +407,12 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Building">Building</SelectItem>
-                  <SelectItem value="Land">Land</SelectItem>
-                  <SelectItem value="Public Lighting">Public Lighting</SelectItem>
-                  <SelectItem value="Heritage">Heritage</SelectItem>
-                  <SelectItem value="Lakes & Ponds">Lakes & Ponds</SelectItem>
-                  <SelectItem value="Plant & Machinery">Plant & Machinery</SelectItem>
+                  <SelectItem value="BUILDING">Building</SelectItem>
+                  <SelectItem value="LAND">Land</SelectItem>
+                  <SelectItem value="PUBLIC_LIGHTING">Public Lighting</SelectItem>
+                  <SelectItem value="HERITAGE">Heritage</SelectItem>
+                  <SelectItem value="LAKES_PONDS">Lakes & Ponds</SelectItem>
+                  <SelectItem value="PLANT_MACHINERY">Plant & Machinery</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -332,10 +422,11 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Under Review">Under Review</SelectItem>
-                  <SelectItem value="Approved">Approved</SelectItem>
+                  <SelectItem value="2">Approved by Admin</SelectItem>
+                  <SelectItem value="1">Approved by Field Officer</SelectItem>
+                  <SelectItem value="0">Pending</SelectItem>
+                  <SelectItem value="-1">Rejected</SelectItem>
+                  <SelectItem value="3">Sent back by Field Officer</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -357,7 +448,9 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Asset Registry ({filteredAssets.length} assets)</span>
+              <span>
+                Asset Registry
+              </span>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <Calendar className="h-4 w-4" />
                 <span>Last updated: {new Date().toLocaleDateString()}</span>
@@ -385,25 +478,32 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
                     <TableRow key={asset.id} className="hover:bg-gray-50">
                       <TableCell className="font-medium">
                         <div className="flex items-center space-x-2">
-                          {getAssetIcon(asset.type)}
-                          <span>{asset.assetId}</span>
+                          {getAssetIcon(asset.asset_type)}
+                          <span>{asset.assets_id}</span>
+                          {asset.is_drafted && (
+                            <Badge variant="outline" className="text-xs">
+                              Draft
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
-                      <TableCell>{asset.type}</TableCell>
-                      <TableCell>{asset.subCategory}</TableCell>
-                      <TableCell>{asset.location}</TableCell>
+                      <TableCell>{formatAssetType(asset.asset_type)}</TableCell>
+                      <TableCell>{getSubCategory(asset)}</TableCell>
+                      <TableCell>{asset.location || asset.road_name || "N/A"}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">Ward {asset.wardNo}</Badge>
+                        {asset.ward_no ? <Badge variant="outline">Ward {asset.ward_no}</Badge> : "N/A"}
                       </TableCell>
                       <TableCell>{getStatusBadge(asset.status)}</TableCell>
-                      <TableCell>{new Date(asset.acquisitionDate).toLocaleDateString()}</TableCell>
-                      <TableCell>₹{asset.totalCost.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {asset.date_of_acquisition ? new Date(asset.date_of_acquisition).toLocaleDateString() : "N/A"}
+                      </TableCell>
+                      <TableCell>₹{(asset.total_cost || asset.cost_of_acquisition || 0).toLocaleString()}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleViewAsset(asset.assetId)}
+                            onClick={() => handleViewAsset(asset.assets_id)}
                             className="h-8 w-8 p-0"
                           >
                             <Eye className="h-4 w-4" />
@@ -411,7 +511,7 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleEditAsset(asset.assetId)}
+                            onClick={() => handleEditAsset(asset.assets_id)}
                             className="h-8 w-8 p-0"
                           >
                             <Edit className="h-4 w-4" />
@@ -424,7 +524,53 @@ export default function Approved({ onAddNewAsset }: AssetDashboardProps) {
               </Table>
             </div>
 
-            {filteredAssets.length === 0 && (
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6">
+                <div className="text-sm text-gray-500">
+                  Showing page {currentPage} of {totalPages} ({apiData?.count || 0} total assets)
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                    Previous
+                  </Button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center space-x-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum
+                      if (totalPages <= 5) {
+                        pageNum = i + 1
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i
+                      } else {
+                        pageNum = currentPage - 2 + i
+                      }
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handlePageChange(pageNum)}
+                          className="w-8 h-8 p-0"
+                        >
+                          {pageNum}
+                        </Button>
+                      )
+                    })}
+                  </div>
+
+                  <Button variant="outline" size="sm" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {filteredAssets.length === 0 && !loading && (
               <div className="text-center py-12">
                 <Building className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No assets found</h3>

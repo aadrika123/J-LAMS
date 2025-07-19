@@ -10,8 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { Building, DollarSign, Save, Send, Plus, Check, Edit3, Eye, X } from "lucide-react"
+import { Building, DollarSign, Save, Send, Plus, Check, Edit3, Eye, X, Upload } from "lucide-react"
 import { toast } from "react-hot-toast"
+import axios from "axios"
+import { ASSETS } from '@/utils/api/urls';
 
 interface Unit {
   index: number
@@ -19,8 +21,8 @@ interface Unit {
   length?: number
   breadth?: number
   height?: number
-  name?: string
-  property_name?: string
+  owner_name?: string
+  property_no?: string
 }
 
 export default function BuildingDetailsForm() {
@@ -37,16 +39,212 @@ export default function BuildingDetailsForm() {
   const [residentialUnits, setResidentialUnits] = useState<Unit[]>([])
   const [selectedUnit, setSelectedUnit] = useState<any>(null)
   const [savedFloors, setSavedFloors] = useState<any[]>([])
-  const [plotNos, setPlotNos] = useState<Array<number | string>>([])
   const [showDataModal, setShowDataModal] = useState(false)
+  const [financialYear, setFinancialYear] = useState("")
+  const [startYear, setStartYear] = useState("")
+  const [endYear, setEndYear] = useState("")
 
-  const handleSaveDraft = () => {
+  // Add these new state variables after the existing ones
+  const [formData, setFormData] = useState({
+    asset_type: "BUILDING",
+    building_name: "",
+    ulb_id: 2,
+    role: "Municipal",
+    head: "",
+    cost_of_acquisition: "",
+    accumulated_depreciation: "",
+    addition_during_year: "",
+    depreciation_for_year: "",
+    wdv_start: "",
+    wdv_end: "",
+    ownership_type: "",
+    date_of_acquisition: "",
+    contractor_name: "",
+    road_name: "",
+    road_type: "",
+    financial_year: "",
+    is_drafted: false,
+    parent_land_id: "",
+  })
+
+  // File Upload States
+  const [blueprintFile, setBlueprintFile] = useState<File | null>(null)
+  const [ownershipFile, setOwnershipFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+const handleFileUpload = async (
+  file: File,
+  endpoint = "https://jharkhandegovernance.com/auth/api/lams/v1/dms/upload-gets"
+) => {
+  if (!file) return null
+
+  const formData = new FormData()
+  formData.append("file", file)
+
+  try {
+    const response = await axios.post(endpoint, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    return response.data?.data || response.data?.filename
+  } catch (error: any) {
+    console.error("File upload error:", error)
+    toast.error("Failed to upload file")
+    return null
+  }
+}
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "blueprint" | "ownership") => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const fileType = file.type
+    const fileSize = file.size
+    const acceptedFileTypes = ["image/png", "image/jpeg", "application/pdf"]
+
+    if (!acceptedFileTypes.includes(fileType)) {
+      toast.error("Please upload a PNG, JPEG, or PDF file.")
+      return
+    }
+
+    if (fileSize / 1024 >= 2048) {
+      toast.error("Cannot upload more than 2MB data!")
+      return
+    }
+
+    if (type === "blueprint") {
+      setBlueprintFile(file)
+    } else {
+      setOwnershipFile(file)
+    }
+  }
+
+const handleSaveDraft = async () => {
+  setIsSubmitting(true)
+  try {
+    // Upload files first
+    let blueprintUrl = null
+    let ownershipUrl = null
+
+    if (blueprintFile) {
+      blueprintUrl = await handleFileUpload(blueprintFile)
+    }
+
+    if (ownershipFile) {
+      ownershipUrl = await handleFileUpload(ownershipFile)
+    }
+
+    // Prepare the payload
+    const payload = {
+      asset_type: "BUILDING",
+      building_name: buildingName,
+      ulb_id: 2,
+      blue_print: blueprintUrl || "blueprint.pdf",
+      ownership_doc: ownershipUrl || "ownership_doc.pdf",
+      role: "Municipal",
+      head: formData.head || "Urban Development",
+      cost_of_acquisition: Number(formData.cost_of_acquisition) || 1200000,
+      accumulated_depreciation: Number(formData.accumulated_depreciation) || 100000,
+      addition_during_year: Number(formData.addition_during_year) || 50000,
+      depreciation_for_year: Number(formData.depreciation_for_year) || 20000,
+      wdv_start: Number(formData.wdv_start) || 1100000,
+      wdv_end: Number(formData.wdv_end) || 1080000,
+      ownership_type: formData.ownership_type || "FREEHOLD",
+      date_of_acquisition: formData.date_of_acquisition,
+      contractor_name: formData.contractor_name,
+      road_name: formData.road_name,
+      road_type: formData.road_type || "EARTHEN",
+      financial_year: financialYear,
+      is_drafted: true,
+      parent_land_id: Number(formData.parent_land_id) || 2,
+      floorData: savedFloors,
+    }
+
+    const response = await axios.post("https://jharkhandegovernance.com/auth/api/lams/v1/asset/create", payload)
+
     toast.success("Building Details form saved as draft")
+    console.log("API Response:", response.data)
+  } catch (error) {
+    console.error("Save draft error:", error)
+    toast.error("Failed to save building as draft")
+  } finally {
+    setIsSubmitting(false)
   }
+}
 
-  const handleSubmitForReview = () => {
+const handleSubmitForReview = async () => {
+  setIsSubmitting(true)
+  try {
+    // Upload files first
+    let blueprintUrl = null
+    let ownershipUrl = null
+
+    if (blueprintFile) {
+      blueprintUrl = await handleFileUpload(blueprintFile)
+    }
+
+    if (ownershipFile) {
+      ownershipUrl = await handleFileUpload(ownershipFile)
+    }
+
+    // Prepare the payload
+    const payload = {
+      asset_type: "BUILDING",
+      building_name: buildingName,
+      ulb_id: 2,
+      blue_print: blueprintUrl || "blueprint.pdf",
+      ownership_doc: ownershipUrl || "ownership_doc.pdf",
+      role: "Municipal",
+      head: "",
+      cost_of_acquisition: Number(formData.cost_of_acquisition) || 1200000,
+      accumulated_depreciation: Number(formData.accumulated_depreciation) || 100000,
+      addition_during_year: Number(formData.addition_during_year) || 50000,
+      depreciation_for_year: Number(formData.depreciation_for_year) || 20000,
+      wdv_start: Number(formData.wdv_start) || 1100000,
+      wdv_end: Number(formData.wdv_end) || 1080000,
+      ownership_type: formData.ownership_type || "FREEHOLD",
+      date_of_acquisition: formData.date_of_acquisition,
+      contractor_name: formData.contractor_name,
+      road_name: formData.road_name,
+      road_type: formData.road_type || "EARTHEN",
+      financial_year: financialYear,
+      is_drafted: false,
+      parent_land_id: Number(formData.parent_land_id) || 2,
+      floorData: savedFloors,
+    }
+
+    const response = await axios.post("https://jharkhandegovernance.com/auth/api/lams/v1/asset/create", payload)
+
     toast.success("Building Details form submitted for review")
+    console.log("API Response:", response.data)
+
+    // Reset form after successful submission
+    setBuildingName("")
+    setFloorCount("")
+    setFloorDisable(false)
+    setSavedFloors([])
+    setBlueprintFile(null)
+    setOwnershipFile(null)
+    setFinancialYear("")
+    setStartYear("")
+    setEndYear("")
+  } catch (error) {
+    console.error("Submit error:", error)
+    toast.error("Failed to submit building for review")
+  } finally {
+    setIsSubmitting(false)
   }
+}
 
   const handleOpenBuildingConfig = () => {
     setShowBuildingConfig(true)
@@ -112,8 +310,8 @@ export default function BuildingDetailsForm() {
         length: 0,
         breadth: 0,
         height: 0,
-        name: "",
-        property_name: "",
+        owner_name: "",
+        property_no: "",
         index: i,
         type: type,
       }))
@@ -133,8 +331,8 @@ export default function BuildingDetailsForm() {
           length: 0,
           breadth: 0,
           height: 0,
-          name: "",
-          property_name: "",
+          owner_name: "",
+          property_no: "",
           index: index,
           type: "Commercial",
         }
@@ -147,8 +345,8 @@ export default function BuildingDetailsForm() {
           length: 0,
           breadth: 0,
           height: 0,
-          name: "",
-          property_name: "",
+           owner_name: "",
+          property_no: "",
           index: index,
           type: "Residential",
         }
@@ -182,11 +380,11 @@ export default function BuildingDetailsForm() {
 
   const processFloorData = () => {
     const allCommercialUnits = commercialUnits.filter(
-      (unit) => unit && unit.length && unit.breadth && unit.height && unit.name && unit.property_name,
+      (unit) => unit && unit.length && unit.breadth && unit.height && unit.owner_name && unit.property_no,
     )
 
     const allResidentialUnits = residentialUnits.filter(
-      (unit) => unit && unit.length && unit.breadth && unit.height && unit.name && unit.property_name,
+      (unit) => unit && unit.length && unit.breadth && unit.height && unit.owner_name && unit.property_no,
     )
 
     const floorName =
@@ -202,8 +400,8 @@ export default function BuildingDetailsForm() {
           length: String(unit.length || "Not Provided"),
           breadth: String(unit.breadth || "Not Provided"),
           height: String(unit.height || "Not Provided"),
-          name: unit.name || `Commercial Unit ${index + 1}`,
-          property_name: unit.property_name || "Unknown Property",
+          owner_name: unit.owner_name || `Commercial Unit ${index + 1}`,
+          property_no: unit.property_no || "Unknown Property",
           type_of_plot: "Commercial",
         })),
         ...allResidentialUnits.map((unit, index) => ({
@@ -212,8 +410,8 @@ export default function BuildingDetailsForm() {
           length: String(unit.length || "Not Provided"),
           breadth: String(unit.breadth || "Not Provided"),
           height: String(unit.height || "Not Provided"),
-          name: unit.name || `Residential Unit ${index + 1}`,
-          property_name: unit.property_name || "Unknown Property",
+          owner_name: unit.owner_name || `Residential Unit ${index + 1}`,
+          property_no: unit.property_no || "Unknown Property",
           type_of_plot: "Residential",
         })),
       ],
@@ -238,8 +436,20 @@ export default function BuildingDetailsForm() {
     toast.success(`Floor Details Saved Successfully - ${floorData[0].details.length} units saved`)
   }
 
+  const handleFinancialYearChange = (value: string) => {
+    setFinancialYear(value)
+    setFormData((prev) => ({
+      ...prev,
+      financial_year: value,
+    }))
+
+    const [start, end] = value.split("-")
+    setStartYear(start)
+    setEndYear(end)
+  }
+
   return (
-    <div className="space-y-8">
+    <div className=" max-h-[110vh] overflow-y-auto pr-2 ">
       <div className="flex items-center space-x-3 mb-6">
         <Building className="h-6 w-6 text-blue-600" />
         <h2 className="text-2xl font-bold text-gray-900">Building Details Registration</h2>
@@ -257,7 +467,7 @@ export default function BuildingDetailsForm() {
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="contractorName">Name of Contractor</Label>
-              <Select>
+              <Select onValueChange={(value) => handleInputChange("contractor_name", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select contractor" />
                 </SelectTrigger>
@@ -271,36 +481,112 @@ export default function BuildingDetailsForm() {
 
             <div className="space-y-2">
               <Label htmlFor="roadName">Road Name / Street *</Label>
-              <Input id="roadName" placeholder="Enter road/street name" />
+              <Input
+                id="roadName"
+                placeholder="Enter road/street name"
+                value={formData.road_name}
+                onChange={(e) => handleInputChange("road_name", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="roadType">Road Type *</Label>
-              <Select>
+              <Select onValueChange={(value) => handleInputChange("road_type", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select road type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="earthen">Earthen</SelectItem>
-                  <SelectItem value="tar">Tar</SelectItem>
-                  <SelectItem value="concrete">Concrete</SelectItem>
+                  <SelectItem value="EARTHEN">Earthen</SelectItem>
+                  <SelectItem value="TAR">Tar</SelectItem>
+                  <SelectItem value="CONCRETE">Concrete</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="head">Head</Label>
-              <Input id="head" placeholder="Enter head" />
+              <Input
+                id="head"
+                placeholder="Enter head"
+                value={formData.head}
+                onChange={(e) => handleInputChange("head", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="acquisitionDate">Date of Acquisition/Construction *</Label>
-              <Input id="acquisitionDate" type="date" />
+              <Input
+                id="acquisitionDate"
+                type="date"
+                value={formData.date_of_acquisition}
+                onChange={(e) => handleInputChange("date_of_acquisition", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="costOfAcquisition">Cost of Acquisition *</Label>
-              <Input id="costOfAcquisition" type="number" placeholder="Enter cost" />
+              <Input
+                id="costOfAcquisition"
+                type="number"
+                placeholder="Enter cost"
+                value={formData.cost_of_acquisition}
+                onChange={(e) => handleInputChange("cost_of_acquisition", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parentLandId">Parent Land Id</Label>
+              <Input
+                id="parentLandId"
+                type="number"
+                placeholder="Enter parent land id"
+                value={formData.parent_land_id}
+                onChange={(e) => handleInputChange("parent_land_id", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="OwnershipType">Ownership Type *</Label>
+              <Select onValueChange={(value) => handleInputChange("ownership_type", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Ownership type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FREEHOLD">Freehold</SelectItem>
+                  <SelectItem value="LEASEHOLD">Leasehold</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Upload className="h-5 w-5 text-green-600" />
+              <span>Document Uploads</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="ownershipDoc">Ownership Document *</Label>
+              <Input
+                id="ownershipDoc"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "ownership")}
+              />
+              {ownershipFile && <p className="text-sm text-green-600 mt-2">✓ {ownershipFile.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="blueprint">Blueprint / Layout Plan</Label>
+              <Input
+                id="blueprint"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "blueprint")}
+              />
+              {blueprintFile && <p className="text-sm text-green-600 mt-2">✓ {blueprintFile.name}</p>}
             </div>
           </CardContent>
         </Card>
@@ -351,7 +637,7 @@ export default function BuildingDetailsForm() {
               <div className="text-center py-8 text-gray-500">
                 <Building className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                 <p>No building configuration set up yet.</p>
-                <p className="text-sm">Click "Configure Building" to set up floors and units.</p>
+                <p className="text-sm">Click &#34;Configure Building&#34; to set up floors and units.</p>
               </div>
             )}
           </CardContent>
@@ -367,41 +653,90 @@ export default function BuildingDetailsForm() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="wdv20240401">WDV as on 01/04/2024</Label>
-              <Input id="wdv20240401" type="number" placeholder="Enter WDV" />
+              <Label htmlFor="financialYear">Financial Year*</Label>
+              <Select onValueChange={handleFinancialYearChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select financial year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2023-2024">2023-2024</SelectItem>
+                  <SelectItem value="2024-2025">2024-2025</SelectItem>
+                  <SelectItem value="2025-2026">2025-2026</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="addition202425">Addition During 2024-25</Label>
-              <Input id="addition202425" type="number" placeholder="Enter addition" />
+              <Label htmlFor="wdvStart">WDV as on start of FY {startYear && `(${startYear}-04-01)`}</Label>
+              <Input
+                id="wdvStart"
+                type="number"
+                placeholder="Enter WDV"
+                value={formData.wdv_start}
+                onChange={(e) => handleInputChange("wdv_start", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="accumulatedDepreciation">Accumulated Depreciation till 2024</Label>
-              <Input id="accumulatedDepreciation" type="number" placeholder="Enter depreciation" />
+              <Label htmlFor="addition">Addition During {financialYear || "____"}</Label>
+              <Input
+                id="addition"
+                type="number"
+                placeholder="Enter addition"
+                value={formData.addition_during_year}
+                onChange={(e) => handleInputChange("addition_during_year", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="depreciation202425">Depreciation 2024-25</Label>
-              <Input id="depreciation202425" type="number" placeholder="Enter depreciation" />
+              <Label htmlFor="accumulatedDepreciation">Accumulated Depreciation till {startYear || "____"}</Label>
+              <Input
+                id="accumulatedDepreciation"
+                type="number"
+                placeholder="Enter depreciation"
+                value={formData.accumulated_depreciation}
+                onChange={(e) => handleInputChange("accumulated_depreciation", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="wdv20250331">WDV as on 31/03/2025</Label>
-              <Input id="wdv20250331" type="number" placeholder="Auto-calculated" disabled className="bg-gray-100" />
+              <Label htmlFor="depreciation">Depreciation in {financialYear || "____"}</Label>
+              <Input
+                id="depreciation"
+                type="number"
+                placeholder="Enter depreciation"
+                value={formData.depreciation_for_year}
+                onChange={(e) => handleInputChange("depreciation_for_year", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="wdvEnd">WDV as on end of FY {endYear && `(${endYear}-03-31)`}</Label>
+              <Input
+                id="wdvEnd"
+                type="number"
+                placeholder="Auto-calculated"
+                value={formData.wdv_end}
+                onChange={(e) => handleInputChange("wdv_end", e.target.value)}
+              />
             </div>
           </CardContent>
         </Card>
 
         {/* Form Actions */}
         <div className="flex items-center justify-end space-x-4 pt-6 border-t">
-          <Button type="button" variant="outline" onClick={handleSaveDraft}>
+          <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSubmitting}>
             <Save className="h-4 w-4 mr-2" />
-            Save Draft
+            {isSubmitting ? "Saving..." : "Save Draft"}
           </Button>
-          <Button type="submit" onClick={handleSubmitForReview} className="bg-blue-600 hover:bg-blue-700">
+          <Button
+            type="submit"
+            onClick={handleSubmitForReview}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={isSubmitting}
+          >
             <Send className="h-4 w-4 mr-2" />
-            Submit for Review
+            {isSubmitting ? "Submitting..." : "Submit for Review"}
           </Button>
         </div>
       </form>
@@ -480,7 +815,11 @@ export default function BuildingDetailsForm() {
                         />
                       </div>
                     </div>
-                    <Button onClick={handleSaveBuildingInfo} disabled={floorDisable} className="w-full md:w-auto">
+                    <Button
+                      onClick={handleSaveBuildingInfo}
+                      disabled={floorDisable}
+                      className="w-full md:w-auto bg-blue-600 hover:bg-blue-700"
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Floors
                     </Button>
@@ -602,7 +941,7 @@ export default function BuildingDetailsForm() {
                                 {generateBoxes(commercialCount).map((num) => {
                                   const unit = commercialUnits[num - 1]
                                   const isComplete =
-                                    unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name
+                                    unit?.length && unit?.breadth && unit?.height && unit?.owner_name && unit?.property_no
 
                                   return (
                                     <Button
@@ -637,7 +976,7 @@ export default function BuildingDetailsForm() {
                                 {generateBoxes(residentialCount).map((num) => {
                                   const unit = residentialUnits[num - 1]
                                   const isComplete =
-                                    unit?.length && unit?.breadth && unit?.height && unit?.name && unit?.property_name
+                                    unit?.length && unit?.breadth && unit?.height && unit?.owner_name && unit?.property_no
 
                                   return (
                                     <Button
@@ -731,28 +1070,28 @@ export default function BuildingDetailsForm() {
                                   placeholder="Owner Name"
                                   value={
                                     selectedUnit.type === "Commercial"
-                                      ? commercialUnits[selectedUnit.index]?.name || ""
-                                      : residentialUnits[selectedUnit.index]?.name || ""
+                                      ? commercialUnits[selectedUnit.index]?.owner_name || ""
+                                      : residentialUnits[selectedUnit.index]?.owner_name || ""
                                   }
-                                  onChange={(e) => handleUnitDetailsChange(e, "name")}
+                                  onChange={(e) => handleUnitDetailsChange(e, "owner_name")}
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label htmlFor="propertyName">Property Name *</Label>
+                                <Label htmlFor="propertyName">Property No*</Label>
                                 <Input
-                                  id="propertyName"
-                                  placeholder="Property Name"
+                                  id="propertyNo"
+                                  placeholder="Property No."
                                   value={
                                     selectedUnit.type === "Commercial"
-                                      ? commercialUnits[selectedUnit.index]?.property_name || ""
-                                      : residentialUnits[selectedUnit.index]?.property_name || ""
+                                      ? commercialUnits[selectedUnit.index]?.property_no || ""
+                                      : residentialUnits[selectedUnit.index]?.property_no || ""
                                   }
-                                  onChange={(e) => handleUnitDetailsChange(e, "property_name")}
+                                  onChange={(e) => handleUnitDetailsChange(e, "property_no")}
                                 />
                               </div>
                             </div>
                             <div className="flex justify-center pt-4">
-                              <Button onClick={handleSaveFloorData} className="px-8 py-3">
+                              <Button onClick={handleSaveFloorData} className="px-8 py-3 bg-blue-600 hover:bg-blue-700">
                                 <Save className="h-4 w-4 mr-2" />
                                 Save & Move to Next Step
                               </Button>
@@ -786,7 +1125,7 @@ export default function BuildingDetailsForm() {
                               <div className="text-2xl font-bold text-purple-600">
                                 {
                                   [...commercialUnits, ...residentialUnits].filter(
-                                    (u) => u?.length && u?.breadth && u?.height && u?.name && u?.property_name,
+                                    (u) => u?.length && u?.breadth && u?.height && u?.owner_name && u?.property_no,
                                   ).length
                                 }
                               </div>
@@ -877,10 +1216,10 @@ export default function BuildingDetailsForm() {
                                     <strong>Height:</strong> {detail.height} m
                                   </p>
                                   <p>
-                                    <strong>Owner:</strong> {detail.name}
+                                    <strong>Owner Name:</strong> {detail.owner_name}
                                   </p>
                                   <p className="col-span-2">
-                                    <strong>Property:</strong> {detail.property_name}
+                                    <strong>Property No. :</strong> {detail.property_no}
                                   </p>
                                 </div>
                               </CardContent>

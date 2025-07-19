@@ -11,118 +11,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model assets_list {
-//   id                      Int                      @id @default(autoincrement())
-//   type_of_assets          String?
-//   asset_sub_category_name String?
-//   assets_category_type    String?
-//   khata_no                String?
-//   plot_no                 String?
-//   ward_no                 String?
-//   address                 String?
-//   depreciation_method     String?
-//   apreciation_method      String?
-//   blue_print              String?
-//   ownership_doc           String?
-//   type_of_land            String?
-//   area                    String?
-//   order_no                String?  @unique
-//   order_date              String?
-//   acquisition             String?
-//   from_whom_acquired      String?
-//   mode_of_acquisition     String?
-//   role                    String?
-//   asset_list              assets_list_change_log[]
-//   asset_fieldOfficer      asset_fieldOfficer_req?
 
-//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
+enum AssetType {
+  LAND
+  BUILDING
+  STATUTES_HERITAGE
+  PUBLIC_LIGHTING
+  LAKE_POND
+  PLANT_MACHINERY
+}
 
-//   created_at DateTime @default(now()) @map("created_at")
-//   updated_at DateTime @updatedAt @map("updated_at")
-// }
+enum OwnershipType {
+  LEASEHOLD
+  FREEHOLD
+}
 
-// model assets_list {
-//   id                      String @id @default(cuid())
-//   type_of_assets          String?
-//   asset_sub_category_name String?
-//   assets_category_type    String?
-//   khata_no                String?
-//   plot_no                 String?
-//   ward_no                 String?
-//   building_name           String?
-//   address                 String?
-//   ulb_id                  Int?  
-//   depreciation_method     String?
-//   location                String?
-//   apreciation_method      String?
-//   blue_print              String?
-//   ownership_doc           String?
-//   type_of_land            String?
-//   area                    String?
-//   order_no                String?                  @unique
-//   order_date              String?
-//   acquisition             String?
-//   from_whom_acquired      String?
-//   mode_of_acquisition     String?
-//   role                    String?
-//   no_of_floors            Int?
-//   asset_list              assets_list_change_log[]
-//   asset_fieldOfficer      asset_fieldOfficer_req?
-//   floorData               floorData[]
-//   // details                 details[]
+enum RoadType {
+  EARTHEN
+  TAR
+  CONCRETE
+}
 
-//   status Int? @default(0) // 0: pending, 1: approved, -1: rejected
-//   is_restructured Boolean @default(false)
-//   is_drafted              Boolean @default(false) 
-//   location_id             Int     @default(2)    // Foreign key to location model
+enum ModeOfAcquisition {
+  ACQUIRED
+  DONATION
+  PURCHASE
+  OTHERS
+}
 
-//   locationRelation        location   @relation(fields: [location_id], references: [id])
-
-
-//   created_at DateTime @default(now()) @map("created_at")
-//   updated_at DateTime @updatedAt @map("updated_at")
-// }
 
 
 model assets_list {
-  id                      Int     @id @default(autoincrement()) // Changed from String to Int with auto-increment
-  assets_id               String  @unique // New field to store the custom asset ID
-  type_of_assets          String?
-  asset_sub_category_name String?
-  assets_category_type    String?
-  khata_no                String?
-  plot_no                 String?
-  ward_no                 String?
-  building_name           String?
-  address                 String?
-  ulb_id                  Int?  
-  depreciation_method     String?
-  location                String?
-  apreciation_method      String?
-  blue_print              String?
-  ownership_doc           String?
-  type_of_land            String?
-  area                    String?
-  order_no                String?                  @unique
-  order_date              String?
-  acquisition             String?
-  from_whom_acquired      String?
-  mode_of_acquisition     String?
-  role                    String?
-  no_of_floors            Int?
-  asset_list              assets_list_change_log[]
-  asset_fieldOfficer      asset_fieldOfficer_req?
-  floorData               floorData[]
+  id                          Int       @id @default(autoincrement())
+  assets_id                   String    @unique
+  asset_type                  AssetType // Enum for LAND, BUILDING, etc.
+  khata_no                    String?
+  plot_no                     String?
+  ward_no                     String?
+  building_name               String?
+  address                     String?
+  ulb_id                      Int?
+  depreciation_method         String?
+  appreciation_method         String?
+  location                    String?
+  blue_print                  String?
+  ownership_doc               String?
+  type_of_land                String?
+  area                        String?
+  order_no                    String?   @unique
+  order_date                  String?
+  acquired_from               String?
+  mode_of_acquisition         ModeOfAcquisition?
+  role                        String?
 
-  status                  Int? @default(0) // 0: pending, 1: approved, -1: rejected
-  is_restructured         Boolean @default(false)
-  is_drafted              Boolean @default(false) 
-  location_id             Int     @default(2)    // Foreign key to location model
+  // Additions from new common asset model
+  head                        String?
+  cost_of_acquisition         Float?
+  accumulated_depreciation    Float?
+  addition_during_year        Float?
+  depreciation_for_year       Float?
+  wdv_start                   Float?
+  wdv_end                     Float?
+  ownership_type              OwnershipType?
+  survey_no                   String?
+  date_of_acquisition         String?
+  improvement_done            Boolean?
+  improvement_date            String?
+  improvement_cost            Float?
+  total_cost                  Float?
+  current_usage               String?
+  title_document_ref          String?
+  current_market_value        Float?
+  remarks                     String?
+  contractor_name             String?
+  road_name                   String?
+  road_type                   RoadType?
+  number_of_lamp_posts        Int?
+  description                 String?
+  make                        String?
+  financial_year              String?
 
-  locationRelation        location   @relation(fields: [location_id], references: [id])
+  parent_land_id              Int? // For hierarchical assets when assets like buildings which are part of a existing land.
+  parent_land                 assets_list? @relation("LandParent", fields: [parent_land_id], references: [id])
+  buildings_on_land           assets_list[] @relation("LandParent")
 
-  created_at              DateTime @default(now()) @map("created_at")
-  updated_at              DateTime @updatedAt @map("updated_at")
+  // Status
+  status                      Int?      @default(0)
+  is_restructured             Boolean   @default(false)
+  is_drafted                  Boolean   @default(false)
+
+  // Relations
+  asset_list_change_logs      assets_list_change_log[]
+  asset_field_officer_req     asset_fieldOfficer_req?
+  floor_data                  floorData[]
+
+  created_at                  DateTime  @default(now()) @map("created_at")
+  updated_at                  DateTime  @updatedAt     @map("updated_at")
 }
 
 
@@ -147,8 +131,8 @@ model details {
   length        String?
   breadth       String?
   height        String?
-  name          String?
-  property_name String?
+  property_no   String?
+  owner_name    String?
   type_of_plot  String?
   floorData     floorData @relation(fields: [floorDataId], references: [id], onDelete: Cascade)
   floorDataId   Int
@@ -243,7 +227,6 @@ model location {
   building_name String? // Added building_name field
   address      String?  // Added address field
   is_active    Boolean?
-  assets       assets_list[] // Back-reference to assets_list
   created_at   DateTime @db.Timestamp
   updated_at   DateTime @db.Timestamp
 }
